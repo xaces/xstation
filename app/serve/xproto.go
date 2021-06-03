@@ -70,6 +70,7 @@ func statusToModel(st *xproto.Status) (o models.XStatus) {
 	o.Gps = internal.ToJString(st.Location)
 	o.Tempers = internal.ToJString(st.Tempers)
 	o.Humiditys = internal.ToJString(st.Humiditys)
+	o.Mileage = internal.ToJString(st.Mileage)
 	o.Oils = internal.ToJString(st.Oils)
 	o.Module = internal.ToJString(st.Module)
 	o.Gsensor = internal.ToJString(st.Gsensor)
