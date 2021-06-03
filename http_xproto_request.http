@@ -1,0 +1,266 @@
+### 录像查询
+POST http://127.0.0.1:12100/xstation/api/dvr/query?deviceId=20198002
+Content-Type: application/json
+
+{
+    "startTime": "2021-05-25 00:00:00",
+    "endTime": "2021-05-25 23:59:59",
+    "channelList": "1",
+    "fileType": 1
+}
+
+### 实时流请求
+// streamType 0 子码流 1 主码流
+POST http://127.0.0.1:12100/xstation/api/dvr/liveStream?deviceId=20198002
+Content-Type: application/json
+
+{
+    "server": "172.16.50.219:33000",
+    "session": "live_20198002_01_00",
+    "channel": 1,
+    "streamType": 0,
+    "on": 1
+}
+
+
+### 远程回放
+// fileName 设备文件名
+POST http://127.0.0.1:12100/xstation/api/dvr/playback?deviceId=20198002
+Content-Type: application/json
+
+{
+    "server": "172.16.50.219:33000",
+    "name": "T/0000_039f0000_6_1621900800_1621900817_0_8034540.avi"
+}
+
+
+### 远程回放
+// 按时间段回放
+POST http://127.0.0.1:12100/xstation/api/dvr/playback?deviceId=20198002
+Content-Type: application/json
+
+{
+    "server": "172.16.50.219:22000",
+    "startTime": "2021-01-06 10:00:00",
+    "endTime": "2021-01-06 10:05:00",
+    "channels": "1;2"
+}
+
+
+### 参数设置
+
+POST http://127.0.0.1:12100/xstation/api/dvr/parameters?deviceId=20198002
+Content-Type: application/json
+
+{
+    "RSBASE": {
+      "rs0": {
+        "baudrate": "115200",
+        "databit": "8",
+        "func": "15",
+        "parity": "2",
+        "stopbit": "1"
+      },
+      "rs1": {
+        "baudrate": "9600",
+        "databit": "8",
+        "func": "0",
+        "parity": "2",
+        "stopbit": "1"
+      },
+      "rs2": {
+        "baudrate": "2400",
+        "databit": "8",
+        "func": "2",
+        "parity": "2",
+        "stopbit": "1"
+      },
+      "rs3": {
+        "baudrate": "115200",
+        "databit": "5",
+        "func": "0",
+        "parity": "3",
+        "stopbit": "1"
+      },
+      "rs4": {
+        "baudrate": "9600",
+        "databit": "8",
+        "func": "1",
+        "parity": "1",
+        "stopbit": "0"
+      },
+      "rs5": {
+        "baudrate": "11520",
+        "databit": "8",
+        "func": "1",
+        "parity": "2",
+        "stopbit": "1"
+      },
+      "rs6": {
+        "baudrate": "11520",
+        "databit": "8",
+        "func": "1",
+        "parity": "0",
+        "stopbit": "1"
+      },
+      "rs7": {
+        "baudrate": "11520",
+        "databit": "8",
+        "func": "1",
+        "parity": "0",
+        "stopbit": "1"
+      }
+    }
+}
+
+### 参数获取
+
+POST http://127.0.0.1:12100/xstation/api/dvr/parameters?deviceId=4104v2
+Content-Type: application/json
+
+{
+    "JTBASE":"",
+    "MOD": "AIBox"
+}
+
+### UserDefineHowen 参数获取
+// act: 1
+POST http://127.0.0.1:12100/xstation/api/dvr/parameters?deviceId=20198002
+Content-Type: application/json
+
+{
+    "UserDefineHowen": {
+        "act": 1,
+        "type": 253
+    }
+}
+
+### UserDefineHowen 参数设置
+// act: 0
+
+POST http://127.0.0.1:12100/xstation/api/dvr/parameters?deviceId=20198002
+Content-Type: application/json
+
+{
+    "UserDefineHowen": {
+        "act": 0,
+        "type": 300,
+        "data": {
+          "channels": 3,
+          "interval": 60,
+          "res": 0
+        }
+    }
+}
+
+### GpsAngle 参数获取
+// act: 1
+POST http://127.0.0.1:12100/xstation/api/dvr/parameters?deviceId=20198002
+Content-Type: application/json
+
+{
+    "gpsAngleConfig": {
+        "act": 0,
+        "dg": 3000,
+        "on": 1
+    }
+}
+
+### GpsAngle 参数设置
+// act: 1
+POST http://127.0.0.1:12100/xstation/api/dvr/parameters?deviceId=20198002
+Content-Type: application/json
+
+{
+    "gpsAngleConfig": {
+        "act": 1
+    }
+}
+
+### 设备控制
+
+POST http://127.0.0.1:12100/xstation/api/dvr/control?deviceId=20198002
+Content-Type: application/json
+
+{
+
+}
+
+### ftp文件传输
+
+POST http://127.0.0.1:12100/xstation/api/dvr/ftpTransfer?deviceId=20198002
+Content-Type: application/json
+
+{
+    "ftpUrl": "ftp://don:123456@172.16.50.219:21",
+    "fileSrc": "HW3521V2-V18092801-V210513T0.105.sw",
+    "fileDst": "",
+    "action": 1,
+    "fileType": 5
+}
+
+### file文件传输
+
+POST http://127.0.0.1:12100/xstation/api/dvr/fileTransfer?deviceId=20198002
+Content-Type: application/json
+
+{
+    "fileName": "/mnt/sd2/picture/Pic20210518153224157A02.jpg",
+    "fileType": 4,
+    "action": 0,
+    "server": "172.16.50.219:33000",
+    "fileSize": 0,
+    "offset": 0
+}
+
+
+### file文件传输
+
+POST http://127.0.0.1:12100/xstation/api/dvr/fileTransfer?deviceId=20198002
+Content-Type: application/json
+
+{
+    "fileName": "HW3521V2-V18092801-V210525T0.105.sw",
+    "fileType": 5,
+    "action": 1,
+    "server": "172.16.50.219:33000",
+    "fileSize": 13013937,
+    "offset": 0
+}
+
+
+### 串口透传设置, 应答的session用于透传数据, 设置为"", 系统会自动生成并返回。
+
+POST http://127.0.0.1:12100/xstation/api/dvr/serial/transparent?deviceId=20198002
+Content-Type: application/json
+
+{
+    "session": "20ffc9c7-9c67-4c1f-8f93-5dcd15ba2395",
+    "port": 1,
+    "baudRate": 15200,
+    "dataBit": 8,
+    "checkBit": 0,
+    "stopBit": 1
+}
+
+### 透传数据
+# type:1 字符串 如 abcdefg
+# type:2 Hex   031F269D
+
+POST http://127.0.0.1:12100/xstation/api/dvr/serial/transfer?deviceId=20198002&session=ca03fffb-0310-4cc1-8191-e4aae455b7f8
+Content-Type: application/json
+
+{
+    "type": 2,
+    "data": "031F269D"
+}
+
+
+### 关闭链接, session存在关闭媒体链路。不存在关闭信令链路
+
+POST http://127.0.0.1:12100/xstation/api/dvr/close?deviceId=20198002&session=live_20198002_01_00
+Content-Type: application/json
+
+{
+   
+}

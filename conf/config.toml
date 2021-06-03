@@ -1,0 +1,16 @@
+### Serve Port
+[Port]
+Api=12100
+Rpc=12110
+Access=33000
+
+### 上级服务地址
+[Superior]
+Address="http://localhost:8080"
+
+### SQL
+[SQL]
+Name="mysql"
+Address="root:123456@tcp(127.0.0.1:3306)/station?charset=utf8&parseTime=True&loc=Local" # Name="mysql"
+LiteDB="xstation.db" # Name="sqlite3"
+Postgre="user=postgres password=123456 dbname=xstation port=5432 sslmode=disable TimeZone=Asia/Shanghai" # Name="postgresql"

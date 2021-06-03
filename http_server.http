@@ -1,0 +1,65 @@
+### 服务授权
+
+POST http://127.0.0.1:12100/xstation/serve/applyAuth
+Content-Type: application/json
+
+{
+    "identity": "EoxNZSJjfJxpxwj7q9SWED",
+    "username": "admin",
+    "password": "admin"
+}
+
+
+### 获取已添加服务列表
+
+GET http://127.0.0.1:12100/xstation/api/serve/list
+Content-Type: application/json
+
+{
+
+}
+
+
+
+### 获取已添加服务状态
+
+GET http://127.0.0.1:12100/xstation/api/serve/status/list
+Content-Type: application/json
+
+{
+
+}
+
+
+### 添加新服务
+
+POST http://127.0.0.1:12100/xstation/api/serve
+Content-Type: application/json
+
+{
+    "name": "other",
+    "port": 13100,
+    "accessPort": 13120,
+    "rpcPort": 13110,
+    "status": 1
+}
+
+### 获取服务
+
+GET http://127.0.0.1:12100/xstation/api/serve/get/92Wub04vsFyOmWISSnwl6T
+Content-Type: application/json
+
+{
+
+}
+
+
+### 修改服务状态
+
+PUT http://127.0.0.1:12100/xstation/api/serve/status
+Content-Type: application/json
+
+{
+    "guid": "92Wub04vsFyOmWISSnwl6T",
+    "status": 1
+}
