@@ -6,6 +6,7 @@ import (
 	"log"
 	"xstation/pkg"
 	"xstation/pkg/rpc"
+	"xstation/service"
 
 	"github.com/smallnest/rpcx/server"
 	"github.com/wlgd/xproto"
@@ -35,7 +36,7 @@ func (t *Arith) XLinkRegister(cxt context.Context, args *rpc.XLinkRegister, repl
 	if !ok {
 		return pkg.ErrParameter
 	}
-	return updateAccessFlow(&link)
+	return service.NewXData().DbUpdateAccess(&link)
 }
 
 var (

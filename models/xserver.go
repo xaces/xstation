@@ -32,5 +32,5 @@ type XServer struct {
 
 // TableName 表名
 func (s *XServer) TableName() string {
-	return "xserver"
+	return "t_xserver"
 }
