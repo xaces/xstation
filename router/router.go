@@ -7,6 +7,8 @@ import (
 	"xstation/app/api/dvr"
 	"xstation/app/api/server"
 
+	"xstation/app/api/device"
+
 	"github.com/gin-gonic/gin"
 )
 
@@ -34,6 +36,16 @@ func xprotoRouter(r *gin.RouterGroup) {
 	p.POST("/close", dvr.CloseLinkHandler)
 }
 
+// deiveRouter 设备路由
+func deiveRouter(r *gin.RouterGroup) {
+	s := device.Device{}
+	r.GET("/device/list", s.ListHandler)
+	r.GET("/device/get/:id", s.GetHandler)
+	r.POST("/device", s.AddHandler)
+	r.PUT("/device", s.UpdateHandler)
+	r.DELETE("/device/:id", s.DeleteHandler)
+}
+
 func newApp() *gin.Engine {
 	r := gin.Default()
 	gin.SetMode(gin.ReleaseMode)
@@ -45,6 +57,7 @@ func newApp() *gin.Engine {
 	api := root.Group("/api")
 	serverRouter(api)
 	xprotoRouter(api)
+	deiveRouter(api)
 	return r
 }
 
