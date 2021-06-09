@@ -17,6 +17,10 @@ func initTables(db *gorm.DB) {
 	db.AutoMigrate(
 		&models.XServer{},
 		&models.XStatus{},
+		&models.XStatus1{},
+		&models.XStatus2{},
+		&models.XStatus3{},
+		&models.XStatus4{},
 		&models.XDevice{},
 		&models.XOFLine{},
 		&models.XAlarm{},

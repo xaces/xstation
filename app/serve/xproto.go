@@ -3,6 +3,7 @@ package serve
 import (
 	"log"
 	"time"
+	"xstation/internal"
 	"xstation/models"
 	"xstation/service"
 
@@ -30,6 +31,11 @@ func NewXNotify() *XNotify {
 // AccessHandler 设备接入
 func (o *XNotify) AccessHandler(data string, access *xproto.LinkAccess) error {
 	log.Printf("%s\n", data)
+	if access.LinkType == xproto.LINK_Signal {
+		if getDeivce(access.DeviceId) == nil {
+			return xproto.ErrInvalidDevice
+		}
+	}
 	if access.LinkType == xproto.LINK_FileTransfer {
 		if err := xproto.UploadFile(access, true); err != nil {
 			return err
@@ -38,10 +44,40 @@ func (o *XNotify) AccessHandler(data string, access *xproto.LinkAccess) error {
 	return o.Service.DbUpdateAccess(access)
 }
 
+// ToStatusModel 转化成Model数据格式
+func ToStatusModel(st *xproto.Status) (o models.XStatus) {
+	dev := getDeivce(st.DeviceId)
+	if dev == nil {
+		return
+	}
+	o.Id = service.PrimaryKey()
+	o.DeviceId = st.DeviceId
+	o.DTU = st.DTU
+	o.Status = st.Status
+	if st.Location.Speed < 1 {
+		st.Location.Speed = 0
+	}
+	o.Gps = internal.ToJString(st.Location)
+	o.Tempers = internal.ToJString(st.Tempers)
+	o.Humiditys = internal.ToJString(st.Humiditys)
+	o.Mileage = internal.ToJString(st.Mileage)
+	o.Oils = internal.ToJString(st.Oils)
+	o.Module = internal.ToJString(st.Module)
+	o.Gsensor = internal.ToJString(st.Gsensor)
+	o.Mobile = internal.ToJString(st.Mobile)
+	o.Disks = internal.ToJString(st.Disks)
+	o.People = internal.ToJString(st.People)
+	o.TableIdx = int(dev.Id % models.KXStatusTabNumber)
+	return
+}
+
 // StatusHandler 接收状态数据
 func (o *XNotify) StatusHandler(tag string, xst *xproto.Status) {
 	xproto.LogStatus(tag, xst)
-	st := o.Service.ToStatusModel(xst)
+	st := ToStatusModel(xst)
+	if st.Id <= 0 {
+		return
+	}
 	o.Status <- st
 }
 
@@ -50,7 +86,10 @@ func (o *XNotify) AlarmHandler(tag, data string, xalr *xproto.Alarm) {
 	xproto.LogAlarm(tag, data, xalr)
 	status := xalr.Status.Status
 	xalr.Status.Status = 2
-	st := o.Service.ToStatusModel(xalr.Status)
+	st := ToStatusModel(xalr.Status)
+	if st.Id <= 0 {
+		return
+	}
 	o.Status <- st
 	xalr.Status.Status = status
 	o.Service.DbCreateAlarm(st.Id, xalr)
@@ -58,15 +97,22 @@ func (o *XNotify) AlarmHandler(tag, data string, xalr *xproto.Alarm) {
 
 // DbStatusHandler 批量处理数据
 func (o *XNotify) DbStatusHandler() {
-	var stArray []models.XStatus
+	var stArray [models.KXStatusTabNumber][]models.XStatus
 	ticker := time.NewTicker(time.Second * 1)
 	for {
 		select {
 		case d := <-o.Status:
-			stArray = append(stArray, d)
+			tabIdx := d.TableIdx
+			stArray[tabIdx] = append(stArray[tabIdx], d)
 		case <-ticker.C:
-			o.Service.DbCreateStatus(stArray)
-			stArray = stArray[:0]
+			for i := 0; i < models.KXStatusTabNumber; i++ {
+				size := len(stArray[i])
+				if size <= 0 {
+					continue
+				}
+				o.Service.DbCreateStatus(i, stArray[i], size)
+				stArray[i] = stArray[i][:0]
+			}
 		}
 	}
 }

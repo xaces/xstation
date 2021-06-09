@@ -18,9 +18,42 @@ type XStatus struct {
 	Mobile    string `json:"mobile" gorm:"type:varchar(64);"`   // 移动网络 json 字符串
 	Disks     string `json:"disks" gorm:"type:varchar(128);"`   // 磁盘 json 字符串
 	People    string `json:"people" gorm:"type:varchar(32);"`   // 人数统计 json 字符串
+	TableIdx  int    `gorm:"-"`
 }
 
 // TableName 表名
 func (s *XStatus) TableName() string {
-	return "t_xstatus"
+	return "t_xstatus0"
 }
+
+type XStatus1 XStatus
+
+// TableName 表名
+func (s *XStatus1) TableName() string {
+	return "t_xstatus1"
+}
+
+type XStatus2 XStatus
+
+// TableName 表名
+func (s *XStatus2) TableName() string {
+	return "t_xstatus2"
+}
+
+type XStatus3 XStatus
+
+// TableName 表名
+func (s *XStatus3) TableName() string {
+	return "t_xstatus3"
+}
+
+type XStatus4 XStatus
+
+// TableName 表名
+func (s *XStatus4) TableName() string {
+	return "t_xstatus4"
+}
+
+const (
+	KXStatusTabNumber = 5
+)

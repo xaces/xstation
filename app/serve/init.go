@@ -67,7 +67,8 @@ func Run() error {
 	configs.LocalId = s.Guid
 	configs.LocalIpAddr = s.Address
 	dbLoadOtherServe()
-
+	// 加载设备信息
+	loadAllDevices()
 	// 初始化rpc
 	go rpcxStart(s.RpcPort)
 	go xprotoStart(s.AccessPort)
