@@ -3,7 +3,6 @@ package serve
 import (
 	"log"
 	"time"
-	"xstation/internal"
 	"xstation/models"
 	"xstation/service"
 
@@ -52,21 +51,23 @@ func ToStatusModel(st *xproto.Status) (o models.XStatus) {
 	}
 	o.Id = service.PrimaryKey()
 	o.DeviceId = dev.Id
+	o.DeviceNo = st.DeviceId
 	o.DTU = st.DTU
 	o.Status = st.Status
 	if st.Location.Speed < 1 {
 		st.Location.Speed = 0
 	}
-	o.Gps = internal.ToJString(st.Location)
-	o.Tempers = internal.ToJString(st.Tempers)
-	o.Humiditys = internal.ToJString(st.Humiditys)
-	o.Mileage = internal.ToJString(st.Mileage)
-	o.Oils = internal.ToJString(st.Oils)
-	o.Module = internal.ToJString(st.Module)
-	o.Gsensor = internal.ToJString(st.Gsensor)
-	o.Mobile = internal.ToJString(st.Mobile)
-	o.Disks = internal.ToJString(st.Disks)
-	o.People = internal.ToJString(st.People)
+	o.Acc = st.Acc
+	o.Gps = models.JGps(st.Location)
+	o.Tempers = models.JFloats(st.Tempers)
+	o.Humiditys = models.JFloats(st.Humiditys)
+	o.Mileage = models.JMileage(st.Mileage)
+	o.Oils = models.JOil(st.Oils)
+	o.Module = models.JModule(st.Module)
+	o.Gsensor = models.JGsensor(st.Gsensor)
+	o.Mobile = models.JMobile(st.Mobile)
+	o.Disks = models.JDisks(st.Disks)
+	o.People = models.JPeople(st.People)
 	o.TableIdx = int(dev.Id) % models.KXStatusTabNumber
 	return
 }

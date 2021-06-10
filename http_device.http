@@ -1,0 +1,26 @@
+### 添加设备
+POST http://127.0.0.1:12100/xstation/api/device
+Content-Type: application/json
+
+{
+    "vehiNo": "20190001",
+    "VehiName": "模拟器",
+    "Icons": ""
+}
+
+
+### 获取设备状态数据
+GET http://127.0.0.1:12100/xstation/api/device/status/list?deviceId=1&startTime=2021-06-10 00:00:00&endTime=2021-06-10 14:55:59&descs=dtu
+Content-Type: application/json
+
+{
+
+}
+
+### 获取设备指定id状态数据
+GET http://127.0.0.1:12100/xstation/api/device/status?deviceId=1&statusId=409377188543983616
+Content-Type: application/json
+
+{
+
+}

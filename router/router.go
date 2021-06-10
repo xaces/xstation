@@ -23,7 +23,7 @@ func serverRouter(r *gin.RouterGroup) {
 	r.GET("/serve/status/list", s.StatusListHandler) // 获取子服务状态
 }
 
-// xprotoRouter 设备路由
+// xprotoRouter 路由
 func xprotoRouter(r *gin.RouterGroup) {
 	p := r.Group("/dvr")
 	p.POST("/liveStream", dvr.LiveStreamHandler)
@@ -44,6 +44,10 @@ func deiveRouter(r *gin.RouterGroup) {
 	r.POST("/device", s.AddHandler)
 	r.PUT("/device", s.UpdateHandler)
 	r.DELETE("/device/:id", s.DeleteHandler)
+
+	st := device.Status{}
+	r.GET("/device/status/list", st.ListHandler)
+	r.GET("/device/status", st.GetHandler)
 }
 
 func newApp() *gin.Engine {

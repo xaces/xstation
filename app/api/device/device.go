@@ -14,8 +14,21 @@ import (
 type Device struct {
 }
 
+type devicePage struct {
+	page.Page
+	StartTime string `json:"startTime"`
+	EndTime   string `json:"endTime"`
+}
+
+// Where 初始化
+func (s *devicePage) Where() (where *orm.DbWhere) {
+	where.Append("created_time >= ?", s.StartTime)
+	where.Append("created_time <= ?", s.EndTime)
+	return where
+}
+
 func (o *Device) ListHandler(c *gin.Context) {
-	var param page.Page
+	var param devicePage
 	if err := c.ShouldBind(&param); err != nil {
 		ctx.JSONWriteError(err, c)
 		return

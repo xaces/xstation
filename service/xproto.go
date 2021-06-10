@@ -79,3 +79,20 @@ func (x *XData) DbCreateStatus(tabIdx int, stArray []models.XStatus, size int) e
 	}()
 	return nil
 }
+
+// GetXStatusModel 获取model模型
+func GetXStatusModel(devId uint64) interface{} {
+	tabIdx := int(devId) % models.KXStatusTabNumber
+	switch tabIdx {
+	case 1:
+		return &models.XStatus1{}
+	case 2:
+		return &models.XStatus2{}
+	case 3:
+		return &models.XStatus3{}
+	case 4:
+		return &models.XStatus4{}
+	default:
+	}
+	return &models.XStatus{}
+}
