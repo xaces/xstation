@@ -11,10 +11,11 @@ type configure struct {
 		Rpc    uint16
 	}
 	SQL struct {
-		Name    string
-		Address string
-		LiteDB  string
-		Postgre string
+		Name       string
+		Address    string
+		LiteDB     string
+		Postgre    string
+		StTableNum int
 	}
 	Superior struct {
 		Address string

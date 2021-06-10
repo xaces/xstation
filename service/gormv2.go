@@ -16,15 +16,27 @@ import (
 func initTables(db *gorm.DB) {
 	db.AutoMigrate(
 		&models.XServer{},
-		&models.XStatus{},
-		&models.XStatus1{},
-		&models.XStatus2{},
-		&models.XStatus3{},
-		&models.XStatus4{},
 		&models.XDevice{},
 		&models.XOFLine{},
 		&models.XAlarm{},
+		&models.XStatus{},
 	)
+	models.KXStatusTabNumber = configs.Default.SQL.StTableNum
+	if models.KXStatusTabNumber > 5 {
+		models.KXStatusTabNumber = 5
+	}
+	if models.KXStatusTabNumber > 1 {
+		db.AutoMigrate(&models.XStatus1{})
+	}
+	if models.KXStatusTabNumber > 2 {
+		db.AutoMigrate(&models.XStatus2{})
+	}
+	if models.KXStatusTabNumber > 3 {
+		db.AutoMigrate(&models.XStatus3{})
+	}
+	if models.KXStatusTabNumber > 4 {
+		db.AutoMigrate(&models.XStatus4{})
+	}
 	orm.SetDB(db)
 }
 

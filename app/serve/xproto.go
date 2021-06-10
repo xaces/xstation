@@ -32,7 +32,7 @@ func NewXNotify() *XNotify {
 func (o *XNotify) AccessHandler(data string, access *xproto.LinkAccess) error {
 	log.Printf("%s\n", data)
 	if access.LinkType == xproto.LINK_Signal {
-		if getDeivce(access.DeviceId) == nil {
+		if DefaultDevsManager.Get(access.DeviceId) == nil {
 			return xproto.ErrInvalidDevice
 		}
 	}
@@ -46,12 +46,12 @@ func (o *XNotify) AccessHandler(data string, access *xproto.LinkAccess) error {
 
 // ToStatusModel 转化成Model数据格式
 func ToStatusModel(st *xproto.Status) (o models.XStatus) {
-	dev := getDeivce(st.DeviceId)
+	dev := DefaultDevsManager.Get(st.DeviceId)
 	if dev == nil {
 		return
 	}
 	o.Id = service.PrimaryKey()
-	o.DeviceId = st.DeviceId
+	o.DeviceId = dev.Id
 	o.DTU = st.DTU
 	o.Status = st.Status
 	if st.Location.Speed < 1 {
@@ -67,7 +67,7 @@ func ToStatusModel(st *xproto.Status) (o models.XStatus) {
 	o.Mobile = internal.ToJString(st.Mobile)
 	o.Disks = internal.ToJString(st.Disks)
 	o.People = internal.ToJString(st.People)
-	o.TableIdx = int(dev.Id % models.KXStatusTabNumber)
+	o.TableIdx = int(dev.Id) % models.KXStatusTabNumber
 	return
 }
 
@@ -97,7 +97,7 @@ func (o *XNotify) AlarmHandler(tag, data string, xalr *xproto.Alarm) {
 
 // DbStatusHandler 批量处理数据
 func (o *XNotify) DbStatusHandler() {
-	var stArray [models.KXStatusTabNumber][]models.XStatus
+	stArray := make([][]models.XStatus, models.KXStatusTabNumber)
 	ticker := time.NewTicker(time.Second * 1)
 	for {
 		select {

@@ -8,6 +8,7 @@ type XDeviceOpt struct {
 
 type XDevice struct {
 	Model
+	Guid string `json:"guid"`
 	XDeviceOpt
 }
 

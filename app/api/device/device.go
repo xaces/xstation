@@ -2,6 +2,7 @@ package device
 
 import (
 	"xstation/app/api/page"
+	"xstation/app/serve"
 	"xstation/internal"
 	"xstation/models"
 	"xstation/pkg/ctx"
@@ -44,7 +45,6 @@ func (o *Device) GetHandler(c *gin.Context) {
 		return
 	}
 	ctx.JSONOk().WriteData(gin.H{"data": data}, c)
-	return
 }
 
 // AddHandler 新增
@@ -55,10 +55,12 @@ func (o *Device) AddHandler(c *gin.Context) {
 		ctx.JSONWriteError(err, c)
 		return
 	}
+	data.Guid = internal.UUID()
 	if err := orm.DbCreate(&data); err != nil {
 		ctx.JSONWriteError(err, c)
 		return
 	}
+	serve.DefaultDevsManager.Add(&data)
 	ctx.JSONOk().WriteTo(c)
 }
 
@@ -85,9 +87,17 @@ func (o *Device) DeleteHandler(c *gin.Context) {
 		return
 	}
 	ids := internal.StringToIntSlice(idstr, ",")
+	var devs []models.XDevice
+	if _, err := orm.DbFindBy(&devs, "id in (?)", ids); err != nil {
+		ctx.JSONWriteError(err, c)
+		return
+	}
 	if err := orm.DbDeletes(models.XDevice{}, ids); err != nil {
 		ctx.JSONWriteError(err, c)
 		return
+	}
+	for _, dev := range devs {
+		serve.DefaultDevsManager.Delete(dev.VehiNo)
 	}
 	ctx.JSONOk().WriteTo(c)
 }

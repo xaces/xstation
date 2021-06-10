@@ -4,7 +4,7 @@ package models
 // gps {"longtitude:,latitude:,..."}
 type XStatus struct {
 	Id        int64  `gorm:"primary_key"`
-	DeviceId  string `json:"deviceId" gorm:"type:varchar(12);"`
+	DeviceId  uint64 `json:"deviceId"`
 	Status    uint8  `json:"status"`                            // 0-实时 1-补传
 	DTU       string `json:"dtu" gorm:"type:varchar(20);"`      // 时间
 	Gps       string `json:"gps" gorm:"type:varchar(128);"`     // gps信息 json 字符串
@@ -54,6 +54,6 @@ func (s *XStatus4) TableName() string {
 	return "t_xstatus4"
 }
 
-const (
-	KXStatusTabNumber = 5
+var (
+	KXStatusTabNumber int = 2
 )
