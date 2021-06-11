@@ -4,7 +4,6 @@ import (
 	"fmt"
 	"net/http"
 	"time"
-	"xstation/app/api/dvr"
 	"xstation/app/api/server"
 
 	"xstation/app/api/device"
@@ -23,21 +22,18 @@ func serverRouter(r *gin.RouterGroup) {
 	r.GET("/serve/status/list", s.StatusListHandler) // 获取子服务状态
 }
 
-// xprotoRouter 路由
-func xprotoRouter(r *gin.RouterGroup) {
-	p := r.Group("/dvr")
-	p.POST("/liveStream", dvr.LiveStreamHandler)
-	p.POST("/playback", dvr.PlaybackHandler)
-	p.POST("/query", dvr.QueryHandler)
-	p.POST("/parameters", dvr.ParametersHandler)
-	p.POST("/control", dvr.ControlHandler)
-	p.POST("/fileTransfer", dvr.FileTransferHandler)
-	p.POST("/ftpTransfer", dvr.FtpTransferHandler)
-	p.POST("/close", dvr.CloseLinkHandler)
-}
-
 // deiveRouter 设备路由
 func deiveRouter(r *gin.RouterGroup) {
+	p := r.Group("/device/request")
+	p.POST("/liveStream", device.LiveStreamHandler)
+	p.POST("/playback", device.PlaybackHandler)
+	p.POST("/query", device.QueryHandler)
+	p.POST("/parameters", device.ParametersHandler)
+	p.POST("/control", device.ControlHandler)
+	p.POST("/fileTransfer", device.FileTransferHandler)
+	p.POST("/ftpTransfer", device.FtpTransferHandler)
+	p.POST("/close", device.CloseLinkHandler)
+
 	s := device.Device{}
 	r.GET("/device/list", s.ListHandler)
 	r.GET("/device/get/:id", s.GetHandler)
@@ -55,12 +51,11 @@ func newApp() *gin.Engine {
 	gin.SetMode(gin.ReleaseMode)
 	r.Use(gin.Logger()) // 日志
 	// /StandardLoginAction_terminalLogin.action?update=gStream&live=1&server=login
-	r.POST("/StandardLoginAction_terminalLogin.action", dvr.TerminalLoginHandler)
+	r.POST("/StandardLoginAction_terminalLogin.action", device.LoginHandler)
 	root := r.Group("/xstation")
 	root.POST("/applyAuth", server.ApplyAuthHandler)
 	api := root.Group("/api")
 	serverRouter(api)
-	xprotoRouter(api)
 	deiveRouter(api)
 	return r
 }

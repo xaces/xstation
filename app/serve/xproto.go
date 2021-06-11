@@ -3,7 +3,9 @@ package serve
 import (
 	"log"
 	"time"
+	"xstation/app/manager"
 	"xstation/models"
+	"xstation/pkg/orm"
 	"xstation/service"
 
 	"github.com/wlgd/xproto"
@@ -31,9 +33,13 @@ func NewXNotify() *XNotify {
 func (o *XNotify) AccessHandler(data string, access *xproto.LinkAccess) error {
 	log.Printf("%s\n", data)
 	if access.LinkType == xproto.LINK_Signal {
-		if DefaultDevsManager.Get(access.DeviceId) == nil {
+		dev := manager.Dev.Get(access.DeviceId)
+		if dev == nil {
 			return xproto.ErrInvalidDevice
 		}
+		dev.Version = access.Version
+		dev.Type = access.Type
+		orm.DbUpdateModel(dev)
 	}
 	if access.LinkType == xproto.LINK_FileTransfer {
 		if err := xproto.UploadFile(access, true); err != nil {
@@ -45,7 +51,7 @@ func (o *XNotify) AccessHandler(data string, access *xproto.LinkAccess) error {
 
 // ToStatusModel 转化成Model数据格式
 func ToStatusModel(st *xproto.Status) (o models.XStatus) {
-	dev := DefaultDevsManager.Get(st.DeviceId)
+	dev := manager.Dev.Get(st.DeviceId)
 	if dev == nil {
 		return
 	}

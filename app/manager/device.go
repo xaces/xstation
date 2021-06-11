@@ -1,9 +1,11 @@
-package serve
+package manager
 
 import (
 	"sync"
 	"xstation/models"
 	"xstation/pkg/orm"
+
+	"github.com/wlgd/xproto"
 )
 
 type devManager struct {
@@ -12,7 +14,7 @@ type devManager struct {
 }
 
 var (
-	DefaultDevsManager = &devManager{lDevMap: make(map[string]models.XDevice)}
+	Dev = &devManager{lDevMap: make(map[string]models.XDevice)}
 )
 
 func (o *devManager) LoadOfDb() {
@@ -47,4 +49,5 @@ func (o *devManager) Delete(vehiNo string) {
 	o.lock.Lock()
 	defer o.lock.Unlock()
 	delete(o.lDevMap, vehiNo)
+	xproto.SyncStopConnection(vehiNo)
 }

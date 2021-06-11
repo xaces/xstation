@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"log"
+	"xstation/app/manager"
 	"xstation/pkg"
 	"xstation/pkg/rpc"
 	"xstation/service"
@@ -17,7 +18,7 @@ type Arith int
 
 // Login 子服务登录
 func (t *Arith) Login(cxt context.Context, args *rpc.LoginArgs, reply *rpc.LoginReply) error {
-	s, err := loadLServe(args.ServeId, args.Address)
+	s, err := manager.Serve.LoadLServe(args.ServeId, args.Address)
 	if err != nil {
 		return err
 	}
@@ -27,7 +28,7 @@ func (t *Arith) Login(cxt context.Context, args *rpc.LoginArgs, reply *rpc.Login
 
 // KeepAlive 工作站保活
 func (t *Arith) KeepAlive(cxt context.Context, args *rpc.KeepAliveArgs, reply *rpc.KeepAliveArgs) error {
-	return updateLServe(args.ServeId, args.Token, args.UpdatedTime)
+	return manager.Serve.UpdateLServe(args.ServeId, args.Token, args.UpdatedTime)
 }
 
 // XLinkRegister 服务注册

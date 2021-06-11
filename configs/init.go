@@ -4,7 +4,12 @@ import (
 	"github.com/BurntSushi/toml"
 )
 
-type configure struct {
+var (
+	LocalId     string // 服务Id
+	LocalIpAddr string // 服务IP
+)
+
+type tomlConfigure struct {
 	Port struct {
 		Api    uint16
 		Access uint16
@@ -24,7 +29,7 @@ type configure struct {
 
 // Default 所有配置参数
 var (
-	Default configure
+	Default tomlConfigure
 )
 
 // Load 初始化配置参数

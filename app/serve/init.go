@@ -4,6 +4,7 @@ import (
 	"errors"
 	"log"
 	"time"
+	"xstation/app/manager"
 	"xstation/configs"
 	"xstation/internal"
 	"xstation/models"
@@ -66,9 +67,9 @@ func Run() error {
 	s := serveInit("station")
 	configs.LocalId = s.Guid
 	configs.LocalIpAddr = s.Address
-	dbLoadOtherServe()
+	manager.Serve.LoadOfDb()
 	// 加载设备信息
-	DefaultDevsManager.LoadOfDb()
+	manager.Dev.LoadOfDb()
 	// 初始化rpc
 	go rpcxStart(s.RpcPort)
 	go xprotoStart(s.AccessPort)

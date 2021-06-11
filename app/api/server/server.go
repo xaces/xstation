@@ -1,7 +1,7 @@
 package server
 
 import (
-	"xstation/app/serve"
+	"xstation/app/manager"
 	"xstation/internal"
 	"xstation/models"
 	"xstation/pkg/ctx"
@@ -9,6 +9,20 @@ import (
 
 	"github.com/gin-gonic/gin"
 )
+
+// ApplyAuthHandler 身份授权
+func ApplyAuthHandler(c *gin.Context) {
+	var param applyAuth
+	if err := c.ShouldBindJSON(&param); err != nil {
+		ctx.JSONWriteError(err, c)
+		return
+	}
+	if err := tryApplyAuth(&param); err != nil {
+		ctx.JSONWriteError(err, c)
+		return
+	}
+	ctx.JSONOk().WriteTo(c)
+}
 
 type Server struct {
 }
@@ -36,7 +50,8 @@ func (o *Server) GetHandler(c *gin.Context) {
 	ctx.JSONOk().WriteData(gin.H{
 		"data": gin.H{
 			"station": st.XServerOpt,
-			"local":   server.XServerOpt}}, c)
+			"local":   server.XServerOpt,
+		}}, c)
 }
 
 // AddHandler 新增
@@ -68,11 +83,6 @@ func (o *Server) UpdateHandler(c *gin.Context) {
 	ctx.JSONOk().WriteTo(c)
 }
 
-type updateStatus struct {
-	Guid   string `json:"guid"`
-	Status int    `json:"status"`
-}
-
 // UpdateStatusHandler
 func (o *Server) UpdateStatusHandler(c *gin.Context) {
 	var param updateStatus
@@ -80,7 +90,7 @@ func (o *Server) UpdateStatusHandler(c *gin.Context) {
 		ctx.JSONWriteError(err, c)
 		return
 	}
-	if err := serve.ChangeStatus(param.Guid, param.Status); err != nil {
+	if err := manager.Serve.ChangeStatus(param.Guid, param.Status); err != nil {
 		ctx.JSONWriteError(err, c)
 		return
 	}
@@ -89,6 +99,6 @@ func (o *Server) UpdateStatusHandler(c *gin.Context) {
 
 // StatusListHandler
 func (o *Server) StatusListHandler(c *gin.Context) {
-	data := serve.LoadAllLServe()
+	data := manager.Serve.LoadAllLServe()
 	ctx.JSONOk().WriteData(gin.H{"data": data}, c)
 }

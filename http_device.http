@@ -3,14 +3,52 @@ POST http://127.0.0.1:12100/xstation/api/device
 Content-Type: application/json
 
 {
-    "vehiNo": "20190001",
-    "VehiName": "模拟器",
+    "vehiNo": "20190000",
+    "VehiName": "测试",
     "Icons": ""
 }
 
+### 设备列表
+GET http://127.0.0.1:12100/xstation/api/device/list
+Content-Type: application/json
+
+{
+
+}
+
+### 设备信息
+GET http://127.0.0.1:12100/xstation/api/device/get/1
+Content-Type: application/json
+
+{
+
+}
+
+
+### 更新设备信息
+PUT http://127.0.0.1:12100/xstation/api/device
+Content-Type: application/json
+
+{
+    "id": 1,
+    "vehiNo": "20198002",
+    "vehiName": "",
+    "icon": ""
+}
+
+
+### 更新设备信息
+DELETE  http://127.0.0.1:12100/xstation/api/device/3
+Content-Type: application/json
+
+{
+
+}
+
+
 
 ### 获取设备状态数据
-GET http://127.0.0.1:12100/xstation/api/device/status/list?deviceId=1&startTime=2021-06-10 00:00:00&endTime=2021-06-10 14:55:59&descs=dtu
+GET http://127.0.0.1:12100/xstation/api/device/status/list?deviceId=1&startTime=2021-06-11 00:00:00&endTime=2021-06-11 23:59:59&descs=dtu
 Content-Type: application/json
 
 {

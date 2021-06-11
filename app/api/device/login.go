@@ -1,14 +1,15 @@
-package dvr
+package device
 
 import (
 	"net/http"
 	"strings"
+
 	"github.com/gin-gonic/gin"
 )
 
-// TerminalLoginHandler 终端登录
+// LoginHandler 终端登录
 // {"userGroupId":3,"result":0,"groupName":"HW","time":"2021-02-20 15:21:44","userName":"353661094105089","userId":30}
-func TerminalLoginHandler(c *gin.Context) {
+func LoginHandler(c *gin.Context) {
 	buf := make([]byte, 1024)
 	c.Request.Body.Read(buf)
 	bodystr := string(buf)

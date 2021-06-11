@@ -1,4 +1,4 @@
-package serve
+package manager
 
 import (
 	"time"
@@ -16,20 +16,24 @@ type LServe struct {
 	models.XServerOpt
 }
 
+type serveManager struct {
+	lServeMap map[string]*LServe
+}
+
 var (
-	lServeMap = make(map[string]*LServe)
+	Serve = &serveManager{lServeMap: make(map[string]*LServe)}
 )
 
 // NewLServe 新建服务
-func newLServe(serveId string, opt models.XServerOpt) {
-	lServeMap[serveId] = &LServe{
+func (o *serveManager) newLServe(serveId string, opt models.XServerOpt) {
+	o.lServeMap[serveId] = &LServe{
 		ServeId:    serveId,
 		XServerOpt: opt,
 	}
 }
 
-// dbLoadOtherServe load sub serve
-func dbLoadOtherServe() {
+// LoadOfDb load sub serve
+func (o *serveManager) LoadOfDb() {
 	var serves []models.XServer
 	orm.DbFindBy(&serves, "role > ?", models.ServeTypeLocal)
 	for _, v := range serves {
@@ -37,13 +41,13 @@ func dbLoadOtherServe() {
 		if opt.Status != models.ServeStatusStoped {
 			opt.Status = models.ServeStatusIdel
 		}
-		newLServe(v.Guid, opt)
+		o.newLServe(v.Guid, opt)
 	}
 }
 
-// GetServeOfType 根据类型获取服务信息
-func GetServeOfType(ctype int) *models.XServerOpt {
-	for _, v := range lServeMap {
+// GetServeByType 根据类型获取服务信息
+func (o *serveManager) GetServeByType(ctype int) *models.XServerOpt {
+	for _, v := range o.lServeMap {
 		if v.XServerOpt.Role == ctype && v.XServerOpt.Status == models.ServeStatusRunning {
 			return &v.XServerOpt
 		}
@@ -52,16 +56,16 @@ func GetServeOfType(ctype int) *models.XServerOpt {
 }
 
 // LoadAllLServe 获取所有服务状态
-func LoadAllLServe() (lse []LServe) {
-	for _, v := range lServeMap {
+func (o *serveManager) LoadAllLServe() (lse []LServe) {
+	for _, v := range o.lServeMap {
 		lse = append(lse, *v)
 	}
 	return
 }
 
 // LoadLServe 获取服务信息
-func loadLServe(serveId, address string) (*LServe, error) {
-	v, ok := lServeMap[serveId]
+func (o *serveManager) LoadLServe(serveId, address string) (*LServe, error) {
+	v, ok := o.lServeMap[serveId]
 	if !ok {
 		return v, rpc.ErrServeNoExist
 	}
@@ -78,9 +82,9 @@ func loadLServe(serveId, address string) (*LServe, error) {
 	return v, nil
 }
 
-// updateLServe 更新
-func updateLServe(serveId, token string, update time.Time) error {
-	v, ok := lServeMap[serveId]
+// UpdateLServe 更新
+func (o *serveManager) UpdateLServe(serveId, token string, update time.Time) error {
+	v, ok := o.lServeMap[serveId]
 	if !ok {
 		return rpc.ErrServeNoExist
 	}
@@ -95,8 +99,8 @@ func updateLServe(serveId, token string, update time.Time) error {
 }
 
 // Shutdown 停止服务
-func ChangeStatus(serveId string, status int) error {
-	v, ok := lServeMap[serveId]
+func (o *serveManager) ChangeStatus(serveId string, status int) error {
+	v, ok := o.lServeMap[serveId]
 	if !ok {
 		return rpc.ErrServeNoExist
 	}

@@ -1,8 +1,7 @@
 package device
 
 import (
-	"xstation/app/api/page"
-	"xstation/app/serve"
+	"xstation/app/manager"
 	"xstation/internal"
 	"xstation/models"
 	"xstation/pkg/ctx"
@@ -12,19 +11,6 @@ import (
 )
 
 type Device struct {
-}
-
-type devicePage struct {
-	page.Page
-	StartTime string `json:"startTime"`
-	EndTime   string `json:"endTime"`
-}
-
-// Where 初始化
-func (s *devicePage) Where() (where *orm.DbWhere) {
-	where.Append("created_time >= ?", s.StartTime)
-	where.Append("created_time <= ?", s.EndTime)
-	return where
 }
 
 func (o *Device) ListHandler(c *gin.Context) {
@@ -73,19 +59,22 @@ func (o *Device) AddHandler(c *gin.Context) {
 		ctx.JSONWriteError(err, c)
 		return
 	}
-	serve.DefaultDevsManager.Add(&data)
+	manager.Dev.Add(&data)
 	ctx.JSONOk().WriteTo(c)
 }
 
 // UpdateHandler 修改
 func (o *Device) UpdateHandler(c *gin.Context) {
-	var data models.XDevice
+	var param deviceUpdate
 	//获取参数
-	if err := c.ShouldBind(&data.XDeviceOpt); err != nil {
+	if err := c.ShouldBind(&param); err != nil {
 		ctx.JSONWriteError(err, c)
 		return
 	}
-	if err := orm.DbUpdateModel(&data); err != nil {
+	data := &models.XDevice{
+		XDeviceOpt: param.XDeviceOpt,
+	}
+	if err := orm.DbUpdateById(&data, param.Id); err != nil {
 		ctx.JSONWriteError(err, c)
 		return
 	}
@@ -100,17 +89,9 @@ func (o *Device) DeleteHandler(c *gin.Context) {
 		return
 	}
 	ids := internal.StringToIntSlice(idstr, ",")
-	var devs []models.XDevice
-	if _, err := orm.DbFindBy(&devs, "id in (?)", ids); err != nil {
+	if err := deleteDevices(ids); err != nil {
 		ctx.JSONWriteError(err, c)
 		return
-	}
-	if err := orm.DbDeletes(models.XDevice{}, ids); err != nil {
-		ctx.JSONWriteError(err, c)
-		return
-	}
-	for _, dev := range devs {
-		serve.DefaultDevsManager.Delete(dev.VehiNo)
 	}
 	ctx.JSONOk().WriteTo(c)
 }

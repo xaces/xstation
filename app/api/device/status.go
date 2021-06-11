@@ -1,7 +1,6 @@
 package device
 
 import (
-	"xstation/app/api/page"
 	"xstation/models"
 	"xstation/pkg/ctx"
 	"xstation/pkg/orm"
@@ -11,24 +10,6 @@ import (
 )
 
 type Status struct {
-}
-
-type statusPage struct {
-	page.Page
-	StartTime string `form:"startTime"`
-	EndTime   string `form:"endTime"`
-	DeviceId  uint64 `form:"deviceId"` //
-	Descs     string `form:"descs"`    //
-}
-
-// Where 初始化
-func (s *statusPage) Where() *orm.DbWhere {
-	var where orm.DbWhere
-	where.Append("device_id = ?", s.DeviceId)
-	where.Append("dtu >= ?", s.StartTime)
-	where.Append("dtu <= ?", s.EndTime)
-	where.Orders = append(where.Orders, s.Descs+" desc")
-	return &where
 }
 
 func (o *Status) ListHandler(c *gin.Context) {
@@ -48,14 +29,9 @@ func (o *Status) ListHandler(c *gin.Context) {
 	ctx.JSONWriteError(err, c)
 }
 
-type statusGetParam struct {
-	DeviceId uint64 `form:"deviceId"` //
-	StatusId uint64 `form:"statusId"` //
-}
-
 // GetHandler 获取指定id
 func (o *Status) GetHandler(c *gin.Context) {
-	var param statusGetParam
+	param := statusGet{}
 	if err := c.ShouldBind(&param); err != nil {
 		ctx.JSONWriteError(err, c)
 		return

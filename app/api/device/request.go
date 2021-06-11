@@ -1,4 +1,4 @@
-package dvr
+package device
 
 import (
 	"errors"
@@ -81,21 +81,11 @@ func LiveStreamHandler(c *gin.Context) {
 		ctx.JSONWriteError(err, c)
 		return
 	}
-	// s := serve.GetServeOfType(model.ServeTypeStream)
-	// if s == nil {
-	// 	ctx.JSONWriteError(errors.New("no live stream serve can use"), c)
-	// 	return
-	// }
-	// param.Server = fmt.Sprintf("%s:%d", s.Address, s.AccessPort)
 	var resp interface{}
 	if err := xproto.SyncSendToDevice(xproto.REQ_LiveStream, param, &resp, i.deviceId); err != nil {
 		ctx.JSONWriteError(err, c)
 		return
 	}
-	// v, ok := resp.(map[string]interface{})
-	// if ok {
-	// 	v["url"] = fmt.Sprintf("http://%s:%d/live", s.Address, s.Port)
-	// }
 	ctx.JSONOk().WriteData(gin.H{"data": resp}, c)
 }
 

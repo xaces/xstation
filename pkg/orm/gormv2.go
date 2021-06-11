@@ -93,8 +93,13 @@ func DbUpdateByIds(model, ids interface{}, value H) error {
 }
 
 // DbDeletes 批量删除
+func DbDeletes(value interface{}) error {
+	return _db.Delete(value).Error
+}
+
+// DbDeleteByIds 批量删除
 // ids id数组 []
-func DbDeletes(model, ids interface{}) error {
+func DbDeleteByIds(model, ids interface{}) error {
 	return _db.Delete(model, ids).Error
 }
 
