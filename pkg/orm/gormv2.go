@@ -200,10 +200,10 @@ func DbPage(model interface{}, where *DbWhere) *dbPage {
 				db = db.Where(wo.Where, wo.Value...)
 			}
 		}
-	}
-	if len(where.Orders) > 0 {
-		for _, order := range where.Orders {
-			db = db.Order(order)
+		if len(where.Orders) > 0 {
+			for _, order := range where.Orders {
+				db = db.Order(order)
+			}
 		}
 	}
 	var totalCount int64
