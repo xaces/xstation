@@ -1,5 +1,10 @@
+@baseUrl=172.16.50.219:12100/xstation/api/device
+@access=172.16.50.219:33000
+@deviceId=20198002
+
 ### 录像查询
-POST http://127.0.0.1:12100/xstation/api/device/request/query?deviceId=20198002
+POST http://{{baseUrl}}/request/query
+?deviceId={{deviceId}}
 Content-Type: application/json
 
 {
@@ -11,12 +16,13 @@ Content-Type: application/json
 
 ### 实时流请求
 // streamType 0 子码流 1 主码流
-POST http://127.0.0.1:12100/xstation/api/device/request/liveStream?deviceId=20198002
+POST http://{{baseUrl}}/request/liveStream
+?deviceId={{deviceId}}
 Content-Type: application/json
 
 {
-    "server": "172.16.50.219:33000",
-    "session": "live_20198002_01_00",
+    "server": "{{access}}",
+    "session": "live_{{deviceId}}_01_00",
     "channel": 1,
     "streamType": 0,
     "on": 1
@@ -25,22 +31,24 @@ Content-Type: application/json
 
 ### 远程回放
 // fileName 设备文件名
-POST http://127.0.0.1:12100/xstation/api/device/request/playback?deviceId=20198002
+POST http://{{baseUrl}}/request/playback
+?deviceId={{deviceId}}
 Content-Type: application/json
 
 {
-    "server": "172.16.50.219:33000",
+    "server": "{{access}}",
     "name": "T/0000_039f0000_6_1621900800_1621900817_0_8034540.avi"
 }
 
 
 ### 远程回放
 // 按时间段回放
-POST http://127.0.0.1:12100/xstation/api/device/request/playback?deviceId=20198002
+POST http://{{baseUrl}}/request/playback
+?deviceId={{deviceId}}
 Content-Type: application/json
 
 {
-    "server": "172.16.50.219:22000",
+    "server": "{{access}}",
     "startTime": "2021-01-06 10:00:00",
     "endTime": "2021-01-06 10:05:00",
     "channels": "1;2"
@@ -49,7 +57,8 @@ Content-Type: application/json
 
 ### 参数设置
 
-POST http://127.0.0.1:12100/xstation/api/device/request/parameters?deviceId=20198002
+POST http://{{baseUrl}}/request/parameters
+?deviceId={{deviceId}}
 Content-Type: application/json
 
 {
@@ -115,7 +124,8 @@ Content-Type: application/json
 
 ### 参数获取
 
-POST http://127.0.0.1:12100/xstation/api/device/request/parameters?deviceId=20198002
+POST http://{{baseUrl}}/request/parameters
+?deviceId={{deviceId}}
 Content-Type: application/json
 
 {
@@ -124,7 +134,8 @@ Content-Type: application/json
 
 ### UserDefineHowen 参数获取
 // act: 1
-POST http://127.0.0.1:12100/xstation/api/device/request/parameters?deviceId=20198002
+POST http://{{baseUrl}}/request/parameters
+?deviceId={{deviceId}}
 Content-Type: application/json
 
 {
@@ -137,7 +148,8 @@ Content-Type: application/json
 ### UserDefineHowen 参数设置
 // act: 0
 
-POST http://127.0.0.1:12100/xstation/api/device/request/parameters?deviceId=20198002
+POST http://{{baseUrl}}/request/parameters
+?deviceId={{deviceId}}
 Content-Type: application/json
 
 {
@@ -154,7 +166,8 @@ Content-Type: application/json
 
 ### GpsAngle 参数获取
 // act: 1
-POST http://127.0.0.1:12100/xstation/api/device/request/parameters?deviceId=20198002
+POST http://{{baseUrl}}/request/parameters
+?deviceId={{deviceId}}
 Content-Type: application/json
 
 {
@@ -167,7 +180,8 @@ Content-Type: application/json
 
 ### GpsAngle 参数设置
 // act: 1
-POST http://127.0.0.1:12100/xstation/api/device/request/parameters?deviceId=20198002
+POST http://{{baseUrl}}/request/parameters
+?deviceId={{deviceId}}
 Content-Type: application/json
 
 {
@@ -178,7 +192,8 @@ Content-Type: application/json
 
 ### 设备控制
 
-POST http://127.0.0.1:12100/xstation/api/device/request/control?deviceId=20198002
+POST http://{{baseUrl}}/request/control
+?deviceId={{deviceId}}
 Content-Type: application/json
 
 {
@@ -187,7 +202,8 @@ Content-Type: application/json
 
 ### ftp文件传输
 
-POST http://127.0.0.1:12100/xstation/api/device/request/ftpTransfer?deviceId=20198002
+POST http://{{baseUrl}}/request/ftpTransfer
+?deviceId={{deviceId}}
 Content-Type: application/json
 
 {
@@ -200,37 +216,23 @@ Content-Type: application/json
 
 ### file文件传输
 
-POST http://127.0.0.1:12100/xstation/api/device/request/fileTransfer?deviceId=20198002
+POST http://{{baseUrl}}/request/fileTransfer
+?deviceId={{deviceId}}
 Content-Type: application/json
 
 {
     "fileName": "/mnt/sd2/debug/dbglog-20210525-153908.log",
     "fileType": 7,
     "action": 0,
-    "server": "172.16.50.219:33000",
+    "server": "{{access}}",
     "fileSize": 0,
     "offset": 0
 }
 
-
-### file文件传输
-
-POST http://127.0.0.1:12100/xstation/api/device/request/fileTransfer?deviceId=20198002
-Content-Type: application/json
-
-{
-    "fileName": "HW3521V2-V18092801-V19042701-V19011201-V210610T0.149.sw",
-    "fileType": 5,
-    "action": 1,
-    "server": "172.16.50.219:33000",
-    "fileSize": 13022129,
-    "offset": 0
-}
-
-
 ### 串口透传设置, 应答的session用于透传数据, 设置为"", 系统会自动生成并返回。
 
-POST http://127.0.0.1:12100/xstation/api/device/request/serial/transparent?deviceId=20198002
+POST http://{{baseUrl}}/request/serial/transparent
+?deviceId={{deviceId}}
 Content-Type: application/json
 
 {
@@ -246,7 +248,9 @@ Content-Type: application/json
 # type:1 字符串 如 abcdefg
 # type:2 Hex   031F269D
 
-POST http://127.0.0.1:12100/xstation/api/device/request/serial/transfer?deviceId=20198002&session=ca03fffb-0310-4cc1-8191-e4aae455b7f8
+POST http://{{baseUrl}}/request/serial/transfer
+?deviceId={{deviceId}}
+&session=ca03fffb-0310-4cc1-8191-e4aae455b7f8
 Content-Type: application/json
 
 {
@@ -257,9 +261,43 @@ Content-Type: application/json
 
 ### 关闭链接, session存在关闭媒体链路。不存在关闭信令链路
 
-POST http://127.0.0.1:12100/xstation/api/device/request/close?deviceId=20198002&session=live_20198002_01_00
+POST http://{{baseUrl}}/request/close
+?deviceId={{deviceId}}
+&session=live_{{deviceId}}_01_00
 Content-Type: application/json
 
 {
    
+}
+
+@upgrade=UpgradeFile
+### 文件上传
+POST http://{{baseUrl}}/xstation/api/upload HTTP/1.1
+Content-Type: multipart/form-data; boundary=----WebKitFormBoundary7MA4YWxkTrZu0gW
+
+------WebKitFormBoundary7MA4YWxkTrZu0gW
+Content-Disposition: form-data; name="text"
+
+title
+------WebKitFormBoundary7MA4YWxkTrZu0gW
+Content-Disposition: form-data; name="file"; filename="{{upgrade}}";
+Content-Type: text/plain
+
+< Z:\\{{upgrade}}
+------WebKitFormBoundary7MA4YWxkTrZu0gW--
+
+
+### file文件传输
+
+POST http://{{baseUrl}}/request/fileTransfer
+?deviceId={{deviceId}}
+Content-Type: application/json
+
+{
+    "fileName": "{{upgrade}}",
+    "fileType": 5,
+    "action": 1,
+    "server": "{{access}}",
+    "fileSize": 13022129,
+    "offset": 0
 }

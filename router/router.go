@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"net/http"
 	"time"
+	"xstation/app/api"
 	"xstation/app/api/server"
 
 	"xstation/app/api/device"
@@ -54,9 +55,10 @@ func newApp() *gin.Engine {
 	r.POST("/StandardLoginAction_terminalLogin.action", device.LoginHandler)
 	root := r.Group("/xstation")
 	root.POST("/applyAuth", server.ApplyAuthHandler)
-	api := root.Group("/api")
-	serverRouter(api)
-	deiveRouter(api)
+	v1 := root.Group("/api")
+	v1.POST("/upload", api.UploadHandler)
+	serverRouter(v1)
+	deiveRouter(v1)
 	return r
 }
 
