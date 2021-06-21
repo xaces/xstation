@@ -57,13 +57,64 @@ func ParametersHandler(c *gin.Context) {
 }
 
 // DvrControl 设置控制
-func ControlHandler(c *gin.Context) {
-	var param interface{}
-	i, err := checkParam(c, &param)
+func ControlPTZHandler(c *gin.Context) {
+	var param xproto.Control
+	i, err := checkParam(c, &param.Data)
 	if err != nil {
 		ctx.JSONWriteError(err, c)
 		return
 	}
+	param.Type = xproto.CTRL_PTZ
+	var resp interface{}
+	if err := xproto.SyncSendToDevice(xproto.REQ_Control, param, &resp, i.deviceId); err != nil {
+		ctx.JSONWriteError(err, c)
+		return
+	}
+	ctx.JSONOk().WriteData(gin.H{"data": resp}, c)
+}
+
+// ControlRebootHandler 设置控制
+func ControlRebootHandler(c *gin.Context) {
+	i, err := checkParam(c, nil)
+	if err != nil {
+		ctx.JSONWriteError(err, c)
+		return
+	}
+	param := &xproto.Control{Type: xproto.CTRL_Reboot}
+	var resp interface{}
+	if err := xproto.SyncSendToDevice(xproto.REQ_Control, param, &resp, i.deviceId); err != nil {
+		ctx.JSONWriteError(err, c)
+		return
+	}
+	ctx.JSONOk().WriteData(gin.H{"data": resp}, c)
+}
+
+// ControlCaptureHandler 设置控制
+func ControlCaptureHandler(c *gin.Context) {
+	var param xproto.Control
+	i, err := checkParam(c, &param.Data)
+	if err != nil {
+		ctx.JSONWriteError(err, c)
+		return
+	}
+	param.Type = xproto.CTRL_Capture
+	var resp interface{}
+	if err := xproto.SyncSendToDevice(xproto.REQ_Control, param, &resp, i.deviceId); err != nil {
+		ctx.JSONWriteError(err, c)
+		return
+	}
+	ctx.JSONOk().WriteData(gin.H{"data": resp}, c)
+}
+
+// ControlOsdHandler 设置控制
+func ControlOsdHandler(c *gin.Context) {
+	var param xproto.Control
+	i, err := checkParam(c, &param.Data)
+	if err != nil {
+		ctx.JSONWriteError(err, c)
+		return
+	}
+	param.Type = xproto.CTRL_OsdSpeed
 	var resp interface{}
 	if err := xproto.SyncSendToDevice(xproto.REQ_Control, param, &resp, i.deviceId); err != nil {
 		ctx.JSONWriteError(err, c)

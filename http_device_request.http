@@ -1,9 +1,9 @@
-@baseUrl=172.16.50.219:12100/xstation/api/device
+@baseUrl=172.16.50.219:12100/xstation/api
 @access=172.16.50.219:33000
 @deviceId=20198002
 
 ### 录像查询
-POST http://{{baseUrl}}/request/query
+POST http://{{baseUrl}}/device/request/query
 ?deviceId={{deviceId}}
 Content-Type: application/json
 
@@ -16,7 +16,7 @@ Content-Type: application/json
 
 ### 实时流请求
 // streamType 0 子码流 1 主码流
-POST http://{{baseUrl}}/request/liveStream
+POST http://{{baseUrl}}/device/request/liveStream
 ?deviceId={{deviceId}}
 Content-Type: application/json
 
@@ -31,7 +31,7 @@ Content-Type: application/json
 
 ### 远程回放
 // fileName 设备文件名
-POST http://{{baseUrl}}/request/playback
+POST http://{{baseUrl}}/device/request/playback
 ?deviceId={{deviceId}}
 Content-Type: application/json
 
@@ -43,7 +43,7 @@ Content-Type: application/json
 
 ### 远程回放
 // 按时间段回放
-POST http://{{baseUrl}}/request/playback
+POST http://{{baseUrl}}/device/request/playback
 ?deviceId={{deviceId}}
 Content-Type: application/json
 
@@ -57,7 +57,7 @@ Content-Type: application/json
 
 ### 参数设置
 
-POST http://{{baseUrl}}/request/parameters
+POST http://{{baseUrl}}/device/request/parameters
 ?deviceId={{deviceId}}
 Content-Type: application/json
 
@@ -124,7 +124,7 @@ Content-Type: application/json
 
 ### 参数获取
 
-POST http://{{baseUrl}}/request/parameters
+POST http://{{baseUrl}}/device/request/parameters
 ?deviceId={{deviceId}}
 Content-Type: application/json
 
@@ -134,7 +134,7 @@ Content-Type: application/json
 
 ### UserDefineHowen 参数获取
 // act: 1
-POST http://{{baseUrl}}/request/parameters
+POST http://{{baseUrl}}/device/request/parameters
 ?deviceId={{deviceId}}
 Content-Type: application/json
 
@@ -148,7 +148,7 @@ Content-Type: application/json
 ### UserDefineHowen 参数设置
 // act: 0
 
-POST http://{{baseUrl}}/request/parameters
+POST http://{{baseUrl}}/device/request/parameters
 ?deviceId={{deviceId}}
 Content-Type: application/json
 
@@ -166,7 +166,7 @@ Content-Type: application/json
 
 ### GpsAngle 参数获取
 // act: 1
-POST http://{{baseUrl}}/request/parameters
+POST http://{{baseUrl}}/device/request/parameters
 ?deviceId={{deviceId}}
 Content-Type: application/json
 
@@ -180,7 +180,7 @@ Content-Type: application/json
 
 ### GpsAngle 参数设置
 // act: 1
-POST http://{{baseUrl}}/request/parameters
+POST http://{{baseUrl}}/device/request/parameters
 ?deviceId={{deviceId}}
 Content-Type: application/json
 
@@ -190,9 +190,21 @@ Content-Type: application/json
     }
 }
 
+### 设备控制 ptz
+
+POST http://{{baseUrl}}/device/request/control/ptz
+?deviceId={{deviceId}}
+Content-Type: application/json
+
+{
+    "code": 24,
+    "channel": 8,
+    "speed": 4
+}
+
 ### 设备控制
 
-POST http://{{baseUrl}}/request/control
+POST http://{{baseUrl}}/device/request/control/reboot
 ?deviceId={{deviceId}}
 Content-Type: application/json
 
@@ -200,15 +212,38 @@ Content-Type: application/json
 
 }
 
+### 设备控制
+
+POST http://{{baseUrl}}/device/request/control/capture
+?deviceId={{deviceId}}
+Content-Type: application/json
+
+{
+    "channelList": "1;2",
+    "reslution": 4
+}
+
+### 设备控制
+
+POST http://{{baseUrl}}/device/request/control/osd
+?deviceId={{deviceId}}
+Content-Type: application/json
+
+{
+    "osdSpeed": "obd"
+}
+
+
+
 ### ftp文件传输
 
-POST http://{{baseUrl}}/request/ftpTransfer
+POST http://{{baseUrl}}/device/request/ftpTransfer
 ?deviceId={{deviceId}}
 Content-Type: application/json
 
 {
     "ftpUrl": "ftp://don:123456@172.16.50.219:21",
-    "fileSrc": "HW3521V2-V18092801-V210513T0.105.sw",
+    "fileSrc": "firmware/HW3521V2-V18092801-V210616T1.149.sw",
     "fileDst": "",
     "action": 1,
     "fileType": 5
@@ -216,7 +251,7 @@ Content-Type: application/json
 
 ### file文件传输
 
-POST http://{{baseUrl}}/request/fileTransfer
+POST http://{{baseUrl}}/device/request/fileTransfer
 ?deviceId={{deviceId}}
 Content-Type: application/json
 
@@ -231,7 +266,7 @@ Content-Type: application/json
 
 ### 串口透传设置, 应答的session用于透传数据, 设置为"", 系统会自动生成并返回。
 
-POST http://{{baseUrl}}/request/serial/transparent
+POST http://{{baseUrl}}/device/request/serial/transparent
 ?deviceId={{deviceId}}
 Content-Type: application/json
 
@@ -248,7 +283,7 @@ Content-Type: application/json
 # type:1 字符串 如 abcdefg
 # type:2 Hex   031F269D
 
-POST http://{{baseUrl}}/request/serial/transfer
+POST http://{{baseUrl}}/device/request/serial/transfer
 ?deviceId={{deviceId}}
 &session=ca03fffb-0310-4cc1-8191-e4aae455b7f8
 Content-Type: application/json
@@ -261,7 +296,7 @@ Content-Type: application/json
 
 ### 关闭链接, session存在关闭媒体链路。不存在关闭信令链路
 
-POST http://{{baseUrl}}/request/close
+POST http://{{baseUrl}}/device/request/close
 ?deviceId={{deviceId}}
 &session=live_{{deviceId}}_01_00
 Content-Type: application/json
@@ -272,7 +307,7 @@ Content-Type: application/json
 
 @upgrade=UpgradeFile
 ### 文件上传
-POST http://{{baseUrl}}/xstation/api/upload HTTP/1.1
+POST http://{{baseUrl}}/upload HTTP/1.1
 Content-Type: multipart/form-data; boundary=----WebKitFormBoundary7MA4YWxkTrZu0gW
 
 ------WebKitFormBoundary7MA4YWxkTrZu0gW

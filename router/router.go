@@ -30,10 +30,15 @@ func deiveRouter(r *gin.RouterGroup) {
 	p.POST("/playback", device.PlaybackHandler)
 	p.POST("/query", device.QueryHandler)
 	p.POST("/parameters", device.ParametersHandler)
-	p.POST("/control", device.ControlHandler)
 	p.POST("/fileTransfer", device.FileTransferHandler)
 	p.POST("/ftpTransfer", device.FtpTransferHandler)
 	p.POST("/close", device.CloseLinkHandler)
+
+	ctrl := p.Group("/control")
+	ctrl.POST("/ptz", device.ControlPTZHandler)
+	ctrl.POST("/reboot", device.ControlRebootHandler)
+	ctrl.POST("/capture", device.ControlCaptureHandler)
+	ctrl.POST("/osd", device.ControlOsdHandler)
 
 	s := device.Device{}
 	r.GET("/device/list", s.ListHandler)
