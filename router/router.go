@@ -27,6 +27,7 @@ func serverRouter(r *gin.RouterGroup) {
 func deiveRouter(r *gin.RouterGroup) {
 	p := r.Group("/device/request")
 	p.POST("/liveStream", device.LiveStreamHandler)
+	p.POST("/voice", device.VoiceHandler)
 	p.POST("/playback", device.PlaybackHandler)
 	p.POST("/query", device.QueryHandler)
 	p.POST("/parameters", device.ParametersHandler)

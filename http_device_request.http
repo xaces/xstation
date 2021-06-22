@@ -22,12 +22,23 @@ Content-Type: application/json
 
 {
     "server": "{{access}}",
-    "session": "live_{{deviceId}}_01_00",
     "channel": 1,
     "streamType": 0,
-    "on": 1
+    "on": 0
 }
 
+### 实时流请求
+// 0-监听 1-对讲 2-广播
+POST http://{{baseUrl}}/device/request/voice
+?deviceId={{deviceId}}
+Content-Type: application/json
+
+{
+    "server": "{{access}}",
+    "channel": 1,
+    "on": 0,
+    "workMode": 1
+}
 
 ### 远程回放
 // fileName 设备文件名

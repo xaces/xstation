@@ -140,6 +140,23 @@ func LiveStreamHandler(c *gin.Context) {
 	ctx.JSONOk().WriteData(gin.H{"data": resp}, c)
 }
 
+// VoiceHandler 语音业务
+// return url 直接打开播放
+func VoiceHandler(c *gin.Context) {
+	var param xproto.Voice
+	i, err := checkParam(c, &param)
+	if err != nil {
+		ctx.JSONWriteError(err, c)
+		return
+	}
+	var resp interface{}
+	if err := xproto.SyncSendToDevice(xproto.REQ_Voice, param, &resp, i.deviceId); err != nil {
+		ctx.JSONWriteError(err, c)
+		return
+	}
+	ctx.JSONOk().WriteData(gin.H{"data": resp}, c)
+}
+
 // DvrPlayback 录像回放
 func PlaybackHandler(c *gin.Context) {
 	var param xproto.Playback
