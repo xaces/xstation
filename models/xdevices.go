@@ -1,7 +1,7 @@
 package models
 
 type XDeviceOpt struct {
-	VehiNo   string `json:"vehiNo" gorm:"type:varchar(20);"`
+	VehiNo   string `json:"vehiNo" gorm:"type:varchar(24);"`
 	VehiName string `json:"vehiName" gorm:"type:varchar(20);"`
 	Icons    string `json:"icon" gorm:"type:varchar(64);"`
 }

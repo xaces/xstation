@@ -133,9 +133,9 @@ func (t *JObds) Scan(v interface{}) error {
 // XStatus 状态数据
 // gps {"longtitude:,latitude:,..."}
 type XStatus struct {
-	Id        int64    `gorm:"primary_key"`
+	Id        int64    `json:"id" gorm:"primary_key"`
 	DeviceId  uint64   `json:"deviceId"`
-	DeviceNo  string   `json:"deviceNo" gorm:"type:varchar(20);"` // 时间
+	DeviceNo  string   `json:"deviceNo" gorm:"type:varchar(24);"` // 时间
 	Status    uint8    `json:"status"`                            // 0-实时 1-补传
 	Acc       uint8    `json:"acc"`                               // acc
 	DTU       string   `json:"dtu" gorm:"type:varchar(20);"`      // 时间
@@ -143,7 +143,7 @@ type XStatus struct {
 	Obds      JObds    `json:"obds"`                              // obd json 字符串
 	Tempers   JFloats  `json:"tempers" gorm:"type:varchar(32);"`  // 温度 json 字符串
 	Humiditys JFloats  `json:"humidity" gorm:"type:varchar(32);"` // 湿度 json 字符串
-	Mileage   JMileage `json:"mileage" gorm:"type:varchar(32);"`  // 里程 json 字符串
+	Mileage   JMileage `json:"mileage" gorm:"type:varchar(64);"`  // 里程 json 字符串
 	Oils      JOil     `json:"oils" gorm:"type:varchar(128);"`    // 油耗 json 字符串
 	Module    JModule  `json:"module" gorm:"type:varchar(64);"`   // 模块状态 json 字符串
 	Gsensor   JGsensor `json:"gsensor" gorm:"type:varchar(64);"`  // GSensor json 字符串

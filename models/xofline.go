@@ -6,7 +6,7 @@ package models
 type XOFLine struct {
 	Id            int64  `gorm:"primary_key"`
 	Guid          string `json:"guid" gorm:"primary_key"`
-	DeviceId      string `json:"deviceId" gorm:"type:varchar(12);"`
+	DeviceId      string `json:"deviceId" gorm:"type:varchar(24);"`
 	RemoteAddress string `json:"remoteAddress"`                   // 设备网络地址
 	OnTime        string `json:"onTime" gorm:"type:varchar(20);"` // 由设备上报
 	OffTime       string `json:"offTime" gorm:"type:varchar(20);"`

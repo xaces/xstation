@@ -148,7 +148,7 @@ var (
 func xprotoStart(port uint16) {
 	_xproto = &xproto.Serve{
 		RequestTimeOut: 50,
-		RecvTimeout:    60,
+		RecvTimeout:    30,
 		Adapter:        protocolAdapter,
 	}
 	xnotify := NewXNotify()
