@@ -51,15 +51,19 @@ func (x *XData) DbCreateAlarm(stId int64, xalr *xproto.Alarm) error {
 	return orm.DbCreate(alr)
 }
 
+type Task struct {
+	TableIdx int
+	Status   []models.XStatus
+	Size     int
+}
+
 // DbCreate 批量添加
-func (x *XData) DbCreateStatus(tabIdx int, stArray []models.XStatus, size int) error {
-	// 备份数据
-	status := make([]models.XStatus, size)
-	copy(status, stArray)
+func DbTaskFunc(obj interface{}) {
+	task := obj.(*Task)
 	// 映射
-	ptr := unsafe.Pointer(&status)
+	ptr := unsafe.Pointer(&task.Status)
 	var data interface{}
-	switch tabIdx {
+	switch task.TableIdx {
 	case 1:
 		data = (*[]models.XStatus1)(ptr)
 	case 2:
@@ -69,15 +73,9 @@ func (x *XData) DbCreateStatus(tabIdx int, stArray []models.XStatus, size int) e
 	case 4:
 		data = (*[]models.XStatus4)(ptr)
 	default:
-		data = &status
+		data = &task.Status
 	}
-	if size <= 10 {
-		return orm.DbCreate(data)
-	}
-	go func() {
-		orm.DbCreate(data)
-	}()
-	return nil
+	orm.DbCreate(data)
 }
 
 // GetXStatusModel 获取model模型

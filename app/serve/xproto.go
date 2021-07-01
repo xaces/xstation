@@ -12,6 +12,8 @@ import (
 	"github.com/wlgd/xproto/ho"
 	"github.com/wlgd/xproto/jt"
 	"github.com/wlgd/xproto/ttx"
+
+	ants "github.com/panjf2000/ants/v2"
 )
 
 type XNotify struct {
@@ -106,6 +108,8 @@ func (o *XNotify) AlarmHandler(tag, data string, xalr *xproto.Alarm) {
 func (o *XNotify) DbStatusHandler() {
 	stArray := make([][]models.XStatus, models.KXStatusTabNumber)
 	ticker := time.NewTicker(time.Second * 1)
+	p, _ := ants.NewPoolWithFunc(20, service.DbTaskFunc) // 协程池
+	defer p.Release()
 	for {
 		select {
 		case d := <-o.Status:
@@ -117,7 +121,12 @@ func (o *XNotify) DbStatusHandler() {
 				if size <= 0 {
 					continue
 				}
-				o.Service.DbCreateStatus(i, stArray[i], size)
+				task := &service.Task{}
+				task.TableIdx = i
+				task.Size = size
+				task.Status = make([]models.XStatus, task.Size)
+				copy(task.Status, stArray[i])
+				p.Invoke(task)
 				stArray[i] = stArray[i][:0]
 			}
 		}
