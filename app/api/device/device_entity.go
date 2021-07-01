@@ -41,7 +41,7 @@ func deleteDevices(ids []int) error {
 		return err
 	}
 	for _, dev := range devs {
-		manager.Dev.Delete(dev.VehiNo)
+		manager.Dev.Delete(dev.DeviceNo)
 	}
 	return nil
 }

@@ -37,11 +37,12 @@ POST http://127.0.0.1:12100/xstation/api/serve
 Content-Type: application/json
 
 {
-    "name": "other",
-    "port": 13100,
-    "accessPort": 13120,
-    "rpcPort": 13110,
-    "status": 1
+    "name": "xstroage",
+    "httpPort": 12200,
+    "rpcPort": 12210,
+    "accessPort": 12220,
+    "status": 1,
+    "role": 3
 }
 
 ### 获取服务

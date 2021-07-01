@@ -1,9 +1,9 @@
 package models
 
 type XDeviceOpt struct {
-	VehiNo   string `json:"vehiNo" gorm:"type:varchar(24);"`
-	VehiName string `json:"vehiName" gorm:"type:varchar(20);"`
-	Icons    string `json:"icon" gorm:"type:varchar(64);"`
+	DeviceNo   string `json:"deviceNo" gorm:"type:varchar(24);"`
+	DeviceName string `json:"deviceName" gorm:"type:varchar(20);"`
+	Icons      string `json:"icon" gorm:"type:varchar(64);"`
 }
 
 type XDevice struct {

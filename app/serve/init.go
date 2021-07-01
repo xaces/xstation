@@ -27,7 +27,7 @@ func serveInit(name string) *models.XServer {
 		orm.DbCreate(&s)
 	}
 	s.Name = name
-	s.Port = configs.Default.Port.Api
+	s.HttpPort = configs.Default.Port.Http
 	s.RpcPort = configs.Default.Port.Rpc
 	s.AccessPort = configs.Default.Port.Access
 	s.Address = utils.PublicIPAddr()

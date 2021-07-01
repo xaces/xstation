@@ -35,13 +35,15 @@ func NewXNotify() *XNotify {
 func (o *XNotify) AccessHandler(data string, access *xproto.LinkAccess) error {
 	log.Printf("%s\n", data)
 	if access.LinkType == xproto.LINK_Signal {
-		dev := manager.Dev.Get(access.DeviceId)
+		dev := manager.Dev.Get(access.DeviceNo)
 		if dev == nil {
 			return xproto.ErrInvalidDevice
 		}
-		dev.Version = access.Version
-		dev.Type = access.Type
-		orm.DbUpdateModel(dev)
+		if dev.Version != access.Version || dev.Type != access.Type {
+			dev.Version = access.Version
+			dev.Type = access.Type
+			orm.DbUpdateModel(dev)
+		}
 	}
 	if access.LinkType == xproto.LINK_FileTransfer {
 		if err := xproto.UploadFile(access, true); err != nil {
@@ -53,13 +55,13 @@ func (o *XNotify) AccessHandler(data string, access *xproto.LinkAccess) error {
 
 // ToStatusModel 转化成Model数据格式
 func ToStatusModel(st *xproto.Status) (o models.XStatus) {
-	dev := manager.Dev.Get(st.DeviceId)
+	dev := manager.Dev.Get(st.DeviceNo)
 	if dev == nil {
 		return
 	}
 	o.Id = service.PrimaryKey()
 	o.DeviceId = dev.Id
-	o.DeviceNo = st.DeviceId
+	o.DeviceNo = st.DeviceNo
 	o.DTU = st.DTU
 	o.Status = st.Status
 	if st.Location.Speed < 1 {

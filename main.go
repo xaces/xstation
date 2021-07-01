@@ -34,9 +34,9 @@ func main() {
 	logFatalln(service.Init())
 	logFatalln(serve.Run())
 	// web服务
-	s := router.Init(configs.Default.Port.Api)
+	s := router.Init(configs.Default.Port.Http)
 	time.Sleep(10 * time.Microsecond)
-	log.Printf("API Server Start On %d\n", configs.Default.Port.Api)
+	log.Printf("API Server Start On %d\n", configs.Default.Port.Http)
 	go func() {
 		if err := s.ListenAndServe(); err != nil && err != http.ErrServerClosed {
 			log.Fatalln(err)

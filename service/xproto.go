@@ -18,14 +18,14 @@ func NewXData() *XData {
 
 // DbUpdateAccess 更新链路信息
 func (x *XData) DbUpdateAccess(reg *xproto.LinkAccess) error {
-	ofline := &models.XOFLine{
+	ofline := &models.XLink{
 		Guid:          reg.Session,
-		DeviceId:      reg.DeviceId,
+		DeviceNo:      reg.DeviceNo,
 		RemoteAddress: reg.RemoteAddress,
-		AccessType:    int(reg.AccessNet),
+		NetType:       int(reg.NetType),
 		Type:          int(reg.LinkType),
-		UpFlow:        reg.UpFlow,
-		DownFlow:      reg.DownFlow,
+		UpTraffic:     reg.UpTraffic,
+		DownTraffic:   reg.DownTraffic,
 		Version:       reg.Version,
 	}
 	if reg.OnLine {
@@ -39,7 +39,7 @@ func (x *XData) DbUpdateAccess(reg *xproto.LinkAccess) error {
 // ToAlarmModel 转化成Model数据格式
 func (x *XData) DbCreateAlarm(stId int64, xalr *xproto.Alarm) error {
 	alr := &models.XAlarm{
-		DeviceId:  xalr.DeviceId,
+		DeviceNo:  xalr.DeviceNo,
 		UUID:      xalr.UUID,
 		StatusId:  stId,
 		Status:    xalr.Status.Status,

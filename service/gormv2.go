@@ -17,14 +17,10 @@ func initTables(db *gorm.DB) {
 	db.AutoMigrate(
 		&models.XServer{},
 		&models.XDevice{},
-		&models.XOFLine{},
+		&models.XLink{},
 		&models.XAlarm{},
 		&models.XStatus{},
 	)
-	models.KXStatusTabNumber = configs.Default.SQL.StTableNum
-	if models.KXStatusTabNumber > 5 {
-		models.KXStatusTabNumber = 5
-	}
 	if models.KXStatusTabNumber > 1 {
 		db.AutoMigrate(&models.XStatus1{})
 	}

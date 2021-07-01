@@ -11,16 +11,15 @@ var (
 
 type tomlConfigure struct {
 	Port struct {
-		Api    uint16
+		Http   uint16
 		Access uint16
 		Rpc    uint16
 	}
 	SQL struct {
-		Name       string
-		Address    string
-		LiteDB     string
-		Postgre    string
-		StTableNum int
+		Name    string
+		Address string
+		LiteDB  string
+		Postgre string
 	}
 	Superior struct {
 		Address string

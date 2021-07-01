@@ -3,7 +3,7 @@ package models
 // XAlarm 报警
 type XAlarm struct {
 	Id        int64  `gorm:"primary_key"`
-	DeviceId  string `json:"deviceId" gorm:"type:varchar(24);"`
+	DeviceNo  string `json:"deviceNo" gorm:"type:varchar(24);"`
 	UUID      string `json:"uuid" gorm:"type:varchar(32);"` // 报警ID
 	StatusId  int64  `json:"statusId"`
 	Status    uint8  `json:"status"`                             // 0-实时 1-补传

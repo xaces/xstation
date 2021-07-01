@@ -23,15 +23,15 @@ func (o *devManager) LoadOfDb() {
 		return
 	}
 	for _, dev := range devs {
-		o.lDevMap[dev.VehiNo] = dev
+		o.lDevMap[dev.DeviceNo] = dev
 	}
 }
 
 // Get 获取
-func (o *devManager) Get(vehiNo string) *models.XDevice {
+func (o *devManager) Get(deviceNo string) *models.XDevice {
 	o.lock.Lock()
 	defer o.lock.Unlock()
-	if v, ok := o.lDevMap[vehiNo]; ok {
+	if v, ok := o.lDevMap[deviceNo]; ok {
 		return &v
 	}
 	return nil
@@ -41,13 +41,13 @@ func (o *devManager) Get(vehiNo string) *models.XDevice {
 func (o *devManager) Add(dev *models.XDevice) {
 	o.lock.Lock()
 	defer o.lock.Unlock()
-	o.lDevMap[dev.VehiNo] = *dev
+	o.lDevMap[dev.DeviceNo] = *dev
 }
 
 // Delete 删除
-func (o *devManager) Delete(vehiNo string) {
+func (o *devManager) Delete(deviceNo string) {
 	o.lock.Lock()
 	defer o.lock.Unlock()
-	delete(o.lDevMap, vehiNo)
-	xproto.SyncStopConnection(vehiNo)
+	delete(o.lDevMap, deviceNo)
+	xproto.SyncStopConnection(deviceNo)
 }
