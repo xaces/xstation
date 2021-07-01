@@ -8,9 +8,10 @@ import (
 	"xstation/configs"
 	"xstation/internal"
 	"xstation/models"
-	"xstation/pkg/orm"
-	"xstation/pkg/rpc"
-	"xstation/pkg/utils"
+
+	"github.com/wlgd/xutils"
+	"github.com/wlgd/xutils/orm"
+	"github.com/wlgd/xutils/rpc"
 )
 
 var (
@@ -30,7 +31,7 @@ func serveInit(name string) *models.XServer {
 	s.HttpPort = configs.Default.Port.Http
 	s.RpcPort = configs.Default.Port.Rpc
 	s.AccessPort = configs.Default.Port.Access
-	s.Address = utils.PublicIPAddr()
+	s.Address = xutils.PublicIPAddr()
 	s.Status = models.ServeStatusRunning
 	orm.DbUpdateModel(&s)
 	return &s

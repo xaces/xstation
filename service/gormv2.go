@@ -4,7 +4,7 @@ import (
 	"errors"
 	"xstation/configs"
 	"xstation/models"
-	"xstation/pkg/orm"
+	"github.com/wlgd/xutils/orm"
 
 	"gorm.io/driver/mysql"
 	"gorm.io/driver/postgres"

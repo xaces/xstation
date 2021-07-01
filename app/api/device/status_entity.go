@@ -2,7 +2,8 @@ package device
 
 import (
 	"xstation/app/api/page"
-	"xstation/pkg/orm"
+
+	"github.com/wlgd/xutils/orm"
 )
 
 // statusPage 分页

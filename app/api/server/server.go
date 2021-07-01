@@ -4,8 +4,10 @@ import (
 	"xstation/app/manager"
 	"xstation/internal"
 	"xstation/models"
-	"xstation/pkg/ctx"
-	"xstation/pkg/orm"
+
+	"github.com/wlgd/xutils/orm"
+
+	"github.com/wlgd/xutils/ctx"
 
 	"github.com/gin-gonic/gin"
 )

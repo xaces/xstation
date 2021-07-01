@@ -4,7 +4,7 @@ import (
 	"unsafe"
 	"xstation/internal"
 	"xstation/models"
-	"xstation/pkg/orm"
+	"github.com/wlgd/xutils/orm"
 
 	"github.com/wlgd/xproto"
 )

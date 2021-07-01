@@ -4,7 +4,8 @@ import (
 	"xstation/app/api/page"
 	"xstation/app/manager"
 	"xstation/models"
-	"xstation/pkg/orm"
+
+	"github.com/wlgd/xutils/orm"
 )
 
 // devicePage 分页

@@ -2,7 +2,8 @@ package device
 
 import (
 	"errors"
-	"xstation/pkg/ctx"
+
+	"github.com/wlgd/xutils/ctx"
 
 	"github.com/gin-gonic/gin"
 	"github.com/wlgd/xproto"

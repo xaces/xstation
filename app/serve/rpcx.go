@@ -5,9 +5,9 @@ import (
 	"fmt"
 	"log"
 	"xstation/app/manager"
-	"xstation/pkg"
-	"xstation/pkg/rpc"
 	"xstation/service"
+
+	"github.com/wlgd/xutils/rpc"
 
 	"github.com/smallnest/rpcx/server"
 	"github.com/wlgd/xproto"
@@ -35,7 +35,7 @@ func (t *Arith) KeepAlive(cxt context.Context, args *rpc.KeepAliveArgs, reply *r
 func (t *Arith) XLinkRegister(cxt context.Context, args *rpc.XLinkRegister, reply *rpc.XLinkRegister) error {
 	link, ok := args.Data.(xproto.LinkAccess)
 	if !ok {
-		return pkg.ErrParameter
+		return rpc.ErrParameter
 	}
 	return service.NewXData().DbUpdateAccess(&link)
 }

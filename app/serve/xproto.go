@@ -5,8 +5,9 @@ import (
 	"time"
 	"xstation/app/manager"
 	"xstation/models"
-	"xstation/pkg/orm"
 	"xstation/service"
+
+	"github.com/wlgd/xutils/orm"
 
 	"github.com/wlgd/xproto"
 	"github.com/wlgd/xproto/ho"

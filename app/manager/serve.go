@@ -4,8 +4,8 @@ import (
 	"time"
 	"xstation/internal"
 	"xstation/models"
-	"xstation/pkg/orm"
-	"xstation/pkg/rpc"
+	"github.com/wlgd/xutils/orm"
+	"github.com/wlgd/xutils/rpc"
 )
 
 // lServe 服务

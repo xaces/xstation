@@ -2,9 +2,11 @@ package device
 
 import (
 	"xstation/models"
-	"xstation/pkg/ctx"
-	"xstation/pkg/orm"
 	"xstation/service"
+
+	"github.com/wlgd/xutils/orm"
+
+	"github.com/wlgd/xutils/ctx"
 
 	"github.com/gin-gonic/gin"
 )

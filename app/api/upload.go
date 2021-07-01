@@ -1,7 +1,7 @@
 package api
 
 import (
-	"xstation/pkg/ctx"
+	"github.com/wlgd/xutils/ctx"
 
 	"github.com/gin-gonic/gin"
 )

@@ -4,7 +4,8 @@ import (
 	"errors"
 	"xstation/configs"
 	"xstation/internal"
-	"xstation/pkg/utils"
+
+	"github.com/wlgd/xutils"
 )
 
 type applyAuth struct {
@@ -16,7 +17,7 @@ type applyAuth struct {
 // tryApplyAuth 尝试申请授权
 func tryApplyAuth(param *applyAuth) error {
 	var data internal.LicensingInf
-	if err := utils.HttpPost(configs.Default.Superior.Address+"/station/applyAuth", param, &data); err != nil {
+	if err := xutils.HttpPost(configs.Default.Superior.Address+"/station/applyAuth", param, &data); err != nil {
 		return errors.New("apply authority failed")
 	}
 	internal.WriteLicences(&data)
