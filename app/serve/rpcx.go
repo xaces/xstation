@@ -18,7 +18,7 @@ type Arith int
 
 // Login 子服务登录
 func (t *Arith) Login(cxt context.Context, args *rpc.LoginArgs, reply *rpc.LoginReply) error {
-	s, err := manager.Serve.LoadLServe(args.ServeId, args.Address)
+	s, err := manager.Serve.Get(args.ServeId, args.Address)
 	if err != nil {
 		return err
 	}
@@ -28,7 +28,7 @@ func (t *Arith) Login(cxt context.Context, args *rpc.LoginArgs, reply *rpc.Login
 
 // KeepAlive 工作站保活
 func (t *Arith) KeepAlive(cxt context.Context, args *rpc.KeepAliveArgs, reply *rpc.KeepAliveArgs) error {
-	return manager.Serve.UpdateLServe(args.ServeId, args.Token, args.UpdatedTime)
+	return manager.Serve.Refresh(args.ServeId, args.Token)
 }
 
 // XLinkRegister 服务注册

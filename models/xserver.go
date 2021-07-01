@@ -7,9 +7,8 @@ const (
 )
 
 const (
-	ServeStatusIdel    = iota // ServeIdel 服务空闲
-	ServeStatusRunning        // ServeRunning 运行
-	ServeStatusStoped         // 停止
+	ServeStatusStoped = iota // 禁止
+	ServeStatusWork          // 正常工作
 )
 
 // ServerOpt 服务配置信息
@@ -20,7 +19,6 @@ type XServerOpt struct {
 	AccessPort uint16 `json:"accessPort" gorm:"comment:设备接入端口号;"`
 	RpcPort    uint16 `json:"rpcPort" gorm:"comment:rpc服务端口号;"`
 	Status     int    `json:"status" gorm:"comment:服务状态 0-停止 1-启动;"`
-	Address    string `json:"address" gorm:"comment:服务IP，由服务主动上报;"`
 }
 
 // Server 服务详细信息

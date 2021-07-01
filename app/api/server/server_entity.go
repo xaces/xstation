@@ -2,10 +2,13 @@ package server
 
 import (
 	"errors"
+	"xstation/app/manager"
 	"xstation/configs"
 	"xstation/internal"
+	"xstation/models"
 
 	"github.com/wlgd/xutils"
+	"github.com/wlgd/xutils/orm"
 )
 
 type applyAuth struct {
@@ -24,8 +27,16 @@ func tryApplyAuth(param *applyAuth) error {
 	return nil
 }
 
-// updateStatus 更新服务状态
-type updateStatus struct {
-	Guid   string `json:"guid"`
-	Status int    `json:"status"`
+// serveOpt 更新服务状态
+type serveOpt struct {
+	Guids  []string `json:"guid"`
+	Status int      `json:"status"`
+}
+
+func deleteServes(guids []string) error {
+	if _, err := orm.DbDeleteBy(&models.XServer{}, "guid in (?)", guids); err != nil {
+		return err
+	}
+	manager.Serve.Delete(guids)
+	return nil
 }

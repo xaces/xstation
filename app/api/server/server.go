@@ -68,6 +68,8 @@ func (o *Server) AddHandler(c *gin.Context) {
 		ctx.JSONWriteError(err, c)
 		return
 	}
+	manager.Serve.Add(&param)
+	// 同步信息到服务管理
 	ctx.JSONOk().WriteTo(c)
 }
 
@@ -87,12 +89,12 @@ func (o *Server) UpdateHandler(c *gin.Context) {
 
 // UpdateStatusHandler
 func (o *Server) UpdateStatusHandler(c *gin.Context) {
-	var param updateStatus
+	var param serveOpt
 	if err := c.ShouldBind(&param); err != nil {
 		ctx.JSONWriteError(err, c)
 		return
 	}
-	if err := manager.Serve.ChangeStatus(param.Guid, param.Status); err != nil {
+	if err := manager.Serve.UpdateStatus(param.Guids, param.Status); err != nil {
 		ctx.JSONWriteError(err, c)
 		return
 	}
@@ -101,6 +103,20 @@ func (o *Server) UpdateStatusHandler(c *gin.Context) {
 
 // StatusListHandler
 func (o *Server) StatusListHandler(c *gin.Context) {
-	data := manager.Serve.LoadAllLServe()
+	data := manager.Serve.GetAll()
 	ctx.JSONOk().WriteData(gin.H{"data": data}, c)
+}
+
+// DeleteHandler 删除
+func (o *Server) DeleteHandler(c *gin.Context) {
+	var param serveOpt
+	if err := c.ShouldBind(&param); err != nil {
+		ctx.JSONWriteError(err, c)
+		return
+	}
+	if err := deleteServes(param.Guids); err != nil {
+		ctx.JSONWriteError(err, c)
+		return
+	}
+	ctx.JSONOk().WriteTo(c)
 }

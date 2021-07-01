@@ -12,7 +12,6 @@ require (
 	github.com/smallnest/rpcx v1.6.4
 	github.com/wlgd/xproto v0.0.0-00010101000000-000000000000
 	github.com/wlgd/xutils v0.0.0-20210701074559-e4b0685b2ff6
-	golang.org/x/crypto v0.0.0-20210314154223-e6e6c4f2bb5b // indirect
 	google.golang.org/grpc/examples v0.0.0-20210630181457-52546c5d89b7 // indirect
 	gorm.io/driver/mysql v1.0.5
 	gorm.io/driver/postgres v1.0.8
@@ -21,4 +20,5 @@ require (
 )
 
 replace github.com/wlgd/xproto => ../xproto
+
 replace github.com/wlgd/xutils => ../xutils

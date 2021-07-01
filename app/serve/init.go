@@ -31,8 +31,7 @@ func serveInit(name string) *models.XServer {
 	s.HttpPort = configs.Default.Port.Http
 	s.RpcPort = configs.Default.Port.Rpc
 	s.AccessPort = configs.Default.Port.Access
-	s.Address = xutils.PublicIPAddr()
-	s.Status = models.ServeStatusRunning
+	s.Status = models.ServeStatusWork
 	orm.DbUpdateModel(&s)
 	return &s
 }
@@ -67,7 +66,7 @@ func Run() error {
 	// 初始API服务
 	s := serveInit("station")
 	configs.LocalId = s.Guid
-	configs.LocalIpAddr = s.Address
+	configs.LocalIpAddr = xutils.PublicIPAddr()
 	manager.Serve.LoadOfDb()
 	// 加载设备信息
 	manager.Dev.LoadOfDb()

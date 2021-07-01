@@ -21,6 +21,7 @@ func serverRouter(r *gin.RouterGroup) {
 	r.PUT("/serve", s.UpdateHandler)
 	r.PUT("/serve/status", s.UpdateStatusHandler)    // 设置子服务
 	r.GET("/serve/status/list", s.StatusListHandler) // 获取子服务状态
+	r.DELETE("/serve", s.DeleteHandler)
 }
 
 // deiveRouter 设备路由

@@ -1,9 +1,11 @@
 package manager
 
 import (
+	"sync"
 	"time"
 	"xstation/internal"
 	"xstation/models"
+
 	"github.com/wlgd/xutils/orm"
 	"github.com/wlgd/xutils/rpc"
 )
@@ -13,77 +15,86 @@ type LServe struct {
 	ServeId     string    `json:"serveId"` // 服务id
 	Token       string    `json:"token"`   //
 	UpdatedTime time.Time `json:"updatedTime"`
+	IsWorking   bool      `json:"isWorking"`
+	Address     string    `json:"address"`
 	models.XServerOpt
 }
 
-type serveManager struct {
+type serve struct {
+	lock      sync.Mutex
 	lServeMap map[string]*LServe
 }
 
 var (
-	Serve = &serveManager{lServeMap: make(map[string]*LServe)}
+	Serve = &serve{lServeMap: make(map[string]*LServe)}
 )
 
 // NewLServe 新建服务
-func (o *serveManager) newLServe(serveId string, opt models.XServerOpt) {
+func (o *serve) newLServe(serveId string, opt models.XServerOpt) {
 	o.lServeMap[serveId] = &LServe{
-		ServeId:    serveId,
-		XServerOpt: opt,
+		ServeId:     serveId,
+		XServerOpt:  opt,
+		IsWorking:   false,
 	}
 }
 
 // LoadOfDb load sub serve
-func (o *serveManager) LoadOfDb() {
+func (o *serve) LoadOfDb() {
 	var serves []models.XServer
 	orm.DbFindBy(&serves, "role > ?", models.ServeTypeLocal)
 	for _, v := range serves {
-		opt := v.XServerOpt
-		if opt.Status != models.ServeStatusStoped {
-			opt.Status = models.ServeStatusIdel
-		}
-		o.newLServe(v.Guid, opt)
+		o.newLServe(v.Guid, v.XServerOpt)
 	}
 }
 
-// GetServeByType 根据类型获取服务信息
-func (o *serveManager) GetServeByType(ctype int) *models.XServerOpt {
+// GetByType 根据类型
+func (o *serve) GetByType(ctype int) *models.XServerOpt {
 	for _, v := range o.lServeMap {
-		if v.XServerOpt.Role == ctype && v.XServerOpt.Status == models.ServeStatusRunning {
+		if v.XServerOpt.Role == ctype && v.IsWorking {
 			return &v.XServerOpt
 		}
 	}
 	return nil
 }
 
-// LoadAllLServe 获取所有服务状态
-func (o *serveManager) LoadAllLServe() (lse []LServe) {
+// LoadAllLServe 获取所有服务实时状态
+func (o *serve) GetAll() (lse []LServe) {
 	for _, v := range o.lServeMap {
 		lse = append(lse, *v)
 	}
 	return
 }
 
-// LoadLServe 获取服务信息
-func (o *serveManager) LoadLServe(serveId, address string) (*LServe, error) {
+// Get 获取
+func (o *serve) Get(serveId, address string) (*LServe, error) {
+	o.lock.Lock()
+	defer o.lock.Unlock()
 	v, ok := o.lServeMap[serveId]
 	if !ok {
-		return v, rpc.ErrServeNoExist
+		return nil, rpc.ErrServeNoExist
 	}
-
 	if v.Status == models.ServeStatusStoped {
-		return v, rpc.ErrServeStoped
+		return nil, rpc.ErrServeStoped
 	}
 	// create token
 	v.Token = internal.UUID()
-	if v.Address != address {
-		orm.DbUpdateColsBy(&models.XServer{}, orm.H{"address": address}, "guid like ?", serveId)
-	}
-	v.Status = models.ServeStatusRunning
+	v.Address = address
+	v.IsWorking = true
+	v.UpdatedTime = time.Now()
 	return v, nil
 }
 
-// UpdateLServe 更新
-func (o *serveManager) UpdateLServe(serveId, token string, update time.Time) error {
+// Add 添加
+func (o *serve) Add(srv *models.XServer) {
+	o.lock.Lock()
+	defer o.lock.Unlock()
+	o.newLServe(srv.Guid, srv.XServerOpt)
+}
+
+// Refresh 刷新
+func (o *serve) Refresh(serveId, token string) error {
+	o.lock.Lock()
+	defer o.lock.Unlock()
 	v, ok := o.lServeMap[serveId]
 	if !ok {
 		return rpc.ErrServeNoExist
@@ -94,21 +105,31 @@ func (o *serveManager) UpdateLServe(serveId, token string, update time.Time) err
 	if v.Token != token {
 		return rpc.ErrAuthority
 	}
-	v.UpdatedTime = update
+	v.UpdatedTime = time.Now()
 	return nil
 }
 
-// Shutdown 停止服务
-func (o *serveManager) ChangeStatus(serveId string, status int) error {
-	v, ok := o.lServeMap[serveId]
-	if !ok {
-		return rpc.ErrServeNoExist
+// UpdateStatus 更新状态
+func (o *serve) UpdateStatus(serveIds []string, status int) error {
+	o.lock.Lock()
+	defer o.lock.Unlock()
+	for _, s := range serveIds {
+		v, ok := o.lServeMap[s]
+		if !ok || status == v.Status {
+			continue
+		}
+		v.Status = status
+		orm.DbUpdateColsBy(&models.XServer{}, orm.H{"status": status}, "guid like ?", s)
 	}
-	if status == models.ServeStatusStoped {
-		v.Status = models.ServeStatusStoped
-	} else {
-		v.Status = models.ServeStatusIdel
+	return nil
+}
+
+// UpdateStatus 更新状态
+func (o *serve) Delete(serveIds []string) error {
+	o.lock.Lock()
+	defer o.lock.Unlock()
+	for _, s := range serveIds {
+		delete(o.lServeMap, s)
 	}
-	orm.DbUpdateColsBy(&models.XServer{}, orm.H{"status": status}, "guid like ?", serveId)
 	return nil
 }
