@@ -2,7 +2,7 @@ package server
 
 import (
 	"errors"
-	"xstation/app/manager"
+	"xstation/app/mnger"
 	"xstation/configs"
 	"xstation/internal"
 	"xstation/models"
@@ -37,6 +37,6 @@ func deleteServes(guids []string) error {
 	if _, err := orm.DbDeleteBy(&models.XServer{}, "guid in (?)", guids); err != nil {
 		return err
 	}
-	manager.Serve.Delete(guids)
+	mnger.Serve.Delete(guids)
 	return nil
 }

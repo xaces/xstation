@@ -1,7 +1,7 @@
 package device
 
 import (
-	"xstation/app/manager"
+	"xstation/app/mnger"
 	"xstation/internal"
 	"xstation/models"
 
@@ -60,7 +60,7 @@ func (o *Device) AddHandler(c *gin.Context) {
 		ctx.JSONWriteError(err, c)
 		return
 	}
-	manager.Dev.Add(&data)
+	mnger.Dev.Add(&data)
 	ctx.JSONOk().WriteTo(c)
 }
 

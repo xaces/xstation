@@ -1,8 +1,9 @@
-package manager
+package mnger
 
 import (
 	"sync"
 	"xstation/models"
+
 	"github.com/wlgd/xutils/orm"
 
 	"github.com/wlgd/xproto"
@@ -10,7 +11,7 @@ import (
 
 type devManager struct {
 	lDevMap map[string]models.XDevice
-	lock    sync.Mutex
+	lock    sync.RWMutex
 }
 
 var (
@@ -29,8 +30,8 @@ func (o *devManager) LoadOfDb() {
 
 // Get 获取
 func (o *devManager) Get(deviceNo string) *models.XDevice {
-	o.lock.Lock()
-	defer o.lock.Unlock()
+	o.lock.RLock()
+	defer o.lock.RUnlock()
 	if v, ok := o.lDevMap[deviceNo]; ok {
 		return &v
 	}

@@ -2,8 +2,8 @@ package service
 
 import (
 	"unsafe"
-	"xstation/internal"
 	"xstation/models"
+
 	"github.com/wlgd/xutils/orm"
 
 	"github.com/wlgd/xproto"
@@ -36,33 +36,18 @@ func (x *XData) DbUpdateAccess(reg *xproto.LinkAccess) error {
 	return orm.DbUpdateModelBy(ofline, "guid = ?", ofline.Guid)
 }
 
-// ToAlarmModel 转化成Model数据格式
-func (x *XData) DbCreateAlarm(stId int64, xalr *xproto.Alarm) error {
-	alr := &models.XAlarm{
-		DeviceNo:  xalr.DeviceNo,
-		UUID:      xalr.UUID,
-		StatusId:  stId,
-		Status:    xalr.Status.Status,
-		Type:      xalr.Type,
-		StartTime: xalr.StartTime,
-		EndTime:   xalr.EndTime,
-		Data:      internal.ToJString(xalr.Data),
-	}
-	return orm.DbCreate(alr)
-}
-
-type Task struct {
+type StatusTask struct {
 	TableIdx int
-	Status   []models.XStatus
+	Data     []models.XStatus
 	Size     int
 }
 
 // DbCreate 批量添加
-func DbTaskFunc(obj interface{}) {
-	task := obj.(*Task)
+func DbStatusTaskFunc(obj interface{}) {
+	task := obj.(*StatusTask)
 	// 映射
-	ptr := unsafe.Pointer(&task.Status)
 	var data interface{}
+	ptr := unsafe.Pointer(&task.Data)
 	switch task.TableIdx {
 	case 1:
 		data = (*[]models.XStatus1)(ptr)
@@ -73,7 +58,7 @@ func DbTaskFunc(obj interface{}) {
 	case 4:
 		data = (*[]models.XStatus4)(ptr)
 	default:
-		data = &task.Status
+		data = &task.Data
 	}
 	orm.DbCreate(data)
 }

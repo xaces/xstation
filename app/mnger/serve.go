@@ -1,4 +1,4 @@
-package manager
+package mnger
 
 import (
 	"sync"
@@ -21,7 +21,7 @@ type LServe struct {
 }
 
 type serve struct {
-	lock      sync.Mutex
+	lock      sync.RWMutex
 	lServeMap map[string]*LServe
 }
 
@@ -32,9 +32,9 @@ var (
 // NewLServe 新建服务
 func (o *serve) newLServe(serveId string, opt models.XServerOpt) {
 	o.lServeMap[serveId] = &LServe{
-		ServeId:     serveId,
-		XServerOpt:  opt,
-		IsWorking:   false,
+		ServeId:    serveId,
+		XServerOpt: opt,
+		IsWorking:  false,
 	}
 }
 
@@ -48,27 +48,44 @@ func (o *serve) LoadOfDb() {
 }
 
 // GetByType 根据类型
-func (o *serve) GetByType(ctype int) *models.XServerOpt {
+func (o *serve) GetByType(ctype int) *LServe {
+	o.lock.RLock()
+	defer o.lock.RUnlock()
 	for _, v := range o.lServeMap {
 		if v.XServerOpt.Role == ctype && v.IsWorking {
-			return &v.XServerOpt
+			return v
 		}
 	}
 	return nil
 }
 
-// LoadAllLServe 获取所有服务实时状态
+// LoadAllLServe 获取实时状态
 func (o *serve) GetAll() (lse []LServe) {
+	o.lock.RLock()
+	defer o.lock.RUnlock()
 	for _, v := range o.lServeMap {
 		lse = append(lse, *v)
 	}
 	return
 }
 
-// Get 获取
-func (o *serve) Get(serveId, address string) (*LServe, error) {
+// UpdateAll 更新状态
+func (o *serve) UpdateAll() {
 	o.lock.Lock()
 	defer o.lock.Unlock()
+	for _, v := range o.lServeMap {
+		if time.Since(v.UpdatedTime) < 60*time.Second {
+			continue
+		}
+		v.IsWorking = false
+		v.UpdatedTime = time.Time{}
+	}
+}
+
+// Get 获取
+func (o *serve) Get(serveId, address string) (*LServe, error) {
+	o.lock.RLock()
+	defer o.lock.RUnlock()
 	v, ok := o.lServeMap[serveId]
 	if !ok {
 		return nil, rpc.ErrServeNoExist

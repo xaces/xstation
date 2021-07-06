@@ -1,7 +1,7 @@
 package server
 
 import (
-	"xstation/app/manager"
+	"xstation/app/mnger"
 	"xstation/internal"
 	"xstation/models"
 
@@ -68,7 +68,7 @@ func (o *Server) AddHandler(c *gin.Context) {
 		ctx.JSONWriteError(err, c)
 		return
 	}
-	manager.Serve.Add(&param)
+	mnger.Serve.Add(&param)
 	// 同步信息到服务管理
 	ctx.JSONOk().WriteTo(c)
 }
@@ -94,7 +94,7 @@ func (o *Server) UpdateStatusHandler(c *gin.Context) {
 		ctx.JSONWriteError(err, c)
 		return
 	}
-	if err := manager.Serve.UpdateStatus(param.Guids, param.Status); err != nil {
+	if err := mnger.Serve.UpdateStatus(param.Guids, param.Status); err != nil {
 		ctx.JSONWriteError(err, c)
 		return
 	}
@@ -103,7 +103,7 @@ func (o *Server) UpdateStatusHandler(c *gin.Context) {
 
 // StatusListHandler
 func (o *Server) StatusListHandler(c *gin.Context) {
-	data := manager.Serve.GetAll()
+	data := mnger.Serve.GetAll()
 	ctx.JSONOk().WriteData(gin.H{"data": data}, c)
 }
 

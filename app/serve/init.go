@@ -1,26 +1,19 @@
 package serve
 
 import (
-	"errors"
 	"log"
 	"time"
-	"xstation/app/manager"
+	"xstation/app/mnger"
 	"xstation/configs"
 	"xstation/internal"
 	"xstation/models"
 
 	"github.com/wlgd/xutils"
 	"github.com/wlgd/xutils/orm"
-	"github.com/wlgd/xutils/rpc"
 )
 
-var (
-	isLoginServer = false
-	rpcToken      = ""
-)
-
-// serveInit 初始化服务
-func serveInit(name string) *models.XServer {
+// localServe 本地服务
+func localServe(name string) *models.XServer {
 	var s models.XServer
 	s.Role = models.ServeTypeLocal
 	if err := orm.DbFirstBy(&s, "role = ?", s.Role); err != nil {
@@ -37,41 +30,16 @@ func serveInit(name string) *models.XServer {
 }
 
 func loginServer() error {
-	if isLoginServer {
-		return rpc.KeepAlive(&rpc.KeepAliveArgs{
-			ServeId:     configs.LocalId,
-			Token:       rpcToken,
-			UpdatedTime: time.Now()})
-	}
-	// if err := rpc.Connect("xvms", "127.0.0.1", 10000); err != nil {
-	// 	return err
-	// }
-	// var reply rpc.LoginReply
-	// if err := rpc.Login(&rpc.LoginArgs{
-	// 	ServeId: global.LocalId,
-	// 	Address: global.LocalIpAddr}, &reply); err != nil {
-	// 	return err
-	// }
-	// rpcToken = reply.Token
-	// isLoginServer = true
 	return nil
 }
 
 // Run 启动
 func Run() error {
-	// 初始化上级服务
-	if configs.Default.Superior.Address == "" {
-		return errors.New("please set superior address firstly")
-	}
-	// 初始API服务
-	s := serveInit("station")
+	s := localServe("station")
 	configs.LocalId = s.Guid
 	configs.LocalIpAddr = xutils.PublicIPAddr()
-	manager.Serve.LoadOfDb()
-	// 加载设备信息
-	manager.Dev.LoadOfDb()
-	// 初始化rpc
-	go rpcxStart(s.RpcPort)
+	mnger.Serve.LoadOfDb()
+	mnger.Dev.LoadOfDb()
 	go xprotoStart(s.AccessPort)
 	go func() {
 		loginServer()
@@ -80,8 +48,8 @@ func Run() error {
 			<-ticker.C
 			if err := loginServer(); err != nil {
 				log.Println(err.Error())
-				isLoginServer = false
 			}
+			mnger.Serve.UpdateAll() // 检测服务状态
 		}
 	}()
 	return nil
@@ -90,5 +58,4 @@ func Run() error {
 // Stop 停止
 func Stop() {
 	xprotoStop()
-	rpcxStop()
 }

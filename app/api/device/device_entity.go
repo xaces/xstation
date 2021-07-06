@@ -2,7 +2,7 @@ package device
 
 import (
 	"xstation/app/api/page"
-	"xstation/app/manager"
+	"xstation/app/mnger"
 	"xstation/models"
 
 	"github.com/wlgd/xutils/orm"
@@ -42,7 +42,7 @@ func deleteDevices(ids []int) error {
 		return err
 	}
 	for _, dev := range devs {
-		manager.Dev.Delete(dev.DeviceNo)
+		mnger.Dev.Delete(dev.DeviceNo)
 	}
 	return nil
 }

@@ -1,6 +1,8 @@
 package configs
 
 import (
+	"errors"
+
 	"github.com/BurntSushi/toml"
 )
 
@@ -34,5 +36,8 @@ var (
 // Load 初始化配置参数
 func Load(path *string) error {
 	_, err := toml.DecodeFile(*path, &Default)
+	if Default.Superior.Address == "" {
+		return errors.New("please set superior address firstly")
+	}
 	return err
 }
