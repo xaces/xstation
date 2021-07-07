@@ -40,10 +40,18 @@ func Run() error {
 	configs.LocalIpAddr = xutils.PublicIPAddr()
 	mnger.Serve.LoadOfDb()
 	mnger.Dev.LoadOfDb()
-	go xprotoStart(s.AccessPort)
+	if err := xprotoStart(s.AccessPort); err != nil {
+		return err
+	}
+	log.Printf("Xproto serve start on %d", s.AccessPort)
+	if err := rpcxStart(s.RpcPort); err != nil {
+		return err
+	}
+	log.Printf("Rpc serve start on %d", s.RpcPort)
 	go func() {
 		loginServer()
 		ticker := time.NewTicker(time.Second * 60)
+		defer ticker.Stop()
 		for {
 			<-ticker.C
 			if err := loginServer(); err != nil {
@@ -58,4 +66,5 @@ func Run() error {
 // Stop 停止
 func Stop() {
 	xprotoStop()
+	rpcxStop()
 }

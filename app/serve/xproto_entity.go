@@ -123,7 +123,9 @@ func (x *XNotify) DbInsertHandler() {
 			stArray[tabIdx] = append(stArray[tabIdx], d)
 		case <-ticker.C:
 			for i := 0; i < models.KXStatusTabNumber; i++ {
-				x.DbInsertStatus(p, i, stArray[i])
+				if err := x.DbInsertStatus(p, i, stArray[i]); err != nil {
+					continue
+				}
 				stArray[i] = stArray[i][:0]
 			}
 		}
@@ -131,15 +133,15 @@ func (x *XNotify) DbInsertHandler() {
 }
 
 // insertStatus
-func (x *XNotify) DbInsertStatus(p *ants.PoolWithFunc, tabIdx int, data []models.XStatus) {
+func (x *XNotify) DbInsertStatus(p *ants.PoolWithFunc, tabIdx int, data []models.XStatus) error {
 	size := len(data)
 	if size <= 0 {
-		return
+		return nil
 	}
 	task := &service.StatusTask{}
 	task.TableIdx = tabIdx
 	task.Size = size
 	task.Data = make([]models.XStatus, task.Size)
 	copy(task.Data, data)
-	p.Invoke(task)
+	return p.Invoke(task)
 }

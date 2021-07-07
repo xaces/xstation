@@ -4,7 +4,7 @@ import (
 	"context"
 	"fmt"
 	"log"
-	"xstation/app/manager"
+	"xstation/app/mnger"
 	"xstation/service"
 
 	"github.com/wlgd/xutils/rpc"
@@ -18,7 +18,7 @@ type Arith int
 
 // Login 子服务登录
 func (t *Arith) Login(cxt context.Context, args *rpc.LoginArgs, reply *rpc.LoginReply) error {
-	s, err := manager.Serve.Get(args.ServeId, args.Address)
+	s, err := mnger.Serve.Get(args.ServeId, args.Address)
 	if err != nil {
 		return err
 	}
@@ -28,7 +28,7 @@ func (t *Arith) Login(cxt context.Context, args *rpc.LoginArgs, reply *rpc.Login
 
 // KeepAlive 工作站保活
 func (t *Arith) KeepAlive(cxt context.Context, args *rpc.KeepAliveArgs, reply *rpc.KeepAliveArgs) error {
-	return manager.Serve.Refresh(args.ServeId, args.Token)
+	return mnger.Serve.Refresh(args.ServeId, args.Token)
 }
 
 // XLinkRegister 服务注册
@@ -45,14 +45,12 @@ var (
 )
 
 // rpcxStart start rpc server
-func rpcxStart(port uint16) {
+func rpcxStart(port uint16) error {
 	address := fmt.Sprintf(":%d", port)
 	_rpcx = server.NewServer()
 	_rpcx.RegisterName("xstation", new(Arith), "")
-	log.Printf("loaclRpcServe Start %d\n", port)
-	if err := _rpcx.Serve("tcp", address); err != nil {
-		log.Fatal(err)
-	}
+	go _rpcx.Serve("tcp", address)
+	return nil
 }
 
 // rpcxStop stop rpc server

@@ -4,7 +4,6 @@ import (
 	"context"
 	"flag"
 	"log"
-	"net/http"
 	"os"
 	"os/signal"
 	"syscall"
@@ -34,14 +33,7 @@ func main() {
 	logFatalln(service.Init())
 	logFatalln(serve.Run())
 	// web服务
-	s := router.Init(configs.Default.Port.Http)
-	time.Sleep(10 * time.Microsecond)
-	log.Printf("API Server Start On %d\n", configs.Default.Port.Http)
-	go func() {
-		if err := s.ListenAndServe(); err != nil && err != http.ErrServerClosed {
-			log.Fatalln(err)
-		}
-	}()
+	s := router.Start(configs.Default.Port.Http)
 	// Wait for interrupt signal to gracefully shutdown the server with
 	// a timeout of 5 seconds.
 	quit := make(chan os.Signal)

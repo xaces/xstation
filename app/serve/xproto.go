@@ -1,8 +1,6 @@
 package serve
 
 import (
-	"log"
-
 	"github.com/wlgd/xproto"
 	"github.com/wlgd/xproto/ho"
 	"github.com/wlgd/xproto/jt"
@@ -29,27 +27,26 @@ var (
 	_xproto *xproto.Serve = nil
 )
 
-// xprotoStart 启动access服务
-func xprotoStart(port uint16) {
-	_xproto = &xproto.Serve{
-		RequestTimeOut: 50,
-		RecvTimeout:    30,
-		Adapter:        protocolAdapter,
-	}
+// xprotoStart 启动
+func xprotoStart(port uint16) error {
 	xnotify := NewXNotify()
-	_xproto.SetNotifyOfLinkAccess(xnotify.AccessHandler)
-	_xproto.SetNotifyOfStatus(xnotify.StatusHandler)
-	_xproto.SetNotifyOfAlarm(xnotify.AlarmHandler)
-	_xproto.SetNotifyOfAVFrame(xproto.LogAVFrame)
-	_xproto.SetNotifyOfEvent(xproto.LogEvent)
-	_xproto.SetNotifyOfRaw(xproto.LogRawFrame)
-	log.Printf("XProto Serve Start %d\n", port)
-	if err := _xproto.ListenAndServe(port); err != nil {
-		log.Fatalln("localAccess", err)
-	}
+	s, err := xproto.NewServe(xproto.Options{
+		RequestTimeout:   50,
+		RecvTimeout:      30,
+		Port:             port,
+		Adapter:          protocolAdapter,
+		LinkAccessNotify: xnotify.AccessHandler,
+		StatusNotify:     xnotify.StatusHandler,
+		AlarmNotify:      xnotify.AlarmHandler,
+		EventNotify:      xproto.LogEvent,
+		AVFrameNotify:    xproto.LogAVFrame,
+		RawNotify:        xproto.LogRawFrame,
+	})
+	_xproto = s
+	return err
 }
 
-// xprotoStop 停止access服务
+// xprotoStop 停止
 func xprotoStop() {
-	_xproto.Close()
+	_xproto.Release()
 }

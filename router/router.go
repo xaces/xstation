@@ -2,6 +2,7 @@ package router
 
 import (
 	"fmt"
+	"log"
 	"net/http"
 	"time"
 	"xstation/app/api"
@@ -70,14 +71,17 @@ func newApp() *gin.Engine {
 }
 
 // Init 路由初始化
-func Init(port uint16) *http.Server {
+func Start(port uint16) *http.Server {
 	r := newApp()
 	address := fmt.Sprintf(":%d", port)
-	return &http.Server{
+	s := &http.Server{
 		Addr:           address,
 		Handler:        r,
 		ReadTimeout:    30 * time.Second,
 		WriteTimeout:   60 * time.Second,
 		MaxHeaderBytes: 1 << 20,
 	}
+	log.Printf("Http Server Start On %d\n", port)
+	go s.ListenAndServe()
+	return s
 }
