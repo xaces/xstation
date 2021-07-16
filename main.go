@@ -34,6 +34,7 @@ func main() {
 	logFatalln(serve.Run())
 	// web服务
 	s := router.Start(configs.Default.Port.Http)
+	log.Printf("Http Server Start at %s\n", s.Addr)
 	// Wait for interrupt signal to gracefully shutdown the server with
 	// a timeout of 5 seconds.
 	quit := make(chan os.Signal)

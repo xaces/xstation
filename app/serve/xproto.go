@@ -30,7 +30,7 @@ var (
 // xprotoStart 启动
 func xprotoStart(port uint16) error {
 	xnotify := NewXNotify()
-	s, err := xproto.NewServe(xproto.Options{
+	s, err := xproto.NewServe(&xproto.Options{
 		RequestTimeout:   50,
 		RecvTimeout:      30,
 		Port:             port,

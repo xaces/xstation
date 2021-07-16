@@ -50,5 +50,5 @@ func (o *devManager) Delete(deviceNo string) {
 	o.lock.Lock()
 	defer o.lock.Unlock()
 	delete(o.lDevMap, deviceNo)
-	xproto.SyncStopConnection(deviceNo)
+	xproto.SyncStop(deviceNo)
 }

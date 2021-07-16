@@ -2,7 +2,6 @@ package router
 
 import (
 	"fmt"
-	"log"
 	"net/http"
 	"time"
 	"xstation/app/api"
@@ -42,6 +41,10 @@ func deiveRouter(r *gin.RouterGroup) {
 	ctrl.POST("/reboot", device.ControlRebootHandler)
 	ctrl.POST("/capture", device.ControlCaptureHandler)
 	ctrl.POST("/osd", device.ControlOsdHandler)
+	ctrl.POST("/reset", device.ControlResetHandler)
+	ctrl.POST("/vehicle", device.ControlVehicleHandler)
+	ctrl.POST("/gsensor", device.ControlGsensorHandler)
+
 
 	s := device.Device{}
 	r.GET("/device/list", s.ListHandler)
@@ -81,7 +84,6 @@ func Start(port uint16) *http.Server {
 		WriteTimeout:   60 * time.Second,
 		MaxHeaderBytes: 1 << 20,
 	}
-	log.Printf("Http Server Start On %d\n", port)
 	go s.ListenAndServe()
 	return s
 }
