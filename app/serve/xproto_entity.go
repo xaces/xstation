@@ -21,7 +21,7 @@ type XNotify struct {
 // NewAccessData 实例化对象
 func NewXNotify() *XNotify {
 	xdata := &XNotify{
-		Status:  make(chan models.XStatus, 1),
+		Status:  make(chan models.XStatus),
 		Service: service.NewXData(),
 	}
 	go xdata.DbInsertHandler()
@@ -116,6 +116,7 @@ func (x *XNotify) DbInsertHandler() {
 	ticker := time.NewTicker(time.Second * 2)
 	p, _ := ants.NewPoolWithFunc(5, service.DbStatusTaskFunc) // 协程池
 	defer p.Release()
+	defer close(x.Status)
 	for {
 		select {
 		case d := <-x.Status:
