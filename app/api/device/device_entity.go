@@ -1,7 +1,6 @@
 package device
 
 import (
-	"xstation/app/api/page"
 	"xstation/app/mnger"
 	"xstation/models"
 
@@ -10,7 +9,8 @@ import (
 
 // devicePage 分页
 type devicePage struct {
-	page.Page
+	PageNum   uint64 `form:"pageNum"`  // 当前页码
+	PageSize  uint64 `form:"pageSize"` // 每页数
 	StartTime string `json:"startTime"`
 	EndTime   string `json:"endTime"`
 }

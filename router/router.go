@@ -59,8 +59,8 @@ func deiveRouter(r *gin.RouterGroup) {
 }
 
 func newApp() *gin.Engine {
-	r := gin.Default()
 	gin.SetMode(gin.ReleaseMode)
+	r := gin.Default()
 	r.Use(gin.Logger()) // 日志
 	// /StandardLoginAction_terminalLogin.action?update=gStream&live=1&server=login
 	r.POST("/StandardLoginAction_terminalLogin.action", device.LoginHandler)

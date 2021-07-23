@@ -1,14 +1,13 @@
 package device
 
 import (
-	"xstation/app/api/page"
-
 	"github.com/wlgd/xutils/orm"
 )
 
 // statusPage 分页
 type statusPage struct {
-	page.Page
+	PageNum   uint64 `form:"pageNum"`  // 当前页码
+	PageSize  uint64 `form:"pageSize"` // 每页数
 	StartTime string `form:"startTime"`
 	EndTime   string `form:"endTime"`
 	DeviceId  uint64 `form:"deviceId"` //
