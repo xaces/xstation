@@ -36,7 +36,7 @@ func deiveRouter(r *gin.RouterGroup) {
 	p.POST("/ftpTransfer", device.FtpTransferHandler)
 	p.POST("/close", device.CloseLinkHandler)
 
-	ctrl := p.Group("/control")
+	ctrl := r.Group("/device/control")
 	ctrl.POST("/ptz", device.ControlPTZHandler)
 	ctrl.POST("/reboot", device.ControlRebootHandler)
 	ctrl.POST("/capture", device.ControlCaptureHandler)

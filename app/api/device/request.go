@@ -81,7 +81,7 @@ func ControlRebootHandler(c *gin.Context) {
 		ctx.JSONWriteError(err, c)
 		return
 	}
-	param := &xproto.Control{Type: xproto.CTRL_Reboot}
+	param := xproto.Control{Type: xproto.CTRL_Reboot}
 	var resp interface{}
 	if err := xproto.SyncSend(xproto.REQ_Control, param, &resp, i.deviceId); err != nil {
 		ctx.JSONWriteError(err, c)
