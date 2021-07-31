@@ -11,6 +11,7 @@ type statusPage struct {
 	StartTime string `form:"startTime"`
 	EndTime   string `form:"endTime"`
 	DeviceNo  string `form:"deviceNo"` //
+	Flag      uint8  `form:"flag"`     // 0-实时 1-补传
 	Desc      string `form:"desc"`     //
 }
 
@@ -20,6 +21,9 @@ func (s *statusPage) Where() *orm.DbWhere {
 	where.Append("device_no like ?", s.DeviceNo)
 	where.Append("dtu >= ?", s.StartTime)
 	where.Append("dtu <= ?", s.EndTime)
+	if s.Flag != 0 {
+		where.Append("flag = ?", s.Flag)
+	}
 	where.Orders = append(where.Orders, s.Desc+" desc")
 	return &where
 }
