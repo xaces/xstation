@@ -1,8 +1,8 @@
 package device
 
 import (
-	"xstation/models"
-	"xstation/service"
+	"xstation/app/mnger"
+	"xstation/model"
 
 	"github.com/wlgd/xutils/orm"
 
@@ -20,12 +20,11 @@ func (o *Status) ListHandler(c *gin.Context) {
 		ctx.JSONWriteError(err, c)
 		return
 	}
-	var rows []models.XStatus
-	totalCount, err := orm.DbPage(service.GetXStatusModel(param.DeviceId), param.Where()).Scan(param.PageNum, param.PageSize, &rows)
+	_, m := mnger.Dev.GetModel(param.DeviceNo)
+	var rows []model.Status
+	totalCount, err := orm.DbPage(m, param.Where()).Scan(param.PageNum, param.PageSize, &rows)
 	if err == nil {
-		ctx.JSONOk().WriteData(gin.H{
-			"total": totalCount,
-			"rows":  rows}, c)
+		ctx.JSONOk().WriteData(gin.H{"total": totalCount, "rows": rows}, c)
 		return
 	}
 	ctx.JSONWriteError(err, c)
@@ -38,10 +37,10 @@ func (o *Status) GetHandler(c *gin.Context) {
 		ctx.JSONWriteError(err, c)
 		return
 	}
-	data := service.GetXStatusModel(param.DeviceId)
-	if err := orm.DbFirstById(param.StatusId, data); err != nil {
+	_, data := mnger.Dev.GetModel(param.DeviceNo)
+	if err := orm.DbFirstById(data, param.StatusId); err != nil {
 		ctx.JSONWriteError(err, c)
 		return
 	}
-	ctx.JSONOk().WriteData(gin.H{"data": data}, c)
+	ctx.JSONOk().WriteData(data, c)
 }

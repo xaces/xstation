@@ -8,14 +8,13 @@ import (
 	"os/signal"
 	"syscall"
 	"time"
+	"xstation/app"
 	"xstation/app/serve"
 	"xstation/configs"
-	"xstation/router"
-	"xstation/service"
 )
 
 var (
-	configure = flag.String("c", "./conf/config.toml", "default config file")
+	configure = flag.String("c", "./config.toml", "default config file")
 )
 
 func logFatalln(err error) {
@@ -30,11 +29,10 @@ func logFatalln(err error) {
 func main() {
 	flag.Parse()
 	logFatalln(configs.Load(configure))
-	logFatalln(service.Init())
 	logFatalln(serve.Run())
 	// web服务
-	s := router.Start(configs.Default.Port.Http)
-	log.Printf("Http Server Start at %s\n", s.Addr)
+	s := app.HttpListenAndServe(configs.Default.Port.Http)
+	log.Printf("Http Start on %d\n", configs.Default.Port.Http)
 	// Wait for interrupt signal to gracefully shutdown the server with
 	// a timeout of 5 seconds.
 	quit := make(chan os.Signal)

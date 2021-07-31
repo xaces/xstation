@@ -37,17 +37,17 @@ POST http://127.0.0.1:12100/xstation/api/serve
 Content-Type: application/json
 
 {
-    "name": "xstroage",
-    "httpPort": 12200,
-    "rpcPort": 12210,
-    "accessPort": 12220,
+    "name": "xstream",
+    "httpPort": 12300,
+    "rpcPort": 12310,
+    "accessPort": 12320,
     "status": 1,
-    "role": 3
+    "role": 2
 }
 
 ### 获取服务
 
-GET http://127.0.0.1:12100/xstation/api/serve/get/92Wub04vsFyOmWISSnwl6T
+GET http://127.0.0.1:12100/xstation/api/serve/get/lbDFjWpEtTVgcpzRgmAPQh
 Content-Type: application/json
 
 {
@@ -63,4 +63,16 @@ Content-Type: application/json
 {
     "guid": "92Wub04vsFyOmWISSnwl6T",
     "status": 1
+}
+
+### 获取服务
+
+DELETE  http://127.0.0.1:12100/xstation/api/serve
+Content-Type: application/json
+
+{
+    "guid": [
+        "lbDFjWpEtTVgcpzRgmAPQh",
+        ""
+    ]
 }

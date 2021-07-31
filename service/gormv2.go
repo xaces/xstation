@@ -3,7 +3,9 @@ package service
 import (
 	"errors"
 	"xstation/configs"
-	"xstation/models"
+	"xstation/internal"
+	"xstation/model"
+
 	"github.com/wlgd/xutils/orm"
 
 	"gorm.io/driver/mysql"
@@ -13,26 +15,19 @@ import (
 	"gorm.io/gorm/schema"
 )
 
+const (
+	StatusTableNum = 2
+)
+
 func initTables(db *gorm.DB) {
 	db.AutoMigrate(
-		&models.XServer{},
-		&models.XDevice{},
-		&models.XLink{},
-		&models.XAlarm{},
-		&models.XStatus{},
+		&model.Serve{},
+		&model.Device{},
+		&model.OnLine{},
+		&model.Alarm{},
+		&model.Status{},
+		&model.Status1{},
 	)
-	if models.KXStatusTabNumber > 1 {
-		db.AutoMigrate(&models.XStatus1{})
-	}
-	if models.KXStatusTabNumber > 2 {
-		db.AutoMigrate(&models.XStatus2{})
-	}
-	if models.KXStatusTabNumber > 3 {
-		db.AutoMigrate(&models.XStatus3{})
-	}
-	if models.KXStatusTabNumber > 4 {
-		db.AutoMigrate(&models.XStatus4{})
-	}
 	orm.SetDB(db)
 }
 
@@ -56,9 +51,9 @@ func sqlInit() error {
 			SkipInitializeWithVersion: false, // 根据版本自动配置
 		}), &gconf)
 	case "sqlite3":
-		db, err = gorm.Open(sqlite.Open(configs.Default.SQL.LiteDB), &gconf)
+		db, err = gorm.Open(sqlite.Open(configs.Default.SQL.Address), &gconf)
 	case "postgresql":
-		db, err = gorm.Open(postgres.Open(configs.Default.SQL.Postgre), &gconf)
+		db, err = gorm.Open(postgres.Open(configs.Default.SQL.Address), &gconf)
 	default:
 	}
 	if err != nil {
@@ -76,5 +71,22 @@ func sqlInit() error {
 	// SetMaxOpenCons 设置数据库的最大连接数量。
 	sqldb.SetMaxOpenConns(100)
 	initTables(db)
+	return nil
+}
+
+var (
+	_snowflake *internal.Snowflake = nil
+)
+
+func PrimaryKey() int64 {
+	return _snowflake.NextId()
+}
+
+// Init 初始化服务
+func Init() error {
+	if err := sqlInit(); err != nil {
+		return err
+	}
+	_snowflake, _ = internal.NewSnowflake(0xFF)
 	return nil
 }

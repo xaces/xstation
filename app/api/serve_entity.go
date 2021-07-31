@@ -1,11 +1,11 @@
-package server
+package api
 
 import (
 	"errors"
 	"xstation/app/mnger"
 	"xstation/configs"
 	"xstation/internal"
-	"xstation/models"
+	"xstation/model"
 
 	"github.com/wlgd/xutils"
 	"github.com/wlgd/xutils/orm"
@@ -34,7 +34,7 @@ type serveOpt struct {
 }
 
 func deleteServes(guids []string) error {
-	if _, err := orm.DbDeleteBy(&models.XServer{}, "guid in (?)", guids); err != nil {
+	if _, err := orm.DbDeleteBy(&model.Serve{}, "guid in (?)", guids); err != nil {
 		return err
 	}
 	mnger.Serve.Delete(guids)

@@ -1,9 +1,9 @@
-package server
+package api
 
 import (
 	"xstation/app/mnger"
 	"xstation/internal"
-	"xstation/models"
+	"xstation/model"
 
 	"github.com/wlgd/xutils/orm"
 
@@ -26,40 +26,36 @@ func ApplyAuthHandler(c *gin.Context) {
 	ctx.JSONOk().WriteTo(c)
 }
 
-type Server struct {
+type Serve struct {
 }
 
 // ListHandler
-func (o *Server) ListHandler(c *gin.Context) {
-	var serves []models.XServer
+func (o *Serve) ListHandler(c *gin.Context) {
+	var serves []model.Serve
 	if err := orm.DbFind(&serves); err != nil {
 		ctx.JSONWriteError(err, c)
 		return
 	}
-	ctx.JSONOk().WriteData(gin.H{"data": serves}, c)
+	ctx.JSONOk().WriteData(serves, c)
 }
 
 // ListHandler
-func (o *Server) GetHandler(c *gin.Context) {
+func (o *Serve) GetHandler(c *gin.Context) {
 	guid := ctx.ParamString(c, "guid")
-	var server models.XServer
+	var server model.Serve
 	if err := orm.DbFirstBy(&server, "guid like ?", guid); err != nil {
 		ctx.JSONWriteError(err, c)
 		return
 	}
-	var st models.XServer
-	orm.DbFirstBy(&st, "role = ?", models.ServeTypeLocal)
-	ctx.JSONOk().WriteData(gin.H{
-		"data": gin.H{
-			"station": st.XServerOpt,
-			"local":   server.XServerOpt,
-		}}, c)
+	var st model.Serve
+	orm.DbFirstBy(&st, "role = ?", 1)
+	ctx.JSONOk().WriteData(gin.H{"station": st.ServeOpt, "local": server.ServeOpt}, c)
 }
 
 // AddHandler 新增
-func (o *Server) AddHandler(c *gin.Context) {
-	var param models.XServer
-	if err := c.ShouldBindJSON(&param.XServerOpt); err != nil {
+func (o *Serve) AddHandler(c *gin.Context) {
+	var param model.Serve
+	if err := c.ShouldBindJSON(&param.ServeOpt); err != nil {
 		ctx.JSONWriteError(err, c)
 		return
 	}
@@ -74,9 +70,9 @@ func (o *Server) AddHandler(c *gin.Context) {
 }
 
 // UpdateHandler
-func (o *Server) UpdateHandler(c *gin.Context) {
-	var param models.XServer
-	if err := c.ShouldBindJSON(&param.XServerOpt); err != nil {
+func (o *Serve) UpdateHandler(c *gin.Context) {
+	var param model.Serve
+	if err := c.ShouldBindJSON(&param.ServeOpt); err != nil {
 		ctx.JSONWriteError(err, c)
 		return
 	}
@@ -88,7 +84,7 @@ func (o *Server) UpdateHandler(c *gin.Context) {
 }
 
 // UpdateStatusHandler
-func (o *Server) UpdateStatusHandler(c *gin.Context) {
+func (o *Serve) UpdateStatusHandler(c *gin.Context) {
 	var param serveOpt
 	if err := c.ShouldBind(&param); err != nil {
 		ctx.JSONWriteError(err, c)
@@ -102,13 +98,13 @@ func (o *Server) UpdateStatusHandler(c *gin.Context) {
 }
 
 // StatusListHandler
-func (o *Server) StatusListHandler(c *gin.Context) {
+func (o *Serve) StatusListHandler(c *gin.Context) {
 	data := mnger.Serve.GetAll()
-	ctx.JSONOk().WriteData(gin.H{"data": data}, c)
+	ctx.JSONOk().WriteData(data, c)
 }
 
 // DeleteHandler 删除
-func (o *Server) DeleteHandler(c *gin.Context) {
+func (o *Serve) DeleteHandler(c *gin.Context) {
 	var param serveOpt
 	if err := c.ShouldBind(&param); err != nil {
 		ctx.JSONWriteError(err, c)

@@ -3,7 +3,7 @@ package device
 import (
 	"xstation/app/mnger"
 	"xstation/internal"
-	"xstation/models"
+	"xstation/model"
 
 	"github.com/wlgd/xutils/ctx"
 	"github.com/wlgd/xutils/orm"
@@ -20,12 +20,10 @@ func (o *Device) ListHandler(c *gin.Context) {
 		ctx.JSONWriteError(err, c)
 		return
 	}
-	var rows []models.XDevice
-	totalCount, err := orm.DbPage(&models.XDevice{}, param.Where()).Find(param.PageNum, param.PageSize, &rows)
+	var rows []model.Device
+	totalCount, err := orm.DbPage(&model.Device{}, param.Where()).Find(param.PageNum, param.PageSize, &rows)
 	if err == nil {
-		ctx.JSONOk().WriteData(gin.H{
-			"total": totalCount,
-			"rows":  rows}, c)
+		ctx.JSONOk().WriteData(gin.H{"total": totalCount, "rows": rows}, c)
 		return
 	}
 	ctx.JSONWriteError(err, c)
@@ -33,25 +31,25 @@ func (o *Device) ListHandler(c *gin.Context) {
 
 // GetHandler 获取指定id
 func (o *Device) GetHandler(c *gin.Context) {
-	ID, err := ctx.ParamInt(c, "id")
+	id, err := ctx.ParamInt(c, "id")
 	if err != nil {
 		ctx.JSONWriteError(err, c)
 		return
 	}
-	var data models.XDevice
-	err = orm.DbFirstById(ID, &data)
+	var data model.Device
+	err = orm.DbFirstById(&data, id)
 	if err != nil {
 		ctx.JSONWriteError(err, c)
 		return
 	}
-	ctx.JSONOk().WriteData(gin.H{"data": data}, c)
+	ctx.JSONOk().WriteData(data, c)
 }
 
 // AddHandler 新增
 func (o *Device) AddHandler(c *gin.Context) {
-	var data models.XDevice
+	var data model.Device
 	//获取参数
-	if err := c.ShouldBind(&data.XDeviceOpt); err != nil {
+	if err := c.ShouldBind(&data.DeviceOpt); err != nil {
 		ctx.JSONWriteError(err, c)
 		return
 	}
@@ -72,8 +70,8 @@ func (o *Device) UpdateHandler(c *gin.Context) {
 		ctx.JSONWriteError(err, c)
 		return
 	}
-	data := &models.XDevice{
-		XDeviceOpt: param.XDeviceOpt,
+	data := &model.Device{
+		DeviceOpt: param.DeviceOpt,
 	}
 	if err := orm.DbUpdateById(&data, param.Id); err != nil {
 		ctx.JSONWriteError(err, c)

@@ -6,26 +6,26 @@ import (
 
 // statusPage 分页
 type statusPage struct {
-	PageNum   uint64 `form:"pageNum"`  // 当前页码
-	PageSize  uint64 `form:"pageSize"` // 每页数
+	PageNum   int    `form:"pageNum"`  // 当前页码
+	PageSize  int    `form:"pageSize"` // 每页数
 	StartTime string `form:"startTime"`
 	EndTime   string `form:"endTime"`
-	DeviceId  uint64 `form:"deviceId"` //
-	Descs     string `form:"descs"`    //
+	DeviceNo  string `form:"deviceNo"` //
+	Desc      string `form:"desc"`     //
 }
 
 // Where 初始化
 func (s *statusPage) Where() *orm.DbWhere {
 	var where orm.DbWhere
-	where.Append("device_id = ?", s.DeviceId)
+	where.Append("device_no like ?", s.DeviceNo)
 	where.Append("dtu >= ?", s.StartTime)
 	where.Append("dtu <= ?", s.EndTime)
-	where.Orders = append(where.Orders, s.Descs+" desc")
+	where.Orders = append(where.Orders, s.Desc+" desc")
 	return &where
 }
 
 // statusGet 获取
 type statusGet struct {
-	DeviceId uint64 `form:"deviceId"` //
-	StatusId uint64 `form:"statusId"` //
+	DeviceNo string `form:"deviceNo"` //
+	StatusId int64  `form:"statusId"` //
 }

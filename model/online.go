@@ -1,10 +1,10 @@
-package models
+package model
 
-// 上下线信息
+// 上线信息
 
-// XLink 定义
-type XLink struct {
-	Id            int64  `gorm:"primary_key"`
+// OnLine 定义
+type OnLine struct {
+	Id            int64  `json:"id" gorm:"primary_key"`
 	Guid          string `json:"guid" gorm:"primary_key"`
 	DeviceNo      string `json:"deviceNo" gorm:"type:varchar(24);"`
 	RemoteAddress string `json:"remoteAddress"`                   // 设备网络地址
@@ -12,12 +12,11 @@ type XLink struct {
 	OffTime       string `json:"offTime" gorm:"type:varchar(20);"`
 	NetType       int    `json:"netType"`  // 网络类型
 	Type          int    `json:"type"`     // 工作类型
-	UpTraffic     int64  `json:"upFlow"`   // 上行流量
-	DownTraffic   int64  `json:"downFlow"` // 下行流量
-	Version       string `json:"vesion" gorm:"type:varchar(32);"`
+	UpTraffic     int64  `json:"upTraffic"`   // 上行流量
+	DownTraffic   int64  `json:"downTraffic"` // 下行流量
 }
 
 // TableName 表名
-func (s *XLink) TableName() string {
-	return "t_xlink"
+func (s *OnLine) TableName() string {
+	return "t_online"
 }

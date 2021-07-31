@@ -201,51 +201,6 @@ Content-Type: application/json
     }
 }
 
-### 设备控制 ptz
-
-POST http://{{baseUrl}}/device/request/control/ptz
-?deviceId={{deviceId}}
-Content-Type: application/json
-
-{
-    "code": 24,
-    "channel": 8,
-    "speed": 4
-}
-
-### 设备控制
-
-POST http://{{baseUrl}}/device/request/control/reboot
-?deviceId={{deviceId}}
-Content-Type: application/json
-
-{
-
-}
-
-### 设备控制
-
-POST http://{{baseUrl}}/device/request/control/capture
-?deviceId={{deviceId}}
-Content-Type: application/json
-
-{
-    "channelList": "1;2",
-    "reslution": 4
-}
-
-### 设备控制
-
-POST http://{{baseUrl}}/device/request/control/osd
-?deviceId={{deviceId}}
-Content-Type: application/json
-
-{
-    "osdSpeed": "obd"
-}
-
-
-
 ### ftp文件传输
 
 POST http://{{baseUrl}}/device/request/ftpTransfer
@@ -316,7 +271,7 @@ Content-Type: application/json
    
 }
 
-@upgrade=UpgradeFile
+@upgrade=HW3520D-V16072701-V210727T1.194.sw
 ### 文件上传
 POST http://{{baseUrl}}/upload HTTP/1.1
 Content-Type: multipart/form-data; boundary=----WebKitFormBoundary7MA4YWxkTrZu0gW
@@ -329,13 +284,13 @@ title
 Content-Disposition: form-data; name="file"; filename="{{upgrade}}";
 Content-Type: text/plain
 
-< Z:\\{{upgrade}}
+< Z:\\mdvr_protocol\\LINUX\\tag\\howen_20190916\\app_hw3520\\release\\{{upgrade}}
 ------WebKitFormBoundary7MA4YWxkTrZu0gW--
 
 
 ### file文件传输
 
-POST http://{{baseUrl}}/request/fileTransfer
+POST http://{{baseUrl}}/device/request/fileTransfer
 ?deviceId={{deviceId}}
 Content-Type: application/json
 
@@ -344,6 +299,6 @@ Content-Type: application/json
     "fileType": 5,
     "action": 1,
     "server": "{{access}}",
-    "fileSize": 13022129,
+    "fileSize": 12828180,
     "offset": 0
 }

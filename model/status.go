@@ -1,4 +1,4 @@
-package models
+package model
 
 import (
 	"database/sql/driver"
@@ -130,62 +130,54 @@ func (t *JObds) Scan(v interface{}) error {
 	return jsoniter.Unmarshal(v.([]byte), t)
 }
 
-// XStatus 状态数据
+// Status 状态数据
 // gps {"longtitude:,latitude:,..."}
-type XStatus struct {
+type Status struct {
 	Id        int64    `json:"id" gorm:"primary_key"`
 	DeviceId  uint64   `json:"deviceId"`
 	DeviceNo  string   `json:"deviceNo" gorm:"type:varchar(24);"` // 时间
-	Status    uint8    `json:"status"`                            // 0-实时 1-补传
+	Flag      uint8    `json:"flag"`                              // 0-实时 1-补传 2-AlarmLink
 	Acc       uint8    `json:"acc"`                               // acc
 	DTU       string   `json:"dtu" gorm:"type:varchar(20);"`      // 时间
 	Gps       JGps     `json:"gps" gorm:"type:varchar(128);"`     // gps信息 json 字符串
 	Obds      JObds    `json:"obds"`                              // obd json 字符串
-	Tempers   JFloats  `json:"tempers" gorm:"type:varchar(32);"`  // 温度 json 字符串
-	Humiditys JFloats  `json:"humidity" gorm:"type:varchar(32);"` // 湿度 json 字符串
-	Mileage   JMileage `json:"mileage" gorm:"type:varchar(64);"`  // 里程 json 字符串
-	Oils      JOil     `json:"oils" gorm:"type:varchar(128);"`    // 油耗 json 字符串
-	Module    JModule  `json:"module" gorm:"type:varchar(64);"`   // 模块状态 json 字符串
-	Gsensor   JGsensor `json:"gsensor" gorm:"type:varchar(64);"`  // GSensor json 字符串
-	Mobile    JMobile  `json:"mobile" gorm:"type:varchar(64);"`   // 移动网络 json 字符串
-	Disks     JDisks   `json:"disks" gorm:"type:varchar(128);"`   // 磁盘 json 字符串
-	People    JPeople  `json:"people" gorm:"type:varchar(32);"`   // 人数统计 json 字符串
+	Tempers   JFloats  `json:"tempers"`                           // 温度 json 字符串
+	Humiditys JFloats  `json:"humidity"`                          // 湿度 json 字符串
+	Mileage   JMileage `json:"mileage"`                           // 里程 json 字符串
+	Oils      JOil     `json:"oils"`                              // 油耗 json 字符串
+	Module    JModule  `json:"module"`                            // 模块状态 json 字符串
+	Gsensor   JGsensor `json:"gsensor"`                           // GSensor json 字符串
+	Mobile    JMobile  `json:"mobile"`                            // 移动网络 json 字符串
+	Disks     JDisks   `json:"disks"`                             // 磁盘 json 字符串
+	People    JPeople  `json:"people"`                            // 人数统计 json 字符串
 	TableIdx  int      `json:"-" gorm:"-"`
 }
 
 // TableName 表名
-func (s *XStatus) TableName() string {
-	return "t_xstatus0"
+func (s *Status) TableName() string {
+	return "t_status0"
 }
 
-type XStatus1 XStatus
+type Status1 Status
 
-// TableName 表名
-func (s *XStatus1) TableName() string {
-	return "t_xstatus1"
+func (s *Status1) TableName() string {
+	return "t_status1"
 }
 
-type XStatus2 XStatus
+type Status2 Status
 
-// TableName 表名
-func (s *XStatus2) TableName() string {
-	return "t_xstatus2"
+func (s *Status2) TableName() string {
+	return "t_status2"
 }
 
-type XStatus3 XStatus
+type Status3 Status
 
-// TableName 表名
-func (s *XStatus3) TableName() string {
-	return "t_xstatus3"
+func (s *Status3) TableName() string {
+	return "t_status3"
 }
 
-type XStatus4 XStatus
+type Status4 Status
 
-// TableName 表名
-func (s *XStatus4) TableName() string {
-	return "t_xstatus4"
+func (s *Status4) TableName() string {
+	return "t_status4"
 }
-
-var (
-	KXStatusTabNumber int = 2
-)

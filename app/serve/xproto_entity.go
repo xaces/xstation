@@ -5,7 +5,7 @@ import (
 	"time"
 	"xstation/app/mnger"
 	"xstation/internal"
-	"xstation/models"
+	"xstation/model"
 	"xstation/service"
 
 	"github.com/panjf2000/ants/v2"
@@ -14,15 +14,13 @@ import (
 )
 
 type XNotify struct {
-	Status  chan models.XStatus
-	Service *service.XData
+	Status chan model.Status
 }
 
 // NewAccessData 实例化对象
 func NewXNotify() *XNotify {
 	xdata := &XNotify{
-		Status:  make(chan models.XStatus),
-		Service: service.NewXData(),
+		Status: make(chan model.Status),
 	}
 	go xdata.DbInsertHandler()
 	return xdata
@@ -34,27 +32,27 @@ func (x *XNotify) AddDbStatus(st *xproto.Status) int64 {
 	if dev == nil {
 		return 0
 	}
-	o := models.XStatus{}
+	o := model.Status{}
 	o.Id = service.PrimaryKey()
 	o.DeviceId = dev.Id
 	o.DeviceNo = st.DeviceNo
 	o.DTU = st.DTU
-	o.Status = st.Status
-	if st.Location.Speed < 1 {
-		st.Location.Speed = 0
+	o.Flag = st.Flag
+	if st.Gps.Speed < 1 {
+		st.Gps.Speed = 0
 	}
 	o.Acc = st.Acc
-	o.Gps = models.JGps(st.Location)
-	o.Tempers = models.JFloats(st.Tempers)
-	o.Humiditys = models.JFloats(st.Humiditys)
-	o.Mileage = models.JMileage(st.Mileage)
-	o.Oils = models.JOil(st.Oils)
-	o.Module = models.JModule(st.Module)
-	o.Gsensor = models.JGsensor(st.Gsensor)
-	o.Mobile = models.JMobile(st.Mobile)
-	o.Disks = models.JDisks(st.Disks)
-	o.People = models.JPeople(st.People)
-	o.TableIdx = int(dev.Id) % models.KXStatusTabNumber
+	o.Gps = model.JGps(st.Gps)
+	o.Tempers = model.JFloats(st.Tempers)
+	o.Humiditys = model.JFloats(st.Humiditys)
+	o.Mileage = model.JMileage(st.Mileage)
+	o.Oils = model.JOil(st.Oils)
+	o.Module = model.JModule(st.Module)
+	o.Gsensor = model.JGsensor(st.Gsensor)
+	o.Mobile = model.JMobile(st.Mobile)
+	o.Disks = model.JDisks(st.Disks)
+	o.People = model.JPeople(st.People)
+	o.TableIdx = int(dev.Id) % service.StatusTableNum
 	x.Status <- o
 	return o.Id
 }
@@ -62,23 +60,22 @@ func (x *XNotify) AddDbStatus(st *xproto.Status) int64 {
 // AccessHandler 设备接入
 func (o *XNotify) AccessHandler(data string, access *xproto.LinkAccess) error {
 	log.Printf("%s\n", data)
-	if access.LinkType == xproto.LINK_Signal {
-		dev := mnger.Dev.Get(access.DeviceNo)
-		if dev == nil {
-			return xproto.ErrInvalidDevice
-		}
-		if dev.Version != access.Version || dev.Type != access.Type {
-			dev.Version = access.Version
-			dev.Type = access.Type
-			orm.DbUpdateModel(dev)
-		}
+	m := mnger.Dev.Get(access.DeviceNo)
+	if m == nil {
+		return xproto.ErrInvalidDevice
 	}
-	if access.LinkType == xproto.LINK_FileTransfer {
+	if access.LinkType == xproto.LINK_Signal {
+		if m.Version != access.Version || m.Type != access.Type {
+			m.Version = access.Version
+			m.Type = access.Type
+			orm.DbUpdateModel(m)
+		}
+	} else if access.LinkType == xproto.LINK_FileTransfer {
 		if err := xproto.UploadFile(access, true); err != nil {
 			return err
 		}
 	}
-	return o.Service.DbUpdateAccess(access)
+	return service.DbUpdateOnline(access)
 }
 
 // StatusHandler 接收状态数据
@@ -90,18 +87,18 @@ func (x *XNotify) StatusHandler(tag string, xst *xproto.Status) {
 // AlarmHandler 接收报警数据
 func (x *XNotify) AlarmHandler(tag, data string, xalr *xproto.Alarm) {
 	xproto.LogAlarm(tag, data, xalr)
-	status := xalr.Status.Status
-	xalr.Status.Status = 2
+	flag := xalr.Status.Flag
+	xalr.Status.Flag = 2
 	statusId := x.AddDbStatus(xalr.Status)
 	if statusId <= 0 {
 		return
 	}
-	alarm := models.XAlarm{
+	alarm := model.Alarm{
 		DeviceNo:  xalr.DeviceNo,
 		Guid:      internal.UUID(),
 		UUID:      xalr.UUID,
 		StatusId:  statusId,
-		Status:    status,
+		Flag:      flag,
 		Type:      xalr.Type,
 		StartTime: xalr.StartTime,
 		EndTime:   xalr.EndTime,
@@ -112,7 +109,7 @@ func (x *XNotify) AlarmHandler(tag, data string, xalr *xproto.Alarm) {
 
 // DbStatusHandler 批量处理数据
 func (x *XNotify) DbInsertHandler() {
-	stArray := make([][]models.XStatus, models.KXStatusTabNumber)
+	stArray := make([][]model.Status, service.StatusTableNum)
 	ticker := time.NewTicker(time.Second * 2)
 	p, _ := ants.NewPoolWithFunc(5, service.DbStatusTaskFunc) // 协程池
 	defer p.Release()
@@ -123,7 +120,7 @@ func (x *XNotify) DbInsertHandler() {
 			tabIdx := d.TableIdx
 			stArray[tabIdx] = append(stArray[tabIdx], d)
 		case <-ticker.C:
-			for i := 0; i < models.KXStatusTabNumber; i++ {
+			for i := 0; i < service.StatusTableNum; i++ {
 				if err := x.DbInsertStatus(p, i, stArray[i]); err != nil {
 					continue
 				}
@@ -134,7 +131,7 @@ func (x *XNotify) DbInsertHandler() {
 }
 
 // insertStatus
-func (x *XNotify) DbInsertStatus(p *ants.PoolWithFunc, tabIdx int, data []models.XStatus) error {
+func (x *XNotify) DbInsertStatus(p *ants.PoolWithFunc, tabIdx int, data []model.Status) error {
 	size := len(data)
 	if size <= 0 {
 		return nil
@@ -142,7 +139,7 @@ func (x *XNotify) DbInsertStatus(p *ants.PoolWithFunc, tabIdx int, data []models
 	task := &service.StatusTask{}
 	task.TableIdx = tabIdx
 	task.Size = size
-	task.Data = make([]models.XStatus, task.Size)
+	task.Data = make([]model.Status, task.Size)
 	copy(task.Data, data)
 	return p.Invoke(task)
 }

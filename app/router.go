@@ -1,11 +1,10 @@
-package router
+package app
 
 import (
 	"fmt"
 	"net/http"
 	"time"
 	"xstation/app/api"
-	"xstation/app/api/server"
 
 	"xstation/app/api/device"
 
@@ -14,7 +13,7 @@ import (
 
 // serverRouter 服务路由
 func serverRouter(r *gin.RouterGroup) {
-	s := server.Server{}
+	s := api.Serve{}
 	r.GET("/serve/list", s.ListHandler)
 	r.GET("/serve/get/:guid", s.GetHandler)
 	r.POST("/serve", s.AddHandler)
@@ -45,7 +44,6 @@ func deiveRouter(r *gin.RouterGroup) {
 	ctrl.POST("/vehicle", device.ControlVehicleHandler)
 	ctrl.POST("/gsensor", device.ControlGsensorHandler)
 
-
 	s := device.Device{}
 	r.GET("/device/list", s.ListHandler)
 	r.GET("/device/get/:id", s.GetHandler)
@@ -56,16 +54,22 @@ func deiveRouter(r *gin.RouterGroup) {
 	st := device.Status{}
 	r.GET("/device/status/list", st.ListHandler)
 	r.GET("/device/status", st.GetHandler)
+
+	on := device.OnLine{}
+	r.POST("/device/online", on.AddHandler)
+	r.GET("/device/online/list", on.ListHandler)
+
+	alr := device.Alarm{}
+	r.GET("/device/alarm/list", alr.ListHandler)
+	r.GET("/device/alarm/bystatus/:statusId", alr.GetByStatusIdHandler)
 }
 
 func newApp() *gin.Engine {
 	gin.SetMode(gin.ReleaseMode)
 	r := gin.Default()
 	r.Use(gin.Logger()) // 日志
-	// /StandardLoginAction_terminalLogin.action?update=gStream&live=1&server=login
-	r.POST("/StandardLoginAction_terminalLogin.action", device.LoginHandler)
 	root := r.Group("/xstation")
-	root.POST("/applyAuth", server.ApplyAuthHandler)
+	root.POST("/applyAuth", api.ApplyAuthHandler)
 	v1 := root.Group("/api")
 	v1.POST("/upload", api.UploadHandler)
 	serverRouter(v1)
@@ -73,8 +77,8 @@ func newApp() *gin.Engine {
 	return r
 }
 
-// Init 路由初始化
-func Start(port uint16) *http.Server {
+// HttpListenAndServe
+func HttpListenAndServe(port uint16) *http.Server {
 	r := newApp()
 	address := fmt.Sprintf(":%d", port)
 	s := &http.Server{

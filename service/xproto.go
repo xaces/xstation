@@ -2,23 +2,16 @@ package service
 
 import (
 	"unsafe"
-	"xstation/models"
+	"xstation/model"
 
 	"github.com/wlgd/xutils/orm"
 
 	"github.com/wlgd/xproto"
 )
 
-type XData struct {
-}
-
-func NewXData() *XData {
-	return new(XData)
-}
-
-// DbUpdateAccess 更新链路信息
-func (x *XData) DbUpdateAccess(reg *xproto.LinkAccess) error {
-	ofline := &models.XLink{
+// DbUpdateOnline 更新链路信息
+func DbUpdateOnline(reg *xproto.LinkAccess) error {
+	ofline := &model.OnLine{
 		Guid:          reg.Session,
 		DeviceNo:      reg.DeviceNo,
 		RemoteAddress: reg.RemoteAddress,
@@ -26,7 +19,6 @@ func (x *XData) DbUpdateAccess(reg *xproto.LinkAccess) error {
 		Type:          int(reg.LinkType),
 		UpTraffic:     reg.UpTraffic,
 		DownTraffic:   reg.DownTraffic,
-		Version:       reg.Version,
 	}
 	if reg.OnLine {
 		ofline.OnTime = reg.DeviceTime
@@ -38,7 +30,7 @@ func (x *XData) DbUpdateAccess(reg *xproto.LinkAccess) error {
 
 type StatusTask struct {
 	TableIdx int
-	Data     []models.XStatus
+	Data     []model.Status
 	Size     int
 }
 
@@ -50,32 +42,37 @@ func DbStatusTaskFunc(obj interface{}) {
 	ptr := unsafe.Pointer(&task.Data)
 	switch task.TableIdx {
 	case 1:
-		data = (*[]models.XStatus1)(ptr)
+		data = (*[]model.Status1)(ptr)
 	case 2:
-		data = (*[]models.XStatus2)(ptr)
+		data = (*[]model.Status2)(ptr)
 	case 3:
-		data = (*[]models.XStatus3)(ptr)
+		data = (*[]model.Status3)(ptr)
 	case 4:
-		data = (*[]models.XStatus4)(ptr)
+		data = (*[]model.Status4)(ptr)
 	default:
 		data = &task.Data
 	}
 	orm.DbCreate(data)
 }
 
-// GetXStatusModel 获取model模型
-func GetXStatusModel(devId uint64) interface{} {
-	tabIdx := int(devId) % models.KXStatusTabNumber
+// StatusModel 获取model模型
+func StatusModel(devId uint64) (string, interface{}) {
+	tabIdx := int(devId) % StatusTableNum
 	switch tabIdx {
 	case 1:
-		return &models.XStatus1{}
+		m := &model.Status1{}
+		return m.TableName(), m
 	case 2:
-		return &models.XStatus2{}
+		m := &model.Status2{}
+		return m.TableName(), m
 	case 3:
-		return &models.XStatus3{}
+		m := &model.Status3{}
+		return m.TableName(), m
 	case 4:
-		return &models.XStatus4{}
+		m := &model.Status4{}
+		return m.TableName(), m
 	default:
 	}
-	return &models.XStatus{}
+	m := &model.Status{}
+	return m.TableName(), m
 }

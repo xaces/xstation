@@ -2,15 +2,15 @@ package device
 
 import (
 	"xstation/app/mnger"
-	"xstation/models"
+	"xstation/model"
 
 	"github.com/wlgd/xutils/orm"
 )
 
 // devicePage 分页
 type devicePage struct {
-	PageNum   uint64 `form:"pageNum"`  // 当前页码
-	PageSize  uint64 `form:"pageSize"` // 每页数
+	PageNum   int    `form:"pageNum"`  // 当前页码
+	PageSize  int    `form:"pageSize"` // 每页数
 	StartTime string `json:"startTime"`
 	EndTime   string `json:"endTime"`
 }
@@ -29,12 +29,12 @@ func (s *devicePage) Where() *orm.DbWhere {
 
 // deviceUpdate 更新
 type deviceUpdate struct {
-	models.XDeviceOpt
+	model.DeviceOpt
 	Id uint64 `json:"id"`
 }
 
 func deleteDevices(ids []int) error {
-	var devs []models.XDevice
+	var devs []model.Device
 	if _, err := orm.DbFindBy(&devs, "id in (?)", ids); err != nil {
 		return err
 	}

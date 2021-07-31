@@ -38,7 +38,7 @@ func QueryHandler(c *gin.Context) {
 		ctx.JSONWriteError(err, c)
 		return
 	}
-	ctx.JSONOk().WriteData(gin.H{"data": resp}, c)
+	ctx.JSONOk().WriteData(resp, c)
 }
 
 // DvrParameters 参数管理 获取/设置
@@ -54,7 +54,7 @@ func ParametersHandler(c *gin.Context) {
 		ctx.JSONWriteError(err, c)
 		return
 	}
-	ctx.JSONOk().WriteData(gin.H{"data": resp}, c)
+	ctx.JSONOk().WriteData(resp, c)
 }
 
 // DvrControl 设置控制
@@ -71,7 +71,7 @@ func ControlPTZHandler(c *gin.Context) {
 		ctx.JSONWriteError(err, c)
 		return
 	}
-	ctx.JSONOk().WriteData(gin.H{"data": resp}, c)
+	ctx.JSONOk().WriteData(resp, c)
 }
 
 // ControlRebootHandler 设置控制
@@ -87,7 +87,7 @@ func ControlRebootHandler(c *gin.Context) {
 		ctx.JSONWriteError(err, c)
 		return
 	}
-	ctx.JSONOk().WriteData(gin.H{"data": resp}, c)
+	ctx.JSONOk().WriteData(resp, c)
 }
 
 // ControlCaptureHandler 设置控制
@@ -104,7 +104,7 @@ func ControlCaptureHandler(c *gin.Context) {
 		ctx.JSONWriteError(err, c)
 		return
 	}
-	ctx.JSONOk().WriteData(gin.H{"data": resp}, c)
+	ctx.JSONOk().WriteData(resp, c)
 }
 
 // ControlOsdHandler 设置控制
@@ -121,7 +121,7 @@ func ControlOsdHandler(c *gin.Context) {
 		ctx.JSONWriteError(err, c)
 		return
 	}
-	ctx.JSONOk().WriteData(gin.H{"data": resp}, c)
+	ctx.JSONOk().WriteData(resp, c)
 }
 // ControlGsensorHandler 设置控制
 func ControlGsensorHandler(c *gin.Context) {
@@ -137,7 +137,7 @@ func ControlGsensorHandler(c *gin.Context) {
 		ctx.JSONWriteError(err, c)
 		return
 	}
-	ctx.JSONOk().WriteData(gin.H{"data": resp}, c)
+	ctx.JSONOk().WriteData(resp, c)
 }
 
 // ControlVehicleHandler 设置控制
@@ -153,7 +153,7 @@ func ControlVehicleHandler(c *gin.Context) {
 		ctx.JSONWriteError(err, c)
 		return
 	}
-	ctx.JSONOk().WriteData(gin.H{"data": resp}, c)
+	ctx.JSONOk().WriteData(resp, c)
 }
 
 // ControlResetHandler 设置控制
@@ -169,7 +169,7 @@ func ControlResetHandler(c *gin.Context) {
 		ctx.JSONWriteError(err, c)
 		return
 	}
-	ctx.JSONOk().WriteData(gin.H{"data": resp}, c)
+	ctx.JSONOk().WriteData(resp, c)
 }
 
 // DvrLiveStream 实时视频请求
@@ -186,7 +186,7 @@ func LiveStreamHandler(c *gin.Context) {
 		ctx.JSONWriteError(err, c)
 		return
 	}
-	ctx.JSONOk().WriteData(gin.H{"data": resp}, c)
+	ctx.JSONOk().WriteData(resp, c)
 }
 
 // VoiceHandler 语音业务
@@ -203,7 +203,7 @@ func VoiceHandler(c *gin.Context) {
 		ctx.JSONWriteError(err, c)
 		return
 	}
-	ctx.JSONOk().WriteData(gin.H{"data": resp}, c)
+	ctx.JSONOk().WriteData(resp, c)
 }
 
 // DvrPlayback 录像回放
@@ -219,7 +219,7 @@ func PlaybackHandler(c *gin.Context) {
 		ctx.JSONWriteError(err, c)
 		return
 	}
-	ctx.JSONOk().WriteData(gin.H{"data": resp}, c)
+	ctx.JSONOk().WriteData(resp, c)
 }
 
 // DvrSerialTransparent 串口透传设置
@@ -235,7 +235,7 @@ func SerialTransparentHandler(c *gin.Context) {
 		ctx.JSONWriteError(err, c)
 		return
 	}
-	ctx.JSONOk().WriteData(gin.H{"data": resp}, c)
+	ctx.JSONOk().WriteData(resp, c)
 }
 
 // DvrSerialTransfer 串口透传数据
@@ -256,7 +256,7 @@ func SerialTransferHandler(c *gin.Context) {
 		ctx.JSONWriteError(err, c)
 		return
 	}
-	ctx.JSONOk().WriteData(gin.H{"data": resp}, c)
+	ctx.JSONOk().WriteData(resp, c)
 }
 
 // DvrFileTransfer 文件传输
@@ -272,7 +272,7 @@ func FileTransferHandler(c *gin.Context) {
 		ctx.JSONWriteError(err, c)
 		return
 	}
-	ctx.JSONOk().WriteData(gin.H{"data": resp}, c)
+	ctx.JSONOk().WriteData(resp, c)
 }
 
 // DvrFtpTransfer ftp文件传输
@@ -288,7 +288,7 @@ func FtpTransferHandler(c *gin.Context) {
 		ctx.JSONWriteError(err, c)
 		return
 	}
-	ctx.JSONOk().WriteData(gin.H{"data": resp}, c)
+	ctx.JSONOk().WriteData(resp, c)
 }
 
 // DvrCloseLink 关闭链路

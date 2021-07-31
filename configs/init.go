@@ -6,10 +6,10 @@ import (
 	"github.com/BurntSushi/toml"
 )
 
-var (
-	LocalId     string // 服务Id
-	LocalIpAddr string // 服务IP
-)
+type localConfigure struct {
+	Id     string // 服务Id
+	IpAddr string // 服务IP
+}
 
 type tomlConfigure struct {
 	Port struct {
@@ -20,17 +20,20 @@ type tomlConfigure struct {
 	SQL struct {
 		Name    string
 		Address string
-		LiteDB  string
-		Postgre string
 	}
 	Superior struct {
 		Address string
+	}
+	Map struct {
+		Name string
+		Key  string
 	}
 }
 
 // Default 所有配置参数
 var (
 	Default tomlConfigure
+	Local   localConfigure
 )
 
 // Load 初始化配置参数
