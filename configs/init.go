@@ -1,14 +1,14 @@
 package configs
 
 import (
-	"errors"
-
 	"github.com/BurntSushi/toml"
+	"github.com/wlgd/xutils"
 )
 
 type localConfigure struct {
-	Id     string // 服务Id
-	IpAddr string // 服务IP
+	Id            string // 服务Id
+	IpAddr        string // 服务IP
+	EffectiveTime int    // 有效时间
 }
 
 type tomlConfigure struct {
@@ -21,9 +21,6 @@ type tomlConfigure struct {
 		Name    string
 		Address string
 	}
-	Superior struct {
-		Address string
-	}
 	Map struct {
 		Name string
 		Key  string
@@ -32,15 +29,22 @@ type tomlConfigure struct {
 
 // Default 所有配置参数
 var (
-	Default tomlConfigure
-	Local   localConfigure
+	Default         tomlConfigure
+	Local           localConfigure
+	SuperiorAddress string
 )
 
 // Load 初始化配置参数
-func Load(path *string) error {
-	_, err := toml.DecodeFile(*path, &Default)
-	if Default.Superior.Address == "" {
-		return errors.New("please set superior address firstly")
+func Load(licences, path *string) error {
+	lice, err := xutils.ReadLicences(*licences)
+	if err != nil {
+		return err
+	}
+	Local.EffectiveTime = lice.EffectiveTime
+	//TODO address
+	SuperiorAddress = lice.Address
+	if _, err := toml.DecodeFile(*path, &Default); err != nil {
+		return err
 	}
 	return err
 }

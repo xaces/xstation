@@ -15,6 +15,7 @@ import (
 
 var (
 	configure = flag.String("c", "./config.toml", "default config file")
+	licences  = flag.String("ces", "xstation.licences", "default licences file")
 )
 
 func logFatalln(err error) {
@@ -28,7 +29,7 @@ func logFatalln(err error) {
 // 2、获取向中心服务配置信息
 func main() {
 	flag.Parse()
-	logFatalln(configs.Load(configure))
+	logFatalln(configs.Load(licences, configure))
 	logFatalln(serve.Run())
 	// web服务
 	s := app.HttpListenAndServe(configs.Default.Port.Http)
