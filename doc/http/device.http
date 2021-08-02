@@ -1,5 +1,5 @@
 ### 添加设备
-POST http://127.0.0.1:12100/xstation/api/device
+POST http://127.0.0.1:12100/station/api/device
 Content-Type: application/json
 
 {
@@ -9,7 +9,7 @@ Content-Type: application/json
 }
 
 ### 设备列表
-GET http://127.0.0.1:12100/xstation/api/device/list
+GET http://127.0.0.1:12100/station/api/device/list
 Content-Type: application/json
 
 {
@@ -17,7 +17,7 @@ Content-Type: application/json
 }
 
 ### 设备信息
-GET http://127.0.0.1:12100/xstation/api/device/get/1
+GET http://127.0.0.1:12100/station/api/device/get/1
 Content-Type: application/json
 
 {
@@ -26,7 +26,7 @@ Content-Type: application/json
 
 
 ### 更新设备信息
-PUT http://127.0.0.1:12100/xstation/api/device
+PUT http://127.0.0.1:12100/station/api/device
 Content-Type: application/json
 
 {
@@ -38,7 +38,7 @@ Content-Type: application/json
 
 
 ### 更新设备信息
-DELETE  http://127.0.0.1:12100/xstation/api/device/3
+DELETE  http://127.0.0.1:12100/station/api/device/3
 Content-Type: application/json
 
 {
@@ -48,7 +48,7 @@ Content-Type: application/json
 
 
 ### 获取设备状态数据
-GET http://127.0.0.1:12100/xstation/api/device/status/list?deviceNo=20198002&startTime=2021-07-31 00:00:00&endTime=2021-07-31 23:59:59&desc=dtu
+GET http://127.0.0.1:12100/station/api/device/status/list?deviceNo=20198002&startTime=2021-07-31 00:00:00&endTime=2021-07-31 23:59:59&desc=dtu
 Content-Type: application/json
 
 {
@@ -56,7 +56,7 @@ Content-Type: application/json
 }
 
 ### 获取设备状态数据
-GET http://127.0.0.1:12100/xstation/api/device/status/list?deviceNo=20198002&startTime=2021-07-31 00:00:00&endTime=2021-07-31 23:59:59&flag=2&desc=dtu
+GET http://127.0.0.1:12100/station/api/device/status/list?deviceNo=20198002&startTime=2021-07-31 00:00:00&endTime=2021-07-31 23:59:59&flag=2&desc=dtu
 Content-Type: application/json
 
 {
@@ -65,7 +65,7 @@ Content-Type: application/json
 
 
 ### 获取设备上下线数据
-GET http://127.0.0.1:12100/xstation/api/device/online/list?deviceNo=20198002&startTime=2021-07-31 00:00:00&endTime=2021-07-31 23:59:59
+GET http://127.0.0.1:12100/station/api/device/online/list?deviceNo=20198002&startTime=2021-07-31 00:00:00&endTime=2021-07-31 23:59:59
 Content-Type: application/json
 
 {
@@ -73,7 +73,7 @@ Content-Type: application/json
 }
 
 ### 获取设备报警数据
-GET http://127.0.0.1:12100/xstation/api/device/alarm/list?deviceNo=20198002&startTime=2021-07-31 00:00:00&endTime=2021-07-31 23:59:59
+GET http://127.0.0.1:12100/station/api/device/alarm/list?deviceNo=20198002&startTime=2021-07-31 00:00:00&endTime=2021-07-31 23:59:59
 Content-Type: application/json
 
 {
@@ -81,7 +81,7 @@ Content-Type: application/json
 }
 
 ### 获取指定状态id报警
-GET http://127.0.0.1:12100/xstation/api/device/alarm/bystatus/427788605789827072
+GET http://127.0.0.1:12100/station/api/device/alarm/bystatus/427788605789827072
 Content-Type: application/json
 
 {
@@ -89,7 +89,7 @@ Content-Type: application/json
 }
 
 ### 获取设备指定id状态数据
-GET http://127.0.0.1:12100/xstation/api/device/status?deviceId=1&statusId=409377188543983616
+GET http://127.0.0.1:12100/station/api/device/status?deviceId=1&statusId=409377188543983616
 Content-Type: application/json
 
 {

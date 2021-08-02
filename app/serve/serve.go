@@ -30,9 +30,7 @@ func loginServe() error {
 // Run 启动
 func Run() error {
 	localData()
-	if err := loginServe(); err != nil {
-		return err
-	}
+	loginServe()
 	if err := xprotoStart(configs.Default.Port.Access); err != nil {
 		return err
 	}
