@@ -1,7 +1,9 @@
 package app
 
 import (
+	"fmt"
 	"net/http"
+	"strings"
 	"time"
 	"xstation/app/api"
 	"xstation/middleware"
@@ -80,9 +82,11 @@ func newApp() *gin.Engine {
 
 // HttpListenAndServe
 func HttpListenAndServe(address string) *http.Server {
+	as := strings.Split(address, ":")
+	addr := fmt.Sprintf(":%s", as[1])
 	r := newApp()
 	s := &http.Server{
-		Addr:           address,
+		Addr:           addr,
 		Handler:        r,
 		ReadTimeout:    30 * time.Second,
 		WriteTimeout:   60 * time.Second,
