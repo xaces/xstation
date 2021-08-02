@@ -21,9 +21,8 @@ func localData() {
 }
 
 func loginServe() error {
-	url := fmt.Sprintf("http://%s/stationLogin", configs.SuperiorAddress)
-	addr := fmt.Sprintf("%s:%d", configs.Default.Host, configs.Default.Port.Http)
-	req := gin.H{"serveId": configs.Local.Id, "address": addr}
+	url := fmt.Sprintf("http://%s/stationLogin", configs.SuperAddress)
+	req := gin.H{"serveId": configs.Local.Id, "address": configs.Default.HttpAddr}
 	return xutils.HttpPost(url, req, nil)
 }
 
@@ -31,10 +30,10 @@ func loginServe() error {
 func Run() error {
 	localData()
 	loginServe()
-	if err := xprotoStart(configs.Default.Port.Access); err != nil {
+	if err := xprotoStart(configs.Default.AccessAddr); err != nil {
 		return err
 	}
-	log.Printf("Xproto start on %d\n", configs.Default.Port.Access)
+	log.Printf("Xproto start at %s\n", configs.Default.AccessAddr)
 	// if err := rpcxStart(s.RpcPort); err != nil {
 	// 	return err
 	// }

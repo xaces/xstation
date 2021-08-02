@@ -20,7 +20,7 @@ type applyAuth struct {
 // tryApplyAuth 尝试申请授权
 func tryApplyAuth(param *applyAuth) error {
 	var data internal.LicensingInf
-	if err := xutils.HttpPost(configs.SuperiorAddress+"/station/applyAuth", param, &data); err != nil {
+	if err := xutils.HttpPost(configs.SuperAddress+"/station/applyAuth", param, &data); err != nil {
 		return errors.New("apply authority failed")
 	}
 	internal.WriteLicences(&data)

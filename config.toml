@@ -1,10 +1,7 @@
-# 公网Ip
-Host="127.0.0.1"
-### Serve Port
-[Port]
-Http=12100
-Rpc=12110
-Access=33000
+### Serve
+HttpAddr="127.0.0.1:12100"
+### 配置公网ip，此ip要下发给设备
+AccessAddr="172.16.50.219:33000"
 
 ### SQL
 [SQL]
@@ -15,4 +12,4 @@ Address="root:123456@tcp(127.0.0.1:3306)/xstation?charset=utf8&parseTime=True&lo
 
 [Map]
 Name="Baidu"
-Key="MkStYYmSDxUSZCrb4SzWESsSHVkMURD8"
+Key=""

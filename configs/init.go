@@ -12,13 +12,9 @@ type localConfigure struct {
 }
 
 type tomlConfigure struct {
-	Host string //
-	Port struct {
-		Http   uint16
-		Access uint16
-		Rpc    uint16
-	}
-	SQL struct {
+	HttpAddr   string //
+	AccessAddr string //
+	SQL        struct {
 		Name    string
 		Address string
 	}
@@ -30,9 +26,9 @@ type tomlConfigure struct {
 
 // Default 所有配置参数
 var (
-	Default         tomlConfigure
-	Local           localConfigure
-	SuperiorAddress string
+	Default      tomlConfigure
+	Local        localConfigure
+	SuperAddress string
 )
 
 // Load 初始化配置参数
@@ -44,12 +40,9 @@ func Load(licences, path *string) error {
 	Local.Id = lice.ServeGuid
 	Local.EffectiveTime = lice.EffectiveTime
 	//TODO address
-	SuperiorAddress = lice.Address
+	SuperAddress = lice.Address
 	if _, err := toml.DecodeFile(*path, &Default); err != nil {
 		return err
-	}
-	if Default.Host == "" {
-		Default.Host = xutils.PublicIPAddr()
 	}
 	return err
 }
