@@ -5,6 +5,7 @@ import (
 	"net/http"
 	"time"
 	"xstation/app/api"
+	"xstation/middleware"
 
 	"xstation/app/api/device"
 
@@ -67,8 +68,9 @@ func deiveRouter(r *gin.RouterGroup) {
 func newApp() *gin.Engine {
 	gin.SetMode(gin.ReleaseMode)
 	r := gin.Default()
-	r.Use(gin.Logger()) // 日志
-	root := r.Group("/xstation")
+	r.Use(gin.Logger())      // 日志
+	r.Use(middleware.Cors()) // 跨域
+	root := r.Group("/station")
 	root.POST("/applyAuth", api.ApplyAuthHandler)
 	v1 := root.Group("/api")
 	v1.POST("/upload", api.UploadHandler)
