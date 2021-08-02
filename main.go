@@ -11,6 +11,7 @@ import (
 	"xstation/app"
 	"xstation/app/serve"
 	"xstation/configs"
+	"xstation/service"
 )
 
 var (
@@ -30,6 +31,7 @@ func logFatalln(err error) {
 func main() {
 	flag.Parse()
 	logFatalln(configs.Load(licences, configure))
+	logFatalln(service.Init())
 	logFatalln(serve.Run())
 	// web服务
 	s := app.HttpListenAndServe(configs.Default.Port.Http)

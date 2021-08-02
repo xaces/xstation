@@ -1,3 +1,5 @@
+# 公网Ip
+Host="127.0.0.1"
 ### Serve Port
 [Port]
 Http=12100

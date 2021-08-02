@@ -12,6 +12,7 @@ type localConfigure struct {
 }
 
 type tomlConfigure struct {
+	Host string //
 	Port struct {
 		Http   uint16
 		Access uint16
@@ -40,11 +41,15 @@ func Load(licences, path *string) error {
 	if err != nil {
 		return err
 	}
+	Local.Id = lice.ServeGuid
 	Local.EffectiveTime = lice.EffectiveTime
 	//TODO address
 	SuperiorAddress = lice.Address
 	if _, err := toml.DecodeFile(*path, &Default); err != nil {
 		return err
+	}
+	if Default.Host == "" {
+		Default.Host = xutils.PublicIPAddr()
 	}
 	return err
 }
