@@ -38,7 +38,7 @@ func NewSnowflake(workerID int64) (*Snowflake, error) {
 }
 
 // NextId 下一个ID
-func (w *Snowflake) NextId() int64 {
+func (w *Snowflake) NextId() uint64 {
 	w.mu.Lock()
 	defer w.mu.Unlock()
 	now := time.Now().UnixNano() / 1e6
@@ -53,6 +53,6 @@ func (w *Snowflake) NextId() int64 {
 		w.number = 0
 		w.timestamp = now
 	}
-	ID := int64((now-startTime)<<timeShift | (w.workerID << workerShift) | (w.number))
-	return ID
+	Id := uint64((now-startTime)<<timeShift | (w.workerID << workerShift) | (w.number))
+	return Id
 }

@@ -133,7 +133,7 @@ func (t *JObds) Scan(v interface{}) error {
 // Status 状态数据
 // gps {"longtitude:,latitude:,..."}
 type Status struct {
-	Id        int64    `json:"id" gorm:"primary_key"`
+	Id        uint64   `json:"id" gorm:"primary_key"`
 	DeviceId  uint64   `json:"deviceId"`
 	DeviceNo  string   `json:"deviceNo" gorm:"type:varchar(24);"` // 时间
 	Flag      uint8    `json:"flag"`                              // 0-实时 1-补传 2-AlarmLink

@@ -31,5 +31,5 @@ func (s *statusPage) Where() *orm.DbWhere {
 // statusGet 获取
 type statusGet struct {
 	DeviceNo string `form:"deviceNo"` //
-	StatusId int64  `form:"statusId"` //
+	StatusId uint64 `form:"statusId"` //
 }

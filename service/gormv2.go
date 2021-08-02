@@ -78,7 +78,7 @@ var (
 	_snowflake *internal.Snowflake = nil
 )
 
-func PrimaryKey() int64 {
+func PrimaryKey() uint64 {
 	return _snowflake.NextId()
 }
 

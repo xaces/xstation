@@ -27,7 +27,7 @@ func NewXNotify() *XNotify {
 }
 
 // AddDbStatus 转化成Model数据格式
-func (x *XNotify) AddDbStatus(st *xproto.Status) int64 {
+func (x *XNotify) AddDbStatus(st *xproto.Status) uint64 {
 	dev := mnger.Dev.Get(st.DeviceNo)
 	if dev == nil {
 		return 0
