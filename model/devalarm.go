@@ -1,7 +1,7 @@
 package model
 
-// Alarm 报警
-type Alarm struct {
+// DevAlarm 报警
+type DevAlarm struct {
 	Id        uint64 `json:"id" gorm:"primary_key"`
 	Guid      string `json:"guid" gorm:"type:varchar(64);"`
 	DeviceNo  string `json:"deviceNo" gorm:"type:varchar(24);"`
@@ -15,6 +15,6 @@ type Alarm struct {
 }
 
 // TableName 表名
-func (s *Alarm) TableName() string {
-	return "t_alarm"
+func (s *DevAlarm) TableName() string {
+	return "t_devalarm"
 }

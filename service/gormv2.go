@@ -23,10 +23,10 @@ func initTables(db *gorm.DB) {
 	db.AutoMigrate(
 		&model.Serve{},
 		&model.Device{},
-		&model.OnLine{},
-		&model.Alarm{},
-		&model.Status{},
-		&model.Status1{},
+		&model.DevOnline{},
+		&model.DevAlarm{},
+		&model.DevStatus{},
+		&model.DevStatus1{},
 	)
 	orm.SetDB(db)
 }

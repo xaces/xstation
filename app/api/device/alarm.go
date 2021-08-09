@@ -13,7 +13,7 @@ type Alarm struct {
 }
 
 type alarm struct {
-	Alarm  model.Alarm `json:"alarm"`
+	Alarm  model.DevAlarm `json:"alarm"`
 	Status interface{} `json:"status"`
 }
 
@@ -23,8 +23,8 @@ func (o *Alarm) ListHandler(c *gin.Context) {
 		ctx.JSONWriteError(err, c)
 		return
 	}
-	var rows []model.Alarm
-	totalCount, err := orm.DbPage(&model.Alarm{}, param.Where()).Scan(param.PageNum, param.PageSize, &rows)
+	var rows []model.DevAlarm
+	totalCount, err := orm.DbPage(&model.DevAlarm{}, param.Where()).Scan(param.PageNum, param.PageSize, &rows)
 	if err == nil {
 		var data []alarm
 		for _, v := range rows {
@@ -48,7 +48,7 @@ func (o *Alarm) GetByStatusIdHandler(c *gin.Context) {
 		ctx.JSONWriteError(err, c)
 		return
 	}
-	var data model.Alarm
+	var data model.DevAlarm
 	err = orm.DbFirstBy(&data, "status_id = ?", statusId)
 	if err != nil {
 		ctx.JSONWriteError(err, c)

@@ -11,7 +11,7 @@ import (
 
 // DbUpdateOnline 更新链路信息
 func DbUpdateOnline(reg *xproto.LinkAccess) error {
-	ofline := &model.OnLine{
+	ofline := &model.DevOnline{
 		Guid:          reg.Session,
 		DeviceNo:      reg.DeviceNo,
 		RemoteAddress: reg.RemoteAddress,
@@ -30,7 +30,7 @@ func DbUpdateOnline(reg *xproto.LinkAccess) error {
 
 type StatusTask struct {
 	TableIdx int
-	Data     []model.Status
+	Data     []model.DevStatus
 	Size     int
 }
 
@@ -42,13 +42,13 @@ func DbStatusTaskFunc(obj interface{}) {
 	ptr := unsafe.Pointer(&task.Data)
 	switch task.TableIdx {
 	case 1:
-		data = (*[]model.Status1)(ptr)
+		data = (*[]model.DevStatus1)(ptr)
 	case 2:
-		data = (*[]model.Status2)(ptr)
+		data = (*[]model.DevStatus2)(ptr)
 	case 3:
-		data = (*[]model.Status3)(ptr)
+		data = (*[]model.DevStatus3)(ptr)
 	case 4:
-		data = (*[]model.Status4)(ptr)
+		data = (*[]model.DevStatus4)(ptr)
 	default:
 		data = &task.Data
 	}
@@ -60,19 +60,19 @@ func StatusModel(devId uint64) (string, interface{}) {
 	tabIdx := int(devId) % StatusTableNum
 	switch tabIdx {
 	case 1:
-		m := &model.Status1{}
+		m := &model.DevStatus1{}
 		return m.TableName(), m
 	case 2:
-		m := &model.Status2{}
+		m := &model.DevStatus2{}
 		return m.TableName(), m
 	case 3:
-		m := &model.Status3{}
+		m := &model.DevStatus3{}
 		return m.TableName(), m
 	case 4:
-		m := &model.Status4{}
+		m := &model.DevStatus4{}
 		return m.TableName(), m
 	default:
 	}
-	m := &model.Status{}
+	m := &model.DevStatus{}
 	return m.TableName(), m
 }

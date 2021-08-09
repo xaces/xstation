@@ -14,13 +14,13 @@ import (
 )
 
 type XNotify struct {
-	Status chan model.Status
+	Status chan model.DevStatus
 }
 
 // NewAccessData 实例化对象
 func NewXNotify() *XNotify {
 	xdata := &XNotify{
-		Status: make(chan model.Status),
+		Status: make(chan model.DevStatus),
 	}
 	go xdata.DbInsertHandler()
 	return xdata
@@ -32,7 +32,7 @@ func (x *XNotify) AddDbStatus(st *xproto.Status) uint64 {
 	if dev == nil {
 		return 0
 	}
-	o := model.Status{}
+	o := model.DevStatus{}
 	o.Id = service.PrimaryKey()
 	o.DeviceId = dev.Id
 	o.DeviceNo = st.DeviceNo
@@ -93,7 +93,7 @@ func (x *XNotify) AlarmHandler(tag, data string, xalr *xproto.Alarm) {
 	if statusId <= 0 {
 		return
 	}
-	alarm := model.Alarm{
+	alarm := model.DevAlarm{
 		DeviceNo:  xalr.DeviceNo,
 		Guid:      internal.UUID(),
 		UUID:      xalr.UUID,
@@ -109,7 +109,7 @@ func (x *XNotify) AlarmHandler(tag, data string, xalr *xproto.Alarm) {
 
 // DbStatusHandler 批量处理数据
 func (x *XNotify) DbInsertHandler() {
-	stArray := make([][]model.Status, service.StatusTableNum)
+	stArray := make([][]model.DevStatus, service.StatusTableNum)
 	ticker := time.NewTicker(time.Second * 2)
 	p, _ := ants.NewPoolWithFunc(5, service.DbStatusTaskFunc) // 协程池
 	defer p.Release()
@@ -131,7 +131,7 @@ func (x *XNotify) DbInsertHandler() {
 }
 
 // insertStatus
-func (x *XNotify) DbInsertStatus(p *ants.PoolWithFunc, tabIdx int, data []model.Status) error {
+func (x *XNotify) DbInsertStatus(p *ants.PoolWithFunc, tabIdx int, data []model.DevStatus) error {
 	size := len(data)
 	if size <= 0 {
 		return nil
@@ -139,7 +139,7 @@ func (x *XNotify) DbInsertStatus(p *ants.PoolWithFunc, tabIdx int, data []model.
 	task := &service.StatusTask{}
 	task.TableIdx = tabIdx
 	task.Size = size
-	task.Data = make([]model.Status, task.Size)
+	task.Data = make([]model.DevStatus, task.Size)
 	copy(task.Data, data)
 	return p.Invoke(task)
 }

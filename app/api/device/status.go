@@ -21,10 +21,10 @@ func (o *Status) ListHandler(c *gin.Context) {
 		return
 	}
 	_, m := mnger.Dev.GetModel(param.DeviceNo)
-	var rows []model.Status
+	var rows []model.DevStatus
 	totalCount, err := orm.DbPage(m, param.Where()).Scan(param.PageNum, param.PageSize, &rows)
 	if err == nil {
-		ctx.JSONOk().WriteData(gin.H{"total": totalCount, "rows": rows}, c)
+		ctx.JSONOk().Write(gin.H{"total": totalCount, "rows": rows}, c)
 		return
 	}
 	ctx.JSONWriteError(err, c)

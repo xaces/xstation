@@ -132,7 +132,7 @@ func (t *JObds) Scan(v interface{}) error {
 
 // Status 状态数据
 // gps {"longtitude:,latitude:,..."}
-type Status struct {
+type DevStatus struct {
 	Id        uint64   `json:"id" gorm:"primary_key"`
 	DeviceId  uint64   `json:"deviceId"`
 	DeviceNo  string   `json:"deviceNo" gorm:"type:varchar(24);"` // 时间
@@ -154,30 +154,30 @@ type Status struct {
 }
 
 // TableName 表名
-func (s *Status) TableName() string {
-	return "t_status0"
+func (s *DevStatus) TableName() string {
+	return "t_devstatus0"
 }
 
-type Status1 Status
+type DevStatus1 DevStatus
 
-func (s *Status1) TableName() string {
-	return "t_status1"
+func (s *DevStatus1) TableName() string {
+	return "t_devstatus1"
 }
 
-type Status2 Status
+type DevStatus2 DevStatus
 
-func (s *Status2) TableName() string {
-	return "t_status2"
+func (s *DevStatus2) TableName() string {
+	return "t_devstatus2"
 }
 
-type Status3 Status
+type DevStatus3 DevStatus
 
-func (s *Status3) TableName() string {
-	return "t_status3"
+func (s *DevStatus3) TableName() string {
+	return "t_devstatus3"
 }
 
-type Status4 Status
+type DevStatus4 DevStatus
 
-func (s *Status4) TableName() string {
-	return "t_status4"
+func (s *DevStatus4) TableName() string {
+	return "t_devstatus4"
 }

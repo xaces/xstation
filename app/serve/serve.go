@@ -21,7 +21,7 @@ func localData() {
 }
 
 func loginServe() error {
-	url := fmt.Sprintf("http://%s/stationLogin", configs.SuperAddress)
+	url := fmt.Sprintf("http://%s/station/login", configs.SuperAddress)
 	req := gin.H{"serveId": configs.Local.Id, "address": configs.Default.HttpAddr}
 	return xutils.HttpPost(url, req, nil)
 }

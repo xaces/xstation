@@ -16,7 +16,7 @@ import (
 
 var (
 	configure = flag.String("c", "./config.toml", "default config file")
-	licences  = flag.String("ces", "xstation.licences", "default licences file")
+	licences  = flag.String("ces", "localtest.lice", "default licences file")
 )
 
 func logFatalln(err error) {

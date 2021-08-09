@@ -17,8 +17,8 @@ func (o *OnLine) ListHandler(c *gin.Context) {
 		ctx.JSONWriteError(err, c)
 		return
 	}
-	var rows []model.OnLine
-	totalCount, err := orm.DbPage(&model.OnLine{}, param.Where()).Scan(param.PageNum, param.PageSize, &rows)
+	var rows []model.DevOnline
+	totalCount, err := orm.DbPage(&model.DevOnline{}, param.Where()).Scan(param.PageNum, param.PageSize, &rows)
 	if err == nil {
 		ctx.JSONOk().WriteData(gin.H{"total": totalCount, "rows": rows}, c)
 		return
@@ -27,7 +27,7 @@ func (o *OnLine) ListHandler(c *gin.Context) {
 }
 
 func (o *OnLine) AddHandler(c *gin.Context) {
-	var data model.OnLine
+	var data model.DevOnline
 	//获取参数
 	if err := c.ShouldBind(&data); err != nil {
 		ctx.JSONWriteError(err, c)
