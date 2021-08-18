@@ -1,7 +1,7 @@
 package device
 
 import (
-	"xstation/app/mnger"
+	"xstation/mnger"
 	"xstation/model"
 
 	"github.com/gin-gonic/gin"

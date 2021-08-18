@@ -1,8 +1,8 @@
 package device
 
 import (
-	"xstation/app/mnger"
 	"xstation/internal"
+	"xstation/mnger"
 	"xstation/model"
 
 	"github.com/wlgd/xutils/ctx"

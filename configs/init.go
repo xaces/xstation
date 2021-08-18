@@ -9,6 +9,7 @@ type localConfigure struct {
 	Id            string // 服务Id
 	IpAddr        string // 服务IP
 	EffectiveTime int    // 有效时间
+	MaxDevNumber  int
 }
 
 type tomlConfigure struct {
@@ -32,16 +33,17 @@ var (
 )
 
 // Load 初始化配置参数
-func Load(licences, path *string) error {
-	lice, err := xutils.ReadLicences(*licences)
+func Load(licences, path string) error {
+	lice, err := xutils.ReadLicences(licences)
 	if err != nil {
 		return err
 	}
 	Local.Id = lice.ServeGuid
 	Local.EffectiveTime = lice.EffectiveTime
+	Local.MaxDevNumber = lice.MaxNumber
 	//TODO address
 	SuperAddress = lice.Address
-	if _, err := toml.DecodeFile(*path, &Default); err != nil {
+	if _, err := toml.DecodeFile(path, &Default); err != nil {
 		return err
 	}
 	return err

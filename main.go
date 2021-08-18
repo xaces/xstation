@@ -1,58 +1,57 @@
 package main
 
 import (
-	"context"
-	"flag"
 	"log"
 	"os"
 	"os/signal"
 	"syscall"
-	"time"
-	"xstation/app"
-	"xstation/app/serve"
 	"xstation/configs"
-	"xstation/service"
-)
 
-var (
-	configure = flag.String("c", "./config.toml", "default config file")
-	licences  = flag.String("ces", "localtest.lice", "default licences file")
+	"github.com/urfave/cli/v2"
 )
-
-func logFatalln(err error) {
-	if err != nil {
-		log.Fatalln(err)
-	}
-}
 
 // 启动流程
 // 1、初始化数据库
 // 2、获取向中心服务配置信息
 func main() {
-	flag.Parse()
-	logFatalln(configs.Load(licences, configure))
-	logFatalln(service.Init())
-	logFatalln(serve.Run())
-	// web服务
-	s := app.HttpListenAndServe(configs.Default.HttpAddr)
-	log.Printf("Http Start at %s\n", configs.Default.HttpAddr)
-	// Wait for interrupt signal to gracefully shutdown the server with
-	// a timeout of 5 seconds.
-	quit := make(chan os.Signal)
-	// kill (no param) default send syscanll.SIGTERM
-	// kill -2 is syscall.SIGINT
-	// kill -9 is syscall. SIGKILL but can"t be catch, so don't need add it
-	signal.Notify(quit, syscall.SIGINT, syscall.SIGTERM)
-	<-quit
-	log.Println("Shutdown Server ...")
-	serve.Stop()
-	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
-	defer cancel()
-	if err := s.Shutdown(ctx); err != nil {
-		log.Fatal("Server Shutdown:", err)
+	app := &cli.App{
+		Name:        "mdvr's workstation",
+		Version:     "0.3.0",
+		Description: "This is mdvr access application",
+		Authors: []*cli.Author{{
+			Name:  "don.wang",
+			Email: "wanguandong@126.com",
+		},
+		},
+		Flags: []cli.Flag{
+			&cli.StringFlag{
+				Name:  "c",
+				Usage: "config file",
+				Value: "./conf/config.toml",
+			},
+			&cli.StringFlag{
+				Name:  "ces",
+				Usage: "licences file",
+				Value: "localtest.lice",
+			},
+		},
+		Before: func(c *cli.Context) error {
+			return configs.Load(c.String("ces"), c.String("c"))
+		},
+		Action: func(c *cli.Context) error {
+			if err := AppRun(); err != nil {
+				return err
+			}
+			quit := make(chan os.Signal)
+			// kill (no param) default send syscanll.SIGTERM
+			// kill -2 is syscall.SIGINT
+			// kill -9 is syscall. SIGKILL but can"t be catch, so don't need add it
+			signal.Notify(quit, syscall.SIGINT, syscall.SIGTERM)
+			<-quit
+			AppShutdown()
+			log.Println("AppShutdown done")
+			return nil
+		},
 	}
-	// catching ctx.Done(). timeout of 5 seconds.
-	<-ctx.Done()
-	log.Println("timeout of 5 seconds.")
-	log.Println("Server exiting")
+	log.Println(app.Run(os.Args))
 }

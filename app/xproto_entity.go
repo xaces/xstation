@@ -1,10 +1,10 @@
-package serve
+package app
 
 import (
 	"log"
 	"time"
-	"xstation/app/mnger"
 	"xstation/internal"
+	"xstation/mnger"
 	"xstation/model"
 	"xstation/service"
 
@@ -17,7 +17,7 @@ type XNotify struct {
 	Status chan model.DevStatus
 }
 
-// NewAccessData 实例化对象
+// NewXNotify 实例化对象
 func NewXNotify() *XNotify {
 	xdata := &XNotify{
 		Status: make(chan model.DevStatus),
@@ -65,11 +65,15 @@ func (o *XNotify) AccessHandler(data string, access *xproto.LinkAccess) error {
 		return xproto.ErrInvalidDevice
 	}
 	if access.LinkType == xproto.LINK_Signal {
-		if m.Version != access.Version || m.Type != access.Type {
-			m.Version = access.Version
-			m.Type = access.Type
-			orm.DbUpdateModel(m)
+		m.Version = access.Version
+		m.Type = access.Type
+		m.DeviceTime = access.DeviceTime
+		if access.OnLine {
+			m.Status = "1"
+		} else {
+			m.Status = "0"
 		}
+		orm.DbUpdateModel(m)
 	} else if access.LinkType == xproto.LINK_FileTransfer {
 		if err := xproto.UploadFile(access, true); err != nil {
 			return err

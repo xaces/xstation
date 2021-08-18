@@ -1,21 +1,22 @@
-package app
+package controller
 
 import (
 	"fmt"
 	"net/http"
 	"strings"
 	"time"
-	"xstation/app/api"
+	"xstation/controller/api"
 	"xstation/middleware"
 
-	"xstation/app/api/device"
+	"xstation/controller/api/device"
+	"xstation/controller/api/sys"
 
 	"github.com/gin-gonic/gin"
 )
 
 // serverRouter 服务路由
 func serverRouter(r *gin.RouterGroup) {
-	s := api.Serve{}
+	s := sys.Serve{}
 	r.GET("/serve/list", s.ListHandler)
 	r.GET("/serve/get/:guid", s.GetHandler)
 	r.POST("/serve", s.AddHandler)
@@ -66,13 +67,12 @@ func deiveRouter(r *gin.RouterGroup) {
 	r.GET("/device/alarm/bystatus/:statusId", alr.GetByStatusIdHandler)
 }
 
-func newApp() *gin.Engine {
+func newRouters() *gin.Engine {
 	gin.SetMode(gin.ReleaseMode)
 	r := gin.Default()
 	r.Use(gin.Logger())      // 日志
 	r.Use(middleware.Cors()) // 跨域
 	root := r.Group("/station")
-	root.POST("/applyAuth", api.ApplyAuthHandler)
 	v1 := root.Group("/api")
 	v1.POST("/upload", api.UploadHandler)
 	serverRouter(v1)
@@ -80,18 +80,16 @@ func newApp() *gin.Engine {
 	return r
 }
 
-// HttpListenAndServe
-func HttpListenAndServe(address string) *http.Server {
+// NewServer
+func NewServer(address string) *http.Server {
 	as := strings.Split(address, ":")
 	addr := fmt.Sprintf(":%s", as[1])
-	r := newApp()
-	s := &http.Server{
+	r := newRouters()
+	return &http.Server{
 		Addr:           addr,
 		Handler:        r,
 		ReadTimeout:    30 * time.Second,
 		WriteTimeout:   60 * time.Second,
 		MaxHeaderBytes: 1 << 20,
 	}
-	go s.ListenAndServe()
-	return s
 }

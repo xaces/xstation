@@ -19,12 +19,12 @@ type statusPage struct {
 func (s *statusPage) Where() *orm.DbWhere {
 	var where orm.DbWhere
 	where.Append("device_no like ?", s.DeviceNo)
-	where.Append("dtu >= ?", s.StartTime)
-	where.Append("dtu <= ?", s.EndTime)
+	where.Append("dtu >= ?", s.StartTime+" 00:00:00")
+	where.Append("dtu <= ?", s.EndTime+" 23:59:59")
 	if s.Flag != 0 {
 		where.Append("flag = ?", s.Flag)
 	}
-	where.Orders = append(where.Orders, s.Desc+" desc")
+	where.Orders = append(where.Orders, "dtu desc")
 	return &where
 }
 

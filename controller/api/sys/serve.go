@@ -1,8 +1,8 @@
-package api
+package sys
 
 import (
-	"xstation/app/mnger"
 	"xstation/internal"
+	"xstation/mnger"
 	"xstation/model"
 
 	"github.com/wlgd/xutils/orm"
@@ -12,26 +12,12 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-// ApplyAuthHandler 身份授权
-func ApplyAuthHandler(c *gin.Context) {
-	var param applyAuth
-	if err := c.ShouldBindJSON(&param); err != nil {
-		ctx.JSONWriteError(err, c)
-		return
-	}
-	if err := tryApplyAuth(&param); err != nil {
-		ctx.JSONWriteError(err, c)
-		return
-	}
-	ctx.JSONOk().WriteTo(c)
-}
-
 type Serve struct {
 }
 
 // ListHandler
 func (o *Serve) ListHandler(c *gin.Context) {
-	var serves []model.Serve
+	var serves []model.SysServe
 	if err := orm.DbFind(&serves); err != nil {
 		ctx.JSONWriteError(err, c)
 		return
@@ -42,20 +28,20 @@ func (o *Serve) ListHandler(c *gin.Context) {
 // ListHandler
 func (o *Serve) GetHandler(c *gin.Context) {
 	guid := ctx.ParamString(c, "guid")
-	var server model.Serve
+	var server model.SysServe
 	if err := orm.DbFirstBy(&server, "guid like ?", guid); err != nil {
 		ctx.JSONWriteError(err, c)
 		return
 	}
-	var st model.Serve
+	var st model.SysServe
 	orm.DbFirstBy(&st, "role = ?", 1)
-	ctx.JSONOk().WriteData(gin.H{"station": st.ServeOpt, "local": server.ServeOpt}, c)
+	ctx.JSONOk().WriteData(gin.H{"station": st.SysServeOpt, "local": server.SysServeOpt}, c)
 }
 
 // AddHandler 新增
 func (o *Serve) AddHandler(c *gin.Context) {
-	var param model.Serve
-	if err := c.ShouldBindJSON(&param.ServeOpt); err != nil {
+	var param model.SysServe
+	if err := c.ShouldBindJSON(&param.SysServeOpt); err != nil {
 		ctx.JSONWriteError(err, c)
 		return
 	}
@@ -71,8 +57,8 @@ func (o *Serve) AddHandler(c *gin.Context) {
 
 // UpdateHandler
 func (o *Serve) UpdateHandler(c *gin.Context) {
-	var param model.Serve
-	if err := c.ShouldBindJSON(&param.ServeOpt); err != nil {
+	var param model.SysServe
+	if err := c.ShouldBindJSON(&param.SysServeOpt); err != nil {
 		ctx.JSONWriteError(err, c)
 		return
 	}

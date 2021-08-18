@@ -1,4 +1,4 @@
-package serve
+package app
 
 import (
 	"strconv"
@@ -30,8 +30,8 @@ var (
 	_xproto *xproto.Serve = nil
 )
 
-// xprotoStart 启动
-func xprotoStart(addr string) error {
+// XprotoStart 启动
+func XprotoStart(addr string) error {
 	as := strings.Split(addr, ":")
 	port, _ := strconv.Atoi(as[1])
 	xnotify := NewXNotify()
@@ -52,7 +52,7 @@ func xprotoStart(addr string) error {
 	return err
 }
 
-// xprotoStop 停止
-func xprotoStop() {
+// XprotoStop 停止
+func XprotoStop() {
 	_xproto.Release()
 }

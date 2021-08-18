@@ -15,7 +15,7 @@ type LServe struct {
 	UpdatedTime time.Time `json:"updatedTime"`
 	IsWorking   bool      `json:"isWorking"`
 	Address     string    `json:"address"`
-	model.ServeOpt
+	model.SysServeOpt
 }
 
 func (s *LServe) Update(address string) error {
@@ -34,20 +34,20 @@ var (
 )
 
 // NewLServe 新建服务
-func (o *serve) newLServe(serveId string, opt model.ServeOpt) {
+func (o *serve) newLServe(serveId string, opt model.SysServeOpt) {
 	o.lServeMap[serveId] = &LServe{
-		ServeId:   serveId,
-		ServeOpt:  opt,
-		IsWorking: false,
+		ServeId:     serveId,
+		SysServeOpt: opt,
+		IsWorking:   false,
 	}
 }
 
 // LoadOfDb load sub serve
 func (o *serve) LoadOfDb() {
-	var serves []model.Serve
+	var serves []model.SysServe
 	orm.DbFind(&serves)
 	for _, v := range serves {
-		o.newLServe(v.Guid, v.ServeOpt)
+		o.newLServe(v.Guid, v.SysServeOpt)
 	}
 }
 
@@ -56,7 +56,7 @@ func (o *serve) GetByType(ctype int) *LServe {
 	o.lock.RLock()
 	defer o.lock.RUnlock()
 	for _, v := range o.lServeMap {
-		if v.ServeOpt.Role == ctype && v.IsWorking {
+		if v.SysServeOpt.Role == ctype && v.IsWorking {
 			return v
 		}
 	}
@@ -85,10 +85,10 @@ func (o *serve) Get(serveId string) *LServe {
 }
 
 // Add 添加
-func (o *serve) Add(srv *model.Serve) {
+func (o *serve) Add(srv *model.SysServe) {
 	o.lock.Lock()
 	defer o.lock.Unlock()
-	o.newLServe(srv.Guid, srv.ServeOpt)
+	o.newLServe(srv.Guid, srv.SysServeOpt)
 }
 
 // UpdateStatus 更新状态
@@ -101,7 +101,7 @@ func (o *serve) UpdateStatus(serveIds []string, status int) error {
 			continue
 		}
 		v.Status = status
-		orm.DbUpdateColsBy(&model.Serve{}, orm.H{"status": status}, "guid like ?", s)
+		orm.DbUpdateColsBy(&model.SysServe{}, orm.H{"status": status}, "guid like ?", s)
 	}
 	return nil
 }

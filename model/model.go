@@ -2,6 +2,7 @@ package model
 
 import (
 	"database/sql/driver"
+	"encoding/json"
 	"fmt"
 	"time"
 
@@ -10,9 +11,14 @@ import (
 
 type Model struct {
 	Id        uint64         `json:"id" gorm:"primary_key"`
-	CreatedAt jtime          `json:"createdAt"`
-	UpdatedAt jtime          `json:"updatedAt"`
-	DeletedAt gorm.DeletedAt `json:"deletedAt"`
+	CreatedAt jtime          `json:"createTime"`
+	UpdatedAt jtime          `json:"updateTime"`
+	DeletedAt gorm.DeletedAt `json:"deleteTime"`
+}
+type TimeModel struct {
+	CreatedAt jtime          `json:"createTime"`
+	UpdatedAt jtime          `json:"updateTime"`
+	DeletedAt gorm.DeletedAt `json:"deleteTime"`
 }
 
 // jtime format json time field by myself
@@ -43,4 +49,16 @@ func (t *jtime) Scan(v interface{}) error {
 		return nil
 	}
 	return fmt.Errorf("can not convert %v to timestamp", v)
+}
+
+type JStrings []string
+
+// Value insert
+func (j JStrings) Value() (driver.Value, error) {
+	return json.Marshal(&j)
+}
+
+// Scan valueof
+func (t *JStrings) Scan(v interface{}) error {
+	return json.Unmarshal(v.([]byte), t)
 }
