@@ -1,8 +1,10 @@
 package configs
 
 import (
-	"github.com/BurntSushi/toml"
+	"io/ioutil"
+
 	"github.com/wlgd/xutils"
+	"gopkg.in/yaml.v2"
 )
 
 type localConfigure struct {
@@ -12,22 +14,31 @@ type localConfigure struct {
 	MaxDevNumber  int
 }
 
-type tomlConfigure struct {
-	HttpAddr   string //
-	AccessAddr string //
-	SQL        struct {
-		Name    string
-		Address string
-	}
+type ymlConfigure struct {
+	Http struct {
+		Host string `yaml:"host"`
+		Port uint16 `yaml:"port"`
+	} `yaml:"http"`
+
+	Access struct {
+		Host string `yaml:"host"`
+		Port uint16 `yaml:"port"`
+	} `yaml:"access"`
+
+	SQL struct {
+		Name    string `yaml:"name"`
+		Address string `yaml:"address"`
+	} `yaml:"sql"`
+
 	Map struct {
-		Name string
-		Key  string
-	}
+		Name string `yaml:"name"`
+		Key  string `yaml:"key"`
+	} `yaml:"map"`
 }
 
 // Default 所有配置参数
 var (
-	Default      tomlConfigure
+	Default      ymlConfigure
 	Local        localConfigure
 	SuperAddress string
 )
@@ -43,8 +54,9 @@ func Load(licences, path string) error {
 	Local.MaxDevNumber = lice.MaxNumber
 	//TODO address
 	SuperAddress = lice.Address
-	if _, err := toml.DecodeFile(path, &Default); err != nil {
+	yfile, err := ioutil.ReadFile(path)
+	if err != nil {
 		return err
 	}
-	return err
+	return yaml.Unmarshal(yfile, &Default)
 }

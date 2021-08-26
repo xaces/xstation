@@ -3,7 +3,6 @@ package controller
 import (
 	"fmt"
 	"net/http"
-	"strings"
 	"time"
 	"xstation/controller/api"
 	"xstation/middleware"
@@ -81,12 +80,11 @@ func newRouters() *gin.Engine {
 }
 
 // NewServer
-func NewServer(address string) *http.Server {
-	as := strings.Split(address, ":")
-	addr := fmt.Sprintf(":%s", as[1])
+func NewServer(port uint16) *http.Server {
+	address := fmt.Sprintf(":%d", port)
 	r := newRouters()
 	return &http.Server{
-		Addr:           addr,
+		Addr:           address,
 		Handler:        r,
 		ReadTimeout:    30 * time.Second,
 		WriteTimeout:   60 * time.Second,

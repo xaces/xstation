@@ -27,7 +27,7 @@ func main() {
 			&cli.StringFlag{
 				Name:  "c",
 				Usage: "config file",
-				Value: "./conf/config.toml",
+				Value: ".config.yml",
 			},
 			&cli.StringFlag{
 				Name:  "ces",

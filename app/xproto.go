@@ -1,9 +1,6 @@
 package app
 
 import (
-	"strconv"
-	"strings"
-
 	"github.com/wlgd/xproto"
 	"github.com/wlgd/xproto/ho"
 	"github.com/wlgd/xproto/jt"
@@ -31,15 +28,13 @@ var (
 )
 
 // XprotoStart 启动
-func XprotoStart(addr string) error {
-	as := strings.Split(addr, ":")
-	port, _ := strconv.Atoi(as[1])
+func XprotoStart(host string, port uint16) error {
 	xnotify := NewXNotify()
 	s, err := xproto.NewServe(&xproto.Options{
 		RequestTimeout:   50,
 		RecvTimeout:      30,
 		Port:             uint16(port),
-		Host:             as[0],
+		Host:             host,
 		Adapter:          protocolAdapter,
 		LinkAccessNotify: xnotify.AccessHandler,
 		StatusNotify:     xnotify.StatusHandler,

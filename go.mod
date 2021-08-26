@@ -3,7 +3,6 @@ module xstation
 go 1.16
 
 require (
-	github.com/BurntSushi/toml v0.3.1
 	github.com/dgrijalva/jwt-go v3.2.0+incompatible
 	github.com/gin-gonic/gin v1.7.2
 	github.com/json-iterator/go v1.1.11
@@ -15,6 +14,7 @@ require (
 	github.com/urfave/cli/v2 v2.3.0
 	github.com/wlgd/xproto v0.0.0-00010101000000-000000000000
 	github.com/wlgd/xutils v0.0.0-20210701074559-e4b0685b2ff6
+	gopkg.in/yaml.v2 v2.3.0 // indirect
 	gorm.io/driver/mysql v1.0.5
 	gorm.io/driver/postgres v1.0.8
 	gorm.io/driver/sqlite v1.1.4
