@@ -15,7 +15,7 @@ type Device struct {
 	Type       string `json:"type" gorm:"type:varchar(20);"`
 	Guid       string `json:"guid" gorm:"type:varchar(64);"`
 	Version    string `json:"version" gorm:"type:varchar(20);"`
-	Status     string `json:"status" gorm:"size:1;default:'0';comment:帐号状态(0离线 1在线);"`
+	Online     bool   `json:"online"`
 	DeviceTime string `json:"deviceTime" gorm:"type:varchar(20);"`
 	TimeModel
 }

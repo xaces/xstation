@@ -58,28 +58,24 @@ func (x *XNotify) AddDbStatus(st *xproto.Status) uint64 {
 }
 
 // AccessHandler 设备接入
-func (o *XNotify) AccessHandler(data string, access *xproto.LinkAccess) error {
+func (o *XNotify) AccessHandler(data string, x *xproto.LinkAccess) error {
 	log.Printf("%s\n", data)
-	m := mnger.Dev.Get(access.DeviceNo)
+	m := mnger.Dev.Get(x.DeviceNo)
 	if m == nil {
 		return xproto.ErrInvalidDevice
 	}
-	if access.LinkType == xproto.LINK_Signal {
-		m.Version = access.Version
-		m.Type = access.Type
-		m.DeviceTime = access.DeviceTime
-		if access.OnLine {
-			m.Status = "1"
-		} else {
-			m.Status = "0"
-		}
-		orm.DbUpdateModel(m)
-	} else if access.LinkType == xproto.LINK_FileTransfer {
-		if err := xproto.UploadFile(access, true); err != nil {
+	if x.LinkType == xproto.LINK_Signal {
+		m.Version = x.Version
+		m.Type = x.Type
+		m.DeviceTime = x.DeviceTime
+		m.Online = x.OnLine
+		orm.DbUpdateSelect(m, "version", "type", "device_time", "online")
+	} else if x.LinkType == xproto.LINK_FileTransfer {
+		if err := xproto.UploadFile(x, true); err != nil {
 			return err
 		}
 	}
-	return service.DbUpdateOnline(access)
+	return service.DbUpdateOnline(x)
 }
 
 // StatusHandler 接收状态数据
