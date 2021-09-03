@@ -7,7 +7,7 @@ import (
 	"github.com/wlgd/xproto/ttx"
 )
 
-func protocolAdapter(b []byte) xproto.InterfaceProto {
+func protocolAdapter(b []byte) xproto.InterfaceProtocol {
 	if _, err := ho.IsValidProto(b); err == nil {
 		return &ho.ProtoImpl{
 			SubAlarmStatus: 0xffff,
@@ -31,17 +31,17 @@ var (
 func XprotoStart(host string, port uint16) error {
 	xnotify := NewXNotify()
 	s, err := xproto.NewServe(&xproto.Options{
-		RequestTimeout:   50,
-		RecvTimeout:      30,
-		Port:             uint16(port),
-		Host:             host,
-		Adapter:          protocolAdapter,
-		LinkAccessNotify: xnotify.AccessHandler,
-		StatusNotify:     xnotify.StatusHandler,
-		AlarmNotify:      xnotify.AlarmHandler,
-		EventNotify:      xproto.LogEvent,
-		AVFrameNotify:    xproto.LogAVFrame,
-		RawNotify:        xproto.LogRawFrame,
+		RequestTimeout: 50,
+		RecvTimeout:    30,
+		Port:           uint16(port),
+		Host:           host,
+		Adapter:        protocolAdapter,
+		AccessNotify:   xnotify.AccessHandler,
+		StatusNotify:   xnotify.StatusHandler,
+		AlarmNotify:    xnotify.AlarmHandler,
+		EventNotify:    xproto.LogEvent,
+		AVFrameNotify:  xproto.LogAVFrame,
+		RawNotify:      xproto.LogRawFrame,
 	})
 	_xproto = s
 	return err

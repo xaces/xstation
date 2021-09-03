@@ -1,10 +1,7 @@
 package configs
 
 import (
-	"io/ioutil"
-
 	"github.com/wlgd/xutils"
-	"gopkg.in/yaml.v2"
 )
 
 type localConfigure struct {
@@ -44,8 +41,8 @@ var (
 )
 
 // Load 初始化配置参数
-func Load(licences, path string) error {
-	lice, err := xutils.ReadLicences(licences)
+func Load(license, path string) error {
+	lice, err := xutils.LicenseRead(license)
 	if err != nil {
 		return err
 	}
@@ -54,9 +51,5 @@ func Load(licences, path string) error {
 	Local.MaxDevNumber = lice.MaxNumber
 	//TODO address
 	SuperAddress = lice.Address
-	yfile, err := ioutil.ReadFile(path)
-	if err != nil {
-		return err
-	}
-	return yaml.Unmarshal(yfile, &Default)
+	return xutils.YMLConf(path, &Default)
 }

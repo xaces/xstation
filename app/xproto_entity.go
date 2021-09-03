@@ -58,8 +58,8 @@ func (x *XNotify) AddDbStatus(st *xproto.Status) uint64 {
 }
 
 // AccessHandler 设备接入
-func (o *XNotify) AccessHandler(data string, x *xproto.LinkAccess) error {
-	log.Printf("%s\n", data)
+func (o *XNotify) AccessHandler(data []byte, arg interface{}, x *xproto.Access) error {
+	log.Printf("%s\n", string(data))
 	m := mnger.Dev.Get(x.DeviceNo)
 	if m == nil {
 		return xproto.ErrInvalidDevice
@@ -71,8 +71,11 @@ func (o *XNotify) AccessHandler(data string, x *xproto.LinkAccess) error {
 		m.Online = x.OnLine
 		orm.DbUpdateSelect(m, "version", "type", "device_time", "online")
 	} else if x.LinkType == xproto.LINK_FileTransfer {
-		if err := xproto.UploadFile(x, true); err != nil {
-			return err
+		filename, act := xproto.FileOfSess(x.Session)
+		if act == xproto.ACTION_Upload {
+			xproto.UploadFile(x, filename, true)
+		} else {
+			xproto.DownloadFile(x, filename, arg)
 		}
 	}
 	return service.DbUpdateOnline(x)
@@ -85,8 +88,8 @@ func (x *XNotify) StatusHandler(tag string, xst *xproto.Status) {
 }
 
 // AlarmHandler 接收报警数据
-func (x *XNotify) AlarmHandler(tag, data string, xalr *xproto.Alarm) {
-	xproto.LogAlarm(tag, data, xalr)
+func (x *XNotify) AlarmHandler(data []byte, xalr *xproto.Alarm) {
+	xproto.LogAlarm(data, xalr)
 	flag := xalr.Status.Flag
 	xalr.Status.Flag = 2
 	statusId := x.AddDbStatus(xalr.Status)

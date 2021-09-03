@@ -10,7 +10,7 @@ import (
 )
 
 // DbUpdateOnline 更新链路信息
-func DbUpdateOnline(reg *xproto.LinkAccess) error {
+func DbUpdateOnline(reg *xproto.Access) error {
 	ofline := &model.DevOnline{
 		Guid:          reg.Session,
 		DeviceNo:      reg.DeviceNo,
