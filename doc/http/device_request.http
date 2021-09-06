@@ -1,239 +1,104 @@
-@baseUrl=172.16.50.219:12100/xstation/api
-@access=172.16.50.219:33000
-@deviceId=20198002
-
 ### 录像查询
-POST http://{{baseUrl}}/device/request/query
-?deviceId={{deviceId}}
+POST http://127.0.0.1:12100/station/api/device/request/query?deviceId=20198002
 Content-Type: application/json
 
 {
-    "startTime": "2021-06-10 00:00:00",
-    "endTime": "2021-06-10 23:59:59",
-    "channelList": "1",
+    "startTime": "2021-09-06 00:00:00",
+    "endTime": "2021-09-06 23:59:59",
+    "channelList": "1;2;3;4;5;6;7;8",
     "fileType": 1
 }
 
 ### 实时流请求
 // streamType 0 子码流 1 主码流
-POST http://{{baseUrl}}/device/request/liveStream
-?deviceId={{deviceId}}
+POST http://127.0.0.1:12100/station/api/device/request/liveStream?deviceId=20198002
 Content-Type: application/json
 
 {
-    "server": "{{access}}",
+    "server": "172.16.50.219:33000",
+    "session": "live_20198002_01_00",
     "channel": 1,
     "streamType": 0,
-    "on": 0
+    "on": 1
 }
 
-### 实时流请求
-// 0-监听 1-对讲 2-广播
-POST http://{{baseUrl}}/device/request/voice
-?deviceId={{deviceId}}
-Content-Type: application/json
-
-{
-    "server": "{{access}}",
-    "channel": 1,
-    "on": 0,
-    "workMode": 1
-}
 
 ### 远程回放
 // fileName 设备文件名
-POST http://{{baseUrl}}/device/request/playback
-?deviceId={{deviceId}}
+POST http://127.0.0.1:12100/station/api/device/request/playback?deviceId=20198002
 Content-Type: application/json
 
 {
-    "server": "{{access}}",
-    "name": "T/0000_039f0000_6_1621900800_1621900817_0_8034540.avi"
+    "server": "172.16.50.219:33000",
+    "name": "/0000_00fb0000_6_1620604800_1620605069_0_127644266.avi"
 }
 
 
 ### 远程回放
 // 按时间段回放
-POST http://{{baseUrl}}/device/request/playback
-?deviceId={{deviceId}}
+POST http://127.0.0.1:12100/station/api/device/request/playback?deviceId=20198002
 Content-Type: application/json
 
 {
-    "server": "{{access}}",
-    "startTime": "2021-01-06 10:00:00",
-    "endTime": "2021-01-06 10:05:00",
+    "server": "172.16.50.252:12320",
+    "startTime": "2021-09-06 09:00:00",
+    "endTime": "2021-09-06 09:00:10",
     "channels": "1;2"
 }
 
 
-### 参数设置
+### 设备控制
 
-POST http://{{baseUrl}}/device/request/parameters
-?deviceId={{deviceId}}
+POST http://127.0.0.1:12100/station/api/device/request/control?deviceId=20198002
 Content-Type: application/json
 
 {
-    "RSBASE": {
-      "rs0": {
-        "baudrate": "115200",
-        "databit": "8",
-        "func": "15",
-        "parity": "2",
-        "stopbit": "1"
-      },
-      "rs1": {
-        "baudrate": "9600",
-        "databit": "8",
-        "func": "0",
-        "parity": "2",
-        "stopbit": "1"
-      },
-      "rs2": {
-        "baudrate": "2400",
-        "databit": "8",
-        "func": "2",
-        "parity": "2",
-        "stopbit": "1"
-      },
-      "rs3": {
-        "baudrate": "115200",
-        "databit": "5",
-        "func": "0",
-        "parity": "3",
-        "stopbit": "1"
-      },
-      "rs4": {
-        "baudrate": "9600",
-        "databit": "8",
-        "func": "1",
-        "parity": "1",
-        "stopbit": "0"
-      },
-      "rs5": {
-        "baudrate": "11520",
-        "databit": "8",
-        "func": "1",
-        "parity": "2",
-        "stopbit": "1"
-      },
-      "rs6": {
-        "baudrate": "11520",
-        "databit": "8",
-        "func": "1",
-        "parity": "0",
-        "stopbit": "1"
-      },
-      "rs7": {
-        "baudrate": "11520",
-        "databit": "8",
-        "func": "1",
-        "parity": "0",
-        "stopbit": "1"
-      }
-    }
-}
 
-### 参数获取
-
-POST http://{{baseUrl}}/device/request/parameters
-?deviceId={{deviceId}}
-Content-Type: application/json
-
-{
-    "JTBASE":""
-}
-
-### UserDefineHowen 参数获取
-// act: 1
-POST http://{{baseUrl}}/device/request/parameters
-?deviceId={{deviceId}}
-Content-Type: application/json
-
-{
-    "UserDefineHowen": {
-        "act": 1,
-        "type": 253
-    }
-}
-
-### UserDefineHowen 参数设置
-// act: 0
-
-POST http://{{baseUrl}}/device/request/parameters
-?deviceId={{deviceId}}
-Content-Type: application/json
-
-{
-    "UserDefineHowen": {
-        "act": 0,
-        "type": 300,
-        "data": {
-          "channels": 3,
-          "interval": 60,
-          "res": 0
-        }
-    }
-}
-
-### GpsAngle 参数获取
-// act: 1
-POST http://{{baseUrl}}/device/request/parameters
-?deviceId={{deviceId}}
-Content-Type: application/json
-
-{
-    "gpsAngleConfig": {
-        "act": 0,
-        "dg": 3000,
-        "on": 0
-    }
-}
-
-### GpsAngle 参数设置
-// act: 1
-POST http://{{baseUrl}}/device/request/parameters
-?deviceId={{deviceId}}
-Content-Type: application/json
-
-{
-    "gpsAngleConfig": {
-        "act": 1
-    }
 }
 
 ### ftp文件传输
 
-POST http://{{baseUrl}}/device/request/ftpTransfer
-?deviceId={{deviceId}}
+POST http://127.0.0.1:12100/station/api/device/request/ftpTransfer?deviceId=20198002
 Content-Type: application/json
 
 {
     "ftpUrl": "ftp://don:123456@172.16.50.219:21",
-    "fileSrc": "firmware/HW3521V2-V18092801-V210616T1.149.sw",
-    "fileDst": "",
-    "action": 1,
-    "fileType": 5
+    "fileSrc": "/mnt/sd2/picture/Pic20210518153224157A02.jpg",
+    "fileDst": "20198002.Pic20210518153224157A02.jpg",
+    "action": 0,
+    "fileType": 4
 }
 
 ### file文件传输
 
-POST http://{{baseUrl}}/device/request/fileTransfer
-?deviceId={{deviceId}}
+POST http://127.0.0.1:12100/station/api/device/request/fileTransfer?deviceId=20198002
 Content-Type: application/json
 
 {
-    "fileName": "/mnt/sd2/debug/dbglog-20210525-153908.log",
-    "fileType": 7,
+    "fileName": "/mnt/sd2/capture/20210831/1630430088212CH02T2.jpg",
+    "fileType": 3,
     "action": 0,
-    "server": "{{access}}",
-    "fileSize": 0,
+    "server": "172.16.50.219:22000",
+    "offset": 0
+}
+
+
+### file文件传输
+
+POST http://127.0.0.1:12100/station/api/device/request/fileTransfer?deviceId=20198002
+Content-Type: application/json
+
+{
+    "fileName": "HW3521V2-V18092801-V210608T0.144.sw",
+    "fileType": 5,
+    "action": 1,
+    "server": "172.16.50.219:33000",
     "offset": 0
 }
 
 ### 串口透传设置, 应答的session用于透传数据, 设置为"", 系统会自动生成并返回。
 
-POST http://{{baseUrl}}/device/request/serial/transparent
-?deviceId={{deviceId}}
+POST http://127.0.0.1:12100/station/api/device/request/transparent?deviceId=20198002
 Content-Type: application/json
 
 {
@@ -249,9 +114,7 @@ Content-Type: application/json
 # type:1 字符串 如 abcdefg
 # type:2 Hex   031F269D
 
-POST http://{{baseUrl}}/device/request/serial/transfer
-?deviceId={{deviceId}}
-&session=ca03fffb-0310-4cc1-8191-e4aae455b7f8
+POST http://127.0.0.1:12100/station/api/device/request/transfer?deviceId=20198002&session=ca03fffb-0310-4cc1-8191-e4aae455b7f8
 Content-Type: application/json
 
 {
@@ -262,43 +125,9 @@ Content-Type: application/json
 
 ### 关闭链接, session存在关闭媒体链路。不存在关闭信令链路
 
-POST http://{{baseUrl}}/device/request/close
-?deviceId={{deviceId}}
-&session=live_{{deviceId}}_01_00
+POST http://127.0.0.1:12100/station/api/device/request/close?deviceId=20198002&session=ca03fffb-0310-4cc1-8191-e4aae455b7f8
 Content-Type: application/json
 
 {
    
-}
-
-@upgrade=HW3520D-V16072701-V210727T1.194.sw
-### 文件上传
-POST http://{{baseUrl}}/upload HTTP/1.1
-Content-Type: multipart/form-data; boundary=----WebKitFormBoundary7MA4YWxkTrZu0gW
-
-------WebKitFormBoundary7MA4YWxkTrZu0gW
-Content-Disposition: form-data; name="text"
-
-title
-------WebKitFormBoundary7MA4YWxkTrZu0gW
-Content-Disposition: form-data; name="file"; filename="{{upgrade}}";
-Content-Type: text/plain
-
-< Z:\\mdvr_protocol\\LINUX\\tag\\howen_20190916\\app_hw3520\\release\\{{upgrade}}
-------WebKitFormBoundary7MA4YWxkTrZu0gW--
-
-
-### file文件传输
-
-POST http://{{baseUrl}}/device/request/fileTransfer
-?deviceId={{deviceId}}
-Content-Type: application/json
-
-{
-    "fileName": "{{upgrade}}",
-    "fileType": 5,
-    "action": 1,
-    "server": "{{access}}",
-    "fileSize": 12828180,
-    "offset": 0
 }

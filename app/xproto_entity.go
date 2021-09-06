@@ -58,7 +58,7 @@ func (x *XNotify) AddDbStatus(st *xproto.Status) uint64 {
 }
 
 // AccessHandler 设备接入
-func (o *XNotify) AccessHandler(data []byte, arg interface{}, x *xproto.Access) error {
+func (o *XNotify) AccessHandler(data []byte, arg *interface{}, x *xproto.Access) error {
 	log.Printf("%s\n", string(data))
 	m := mnger.Dev.Get(x.DeviceNo)
 	if m == nil {
