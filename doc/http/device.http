@@ -3,9 +3,9 @@ POST http://127.0.0.1:12100/station/api/device
 Content-Type: application/json
 
 {
-    "deviceNo": "20198002",
-    "deviceName": "",
-    "Icons": ""
+    "no": "20198002",
+    "name": "",
+    "icon": ""
 }
 
 ### 设备列表
@@ -31,8 +31,8 @@ Content-Type: application/json
 
 {
     "id": 1,
-    "deviceNo": "20198002",
-    "deviceName": "",
+    "no": "20198002",
+    "name": "",
     "icon": ""
 }
 

@@ -83,11 +83,13 @@ func newRouters() *gin.Engine {
 func NewServer(port uint16) *http.Server {
 	address := fmt.Sprintf(":%d", port)
 	r := newRouters()
-	return &http.Server{
+	s := &http.Server{
 		Addr:           address,
 		Handler:        r,
 		ReadTimeout:    30 * time.Second,
 		WriteTimeout:   60 * time.Second,
 		MaxHeaderBytes: 1 << 20,
 	}
+	go s.ListenAndServe()
+	return s
 }

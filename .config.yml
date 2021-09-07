@@ -3,12 +3,12 @@ http: ### Serve, 如不在同一台服务器，请配置公网ip
  port: 12100
 
 access: ### 配置公网ip，此ip需要下发给设备
- host: "172.16.50.219"
+ host: "172.16.50.252"
  port: 22000
 
 sql: ### SQL
  name: "mysql"
- address: "root:123456@tcp(127.0.0.1:3306)/xostation?charset=utf8&parseTime=True&loc=Local"
+ address: "root:123456@tcp(172.16.50.219:3306)/station?charset=utf8&parseTime=True&loc=Local"
 # Address="xstation.db"
 # Address="user=postgres password=123456 dbname=xstation port=5432 sslmode=disable TimeZone=Asia/Shanghai"
 map: ### 地图

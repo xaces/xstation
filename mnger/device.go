@@ -9,17 +9,17 @@ import (
 )
 
 type devManager struct {
-	lDevMap map[string]model.Device
+	lDevMap map[string]*model.Device
 	lock    sync.RWMutex
 }
 
 var (
-	Dev = &devManager{lDevMap: make(map[string]model.Device)}
+	Dev = &devManager{lDevMap: make(map[string]*model.Device)}
 )
 
 func (o *devManager) Set(devs []model.Device) {
 	for _, dev := range devs {
-		o.lDevMap[dev.DeviceNo] = dev
+		o.lDevMap[dev.No] = &dev
 	}
 }
 
@@ -28,7 +28,7 @@ func (o *devManager) Get(deviceNo string) *model.Device {
 	o.lock.RLock()
 	defer o.lock.RUnlock()
 	if v, ok := o.lDevMap[deviceNo]; ok {
-		return &v
+		return v
 	}
 	return nil
 }
@@ -37,7 +37,7 @@ func (o *devManager) Get(deviceNo string) *model.Device {
 func (o *devManager) Add(dev *model.Device) {
 	o.lock.Lock()
 	defer o.lock.Unlock()
-	o.lDevMap[dev.DeviceNo] = *dev
+	o.lDevMap[dev.No] = dev
 }
 
 // Delete 删除

@@ -9,12 +9,12 @@ import (
 
 // devicePage 分页
 type devicePage struct {
-	PageNum    int    `form:"pageNum"`  // 当前页码
-	PageSize   int    `form:"pageSize"` // 每页数
-	StartTime  string `form:"startTime"`
-	EndTime    string `form:"endTime"`
-	DeviceNo   string `form:"deviceNo"`
-	DeviceName string `form:"deviceName"`
+	PageNum   int    `form:"pageNum"`  // 当前页码
+	PageSize  int    `form:"pageSize"` // 每页数
+	StartTime string `form:"startTime"`
+	EndTime   string `form:"endTime"`
+	No        string `form:"no"`
+	Name      string `form:"name"`
 }
 
 // Where 初始化
@@ -26,11 +26,11 @@ func (s *devicePage) Where() *orm.DbWhere {
 	if s.EndTime != "" {
 		where.Append("created_at <= ?", s.EndTime)
 	}
-	if s.DeviceNo != "" {
-		where.Append("device_no like ?", s.DeviceNo)
+	if s.No != "" {
+		where.Append("no like ?", s.No)
 	}
-	if s.DeviceName != "" {
-		where.Append("device_name like ?", s.DeviceName)
+	if s.Name != "" {
+		where.Append("name like ?", s.Name)
 	}
 	return &where
 }
@@ -50,7 +50,7 @@ func deleteDevices(ids []int) error {
 		return err
 	}
 	for _, dev := range devs {
-		mnger.Dev.Delete(dev.DeviceNo)
+		mnger.Dev.Delete(dev.No)
 	}
 	return nil
 }

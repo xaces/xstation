@@ -54,6 +54,7 @@ func (x *XNotify) AddDbStatus(st *xproto.Status) uint64 {
 	o.People = model.JPeople(st.People)
 	o.TableIdx = int(dev.Id) % service.StatusTableNum
 	x.Status <- o
+	(*dev).LastStatus = model.JDevStatus(o)
 	return o.Id
 }
 
@@ -67,9 +68,12 @@ func (o *XNotify) AccessHandler(data []byte, arg *interface{}, x *xproto.Access)
 	if x.LinkType == xproto.LINK_Signal {
 		m.Version = x.Version
 		m.Type = x.Type
-		m.DeviceTime = x.DeviceTime
 		m.Online = x.OnLine
-		orm.DbUpdateSelect(m, "version", "type", "device_time", "online")
+		fields := []string{"version", "type", "last_time", "online"}
+		if !m.Online {
+			fields = append(fields, "last_status")
+		}
+		orm.DbUpdates(m, fields)
 	} else if x.LinkType == xproto.LINK_FileTransfer {
 		filename, act := xproto.FileOfSess(x.Session)
 		if act == xproto.ACTION_Upload {

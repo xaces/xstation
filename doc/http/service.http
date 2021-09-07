@@ -1,6 +1,6 @@
 ### 服务授权
 
-POST http://127.0.0.1:12100/xstation/serve/applyAuth
+POST http://127.0.0.1:12100/station/serve/applyAuth
 Content-Type: application/json
 
 {
@@ -12,7 +12,7 @@ Content-Type: application/json
 
 ### 获取已添加服务列表
 
-GET http://127.0.0.1:12100/xstation/api/serve/list
+GET http://127.0.0.1:12100/station/api/serve/list
 Content-Type: application/json
 
 {
@@ -23,7 +23,7 @@ Content-Type: application/json
 
 ### 获取已添加服务状态
 
-GET http://127.0.0.1:12100/xstation/api/serve/status/list
+GET http://127.0.0.1:12100/station/api/serve/status/list
 Content-Type: application/json
 
 {
@@ -33,21 +33,21 @@ Content-Type: application/json
 
 ### 添加新服务
 
-POST http://127.0.0.1:12100/xstation/api/serve
+POST http://127.0.0.1:12100/station/api/serve
 Content-Type: application/json
 
 {
-    "name": "xstream",
+    "name": "stroge",
     "httpPort": 12300,
     "rpcPort": 12310,
     "accessPort": 12320,
     "status": 1,
-    "role": 2
+    "role": 3
 }
 
 ### 获取服务
 
-GET http://127.0.0.1:12100/xstation/api/serve/get/lbDFjWpEtTVgcpzRgmAPQh
+GET http://127.0.0.1:12100/station/api/serve/get/lbDFjWpEtTVgcpzRgmAPQh
 Content-Type: application/json
 
 {
@@ -57,7 +57,7 @@ Content-Type: application/json
 
 ### 修改服务状态
 
-PUT http://127.0.0.1:12100/xstation/api/serve/status
+PUT http://127.0.0.1:12100/station/api/serve/status
 Content-Type: application/json
 
 {
@@ -67,7 +67,7 @@ Content-Type: application/json
 
 ### 获取服务
 
-DELETE  http://127.0.0.1:12100/xstation/api/serve
+DELETE  http://127.0.0.1:12100/station/api/serve
 Content-Type: application/json
 
 {

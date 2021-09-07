@@ -1,8 +1,11 @@
 package main
 
 import (
+	"context"
 	"fmt"
 	"log"
+	"net/http"
+	"time"
 	"xstation/app"
 	"xstation/configs"
 	"xstation/controller"
@@ -13,6 +16,10 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/wlgd/xutils"
 	"github.com/wlgd/xutils/orm"
+)
+
+var (
+	hs *http.Server
 )
 
 // loadData 本地数据
@@ -54,7 +61,7 @@ func AppRun() error {
 	// 	return err
 	// }
 	log.Printf("Http ListenAndServe at %s:%d\n", configs.Default.Http.Host, configs.Default.Http.Port)
-	go controller.NewServer(configs.Default.Http.Port).ListenAndServe()
+	hs = controller.NewServer(configs.Default.Http.Port)
 	return nil
 }
 
@@ -63,4 +70,11 @@ func AppShutdown() {
 	app.XprotoStop()
 	// rpcxStop()
 	// hook.MqttStop()
+	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+	defer cancel()
+	if err := hs.Shutdown(ctx); err != nil {
+		log.Fatal("Server Shutdown:", err)
+	}
+	// catching ctx.Done(). timeout of 5 seconds.
+	<-ctx.Done()
 }
