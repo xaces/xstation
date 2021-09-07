@@ -54,7 +54,7 @@ func (x *XNotify) AddDbStatus(st *xproto.Status) uint64 {
 	o.People = model.JPeople(st.People)
 	o.TableIdx = int(dev.Id) % service.StatusTableNum
 	x.Status <- o
-	(*dev).LastStatus = model.JDevStatus(o)
+	dev.LastStatus = model.JDevStatus(o)
 	return o.Id
 }
 
