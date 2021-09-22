@@ -2,7 +2,7 @@
 ### ptz ptz
 ### code 参考协议文档
 
-POST http://127.0.0.1:12100/xstation/api/device/control/ptz?deviceId=20198002
+POST http://127.0.0.1:12100/station/api/device/control/ptz?deviceId=20198002
 Content-Type: application/json
 
 {
@@ -13,7 +13,7 @@ Content-Type: application/json
 
 ### 重启
 
-POST http://127.0.0.1:12100/xstation/api/device/control/reboot?deviceId=20198002
+POST http://127.0.0.1:12100/station/api/device/control/reboot?deviceId=20198002
 Content-Type: application/json
 
 {
@@ -22,7 +22,7 @@ Content-Type: application/json
 
 ### 抓拍
 
-POST http://127.0.0.1:12100/xstation/api/device/control/capture?deviceId=20198002
+POST http://127.0.0.1:12100/station/api/device/control/capture?deviceId=20198002
 Content-Type: application/json
 
 {
@@ -32,7 +32,7 @@ Content-Type: application/json
 
 ### 设备控制
 
-POST http://127.0.0.1:12100/xstation/api/device/control/osd?deviceId=20198002
+POST http://127.0.0.1:12100/station/api/device/control/osd?deviceId=20198002
 Content-Type: application/json
 
 {
@@ -42,7 +42,7 @@ Content-Type: application/json
 
 ### 格式化磁盘
 
-POST http://127.0.0.1:12100/xstation/api/device/control/format?deviceId=20198002
+POST http://127.0.0.1:12100/station/api/device/control/format?deviceId=20198002
 Content-Type: application/json
 
 {
@@ -52,7 +52,7 @@ Content-Type: application/json
 
 ### GSensor校准
 
-POST http://127.0.0.1:12100/xstation/api/device/control/gsensor?deviceId=20198002
+POST http://127.0.0.1:12100/station/api/device/control/gsensor?deviceId=20198002
 Content-Type: application/json
 
 {
@@ -61,7 +61,7 @@ Content-Type: application/json
 
 ### 恢复出厂设置
 
-POST http://127.0.0.1:12100/xstation/api/device/control/reset?deviceId=20198002
+POST http://127.0.0.1:12100/station/api/device/control/reset?deviceId=20198002
 Content-Type: application/json
 
 {
@@ -70,7 +70,7 @@ Content-Type: application/json
 
 ### 车辆控制
 // code 参考文档act
-POST http://127.0.0.1:12100/xstation/api/device/control/vehicle?deviceId=20198002
+POST http://127.0.0.1:12100/station/api/device/control/vehicle?deviceId=20198002
 Content-Type: application/json
 
 {

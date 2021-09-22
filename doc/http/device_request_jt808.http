@@ -1,0 +1,141 @@
+
+### jt808
+POST http://127.0.0.1:12100/station/api/device/request/jt808?deviceId=20198002
+Content-Type: application/json
+
+{
+    "codeId": "0x8107"
+}
+
+### jt808
+POST http://127.0.0.1:12100/station/api/device/request/jt808?deviceId=20198002
+Content-Type: application/json
+
+{
+    "codeId": "0x8201"
+}
+
+### jt808
+POST http://127.0.0.1:12100/station/api/device/request/jt808?deviceId=20198002
+Content-Type: application/json
+
+{
+    "codeId": "0x8202",
+    "data": {
+        "interval": 1,
+        "effectiveTime": 21
+    }
+}
+
+### jt808
+POST http://127.0.0.1:12100/station/api/device/request/jt808?deviceId=20198002
+Content-Type: application/json
+
+{
+    "codeId": "0x8203",
+    "data": {
+        "alarmSerial": 1,
+        "alarmType": 21
+    }
+}
+
+### jt808
+POST http://127.0.0.1:12100/station/api/device/request/jt808?deviceId=20198002
+Content-Type: application/json
+
+{
+    "codeId": "0x8300",
+    "data": {
+        "flag": 1,
+        "text": "hello"
+    }
+}
+
+### jt808
+POST http://127.0.0.1:12100/station/api/device/request/jt808?deviceId=20198002
+Content-Type: application/json
+
+{
+    "codeId": "0x8302",
+    "data": {
+        "text": "",
+        "answers": [
+            {
+                "id": 1,
+                "content": "nihao"
+            },
+            {
+                "id": 2,
+                "content": "你好"
+            }
+        ]
+    }
+}
+
+### jt808
+POST http://127.0.0.1:12100/station/api/device/request/jt808?deviceId=20198002
+Content-Type: application/json
+
+{
+    "codeId": "0x8303",
+    "data": {
+        "type": 1,
+        "message": [
+            {
+                "type": 1,
+                "name": "nihao"
+            },
+            {
+                "name": 2,
+                "name": "你好"
+            }
+        ]
+    }
+}
+
+### jt808
+POST http://127.0.0.1:12100/station/api/device/request/jt808?deviceId=20198002
+Content-Type: application/json
+
+{
+    "codeId": "0x8304",
+    "data": {
+        "type": 1,
+        "content": ""
+    }
+}
+
+### jt808
+POST http://127.0.0.1:12100/station/api/device/request/jt808?deviceId=20198002
+Content-Type: application/json
+
+{
+    "codeId": "0x8400",
+    "data": {
+        "type": 1,
+        "phoneNumber": ""
+    }
+}
+
+### jt808
+POST http://127.0.0.1:12100/station/api/device/request/jt808?deviceId=20198002
+Content-Type: application/json
+
+{
+    "codeId": "0x8401",
+    "data": {
+        "type": 1,
+        "contacts": [
+            {
+                "type": 1,
+                "phoneNumber": "233333333",
+                "name": ""
+            },
+            {
+                "type": 1,
+                "phoneNumber": "233333333",
+                "name": ""
+            }
+        ]
+    }
+}

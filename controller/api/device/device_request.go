@@ -123,6 +123,7 @@ func ControlOsdHandler(c *gin.Context) {
 	}
 	ctx.JSONOk().WriteData(resp, c)
 }
+
 // ControlGsensorHandler 设置控制
 func ControlGsensorHandler(c *gin.Context) {
 	var param xproto.Control
@@ -285,6 +286,22 @@ func FtpTransferHandler(c *gin.Context) {
 	}
 	var resp interface{}
 	if err := xproto.SyncSend(xproto.REQ_FtpTransfer, param, &resp, i.deviceId); err != nil {
+		ctx.JSONWriteError(err, c)
+		return
+	}
+	ctx.JSONOk().WriteData(resp, c)
+}
+
+// Jt808Handler
+func Jt808Handler(c *gin.Context) {
+	var param xproto.Jt808
+	i, err := checkParam(c, &param)
+	if err != nil {
+		ctx.JSONWriteError(err, c)
+		return
+	}
+	var resp interface{}
+	if err := xproto.SyncSend(xproto.REQ_Jt808, param, &resp, i.deviceId); err != nil {
 		ctx.JSONWriteError(err, c)
 		return
 	}

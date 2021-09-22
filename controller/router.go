@@ -35,6 +35,7 @@ func deiveRouter(r *gin.RouterGroup) {
 	p.POST("/parameters", device.ParametersHandler)
 	p.POST("/fileTransfer", device.FileTransferHandler)
 	p.POST("/ftpTransfer", device.FtpTransferHandler)
+	p.POST("/jt808", device.Jt808Handler)
 	p.POST("/close", device.CloseLinkHandler)
 
 	ctrl := r.Group("/device/control")

@@ -1,0 +1,88 @@
+
+### 参数设置
+
+POST http://127.0.0.1:12100/station/api/device/request/parameters?deviceId=20198002
+Content-Type: application/json
+
+{
+   "jtparameter": {}
+}
+
+### 参数获取
+
+POST http://127.0.0.1:12100/station/api/device/request/parameters?deviceId=20198002
+Content-Type: application/json
+
+{
+ "jtparameter": [
+      {
+        "codeId": "0x0001",
+        "value": 50
+      },
+      {
+        "codeId": "0x0002",
+        "value": 30
+      },
+      {
+        "codeId": "0x0040",
+        "value": "123112"
+      }
+ ]
+}
+
+### 参数获取
+
+POST http://127.0.0.1:12100/station/api/device/request/parameters?deviceId=20198002
+Content-Type: application/json
+
+{
+    "UserDefineHowen": {
+        "act": 1,
+        "type": 300,
+        "data": {
+            "channels": 3,
+            "interval": 60,
+            "res": 2
+        }
+    }
+}
+
+### 参数设置
+
+POST http://127.0.0.1:12100/station/api/device/request/parameters?deviceId=20198002
+Content-Type: application/json
+
+{
+    "UserDefineHowen": {
+        "act": 0,
+        "type": 49153,
+        "data": {
+            "switch": 0,
+            "keepTime": 45
+        }
+    }
+}
+
+
+### AIBox参数设置
+
+POST http://127.0.0.1:12100/station/api/device/request/parameters?deviceId=20198002
+Content-Type: application/json
+
+{
+    "IOSET": "",
+    "MOD": "AIBox"
+}
+
+### Gps角度优化
+
+POST http://127.0.0.1:12100/station/api/device/request/parameters?deviceId=20198002
+Content-Type: application/json
+
+{
+    "gpsAngleConfig": {
+        "act": "1",
+        "dg": "1000",
+        "on": "1"
+    }
+}
