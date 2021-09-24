@@ -5,7 +5,9 @@ Content-Type: application/json
 {
     "no": "20198002",
     "name": "",
-    "icon": ""
+    "icon": "",
+    "chlNumber": 4,
+    "chlNames": ["CH01", "CH02", "CH03", "CH04"]
 }
 
 ### 设备列表
@@ -31,13 +33,12 @@ Content-Type: application/json
 
 {
     "id": 1,
-    "no": "20198002",
-    "name": "",
+    "name": "测试001",
     "icon": ""
 }
 
 
-### 更新设备信息
+### 删除设备信息
 DELETE  http://127.0.0.1:12100/station/api/device/3
 Content-Type: application/json
 
@@ -73,7 +74,7 @@ Content-Type: application/json
 }
 
 ### 获取设备报警数据
-GET http://127.0.0.1:12100/station/api/device/alarm/list?deviceNo=20198002&startTime=2021-07-31 00:00:00&endTime=2021-07-31 23:59:59
+GET http://127.0.0.1:12100/station/api/device/alarm/list?deviceNo=20198002&startTime=2021-09-24 00:00:00&endTime=2021-09-24 23:59:59
 Content-Type: application/json
 
 {
