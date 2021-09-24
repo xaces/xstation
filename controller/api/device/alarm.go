@@ -1,7 +1,6 @@
 package device
 
 import (
-	"xstation/mnger"
 	"xstation/model"
 
 	"github.com/gin-gonic/gin"
@@ -12,33 +11,22 @@ import (
 type Alarm struct {
 }
 
-type alarm struct {
-	Alarm  model.DevAlarm `json:"alarm"`
-	Status interface{} `json:"status"`
-}
-
 func (o *Alarm) ListHandler(c *gin.Context) {
-	var param alarmPage
-	if err := c.ShouldBind(&param); err != nil {
+	var p alarmPage
+	if err := c.ShouldBind(&p); err != nil {
 		ctx.JSONWriteError(err, c)
 		return
 	}
-	var rows []model.DevAlarm
-	totalCount, err := orm.DbPage(&model.DevAlarm{}, param.Where()).Scan(param.PageNum, param.PageSize, &rows)
-	if err == nil {
-		var data []alarm
-		for _, v := range rows {
-			alr := alarm{Alarm: v}
-			_, m := mnger.Dev.GetModel(param.DeviceNo)
-			if err := orm.DbFirstById(m, v.StatusId); err == nil {
-				alr.Status = m
-			}
-			data = append(data, alr)
-		}
-		ctx.JSONOk().WriteData(gin.H{"total": totalCount, "rows": data}, c)
+	var rows []alarmData
+	if err := orm.DB().Raw(p.Where()).Scan(&rows).Error; err != nil {
+		ctx.JSONWriteError(err, c)
 		return
 	}
-	ctx.JSONWriteError(err, c)
+	total := len(rows)
+	if p.PageSize > 0 {
+		rows = rows[p.PageSize*(p.PageNum-1) : p.PageSize*p.PageNum]
+	}
+	ctx.JSONOk().WriteData(gin.H{"total": total, "rows": rows}, c)
 }
 
 // GetByStatusIdHandler 获取指定id

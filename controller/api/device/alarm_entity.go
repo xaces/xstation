@@ -1,6 +1,10 @@
 package device
 
-import "github.com/wlgd/xutils/orm"
+import (
+	"fmt"
+	"xstation/mnger"
+	"xstation/model"
+)
 
 // alarmPage 分页
 type alarmPage struct {
@@ -11,12 +15,16 @@ type alarmPage struct {
 	DeviceNo  string `form:"deviceNo"` //
 }
 
+type alarmData struct {
+	model.DevAlarm
+	Gps model.JGps `json:"gps"`
+}
+
 // Where 初始化
-func (s *alarmPage) Where() *orm.DbWhere {
-	var where orm.DbWhere
-	where.Append("device_no like ?", s.DeviceNo)
-	where.Append("start_time >= ?", s.StartTime)
-	where.Append("end_time <= ?", s.EndTime)
-	where.Orders = append(where.Orders, "start_time desc")
-	return &where
+func (s *alarmPage) Where() string {
+	tbname, _ := mnger.Dev.GetModel(s.DeviceNo)
+	sql := "SELECT a.*, s.gps FROM t_devalarm a JOIN %s s" +
+		" ON a.device_no like '%s' AND a.start_time >= '%s' AND a.end_time <= '%s' AND a.status_id = s.id ORDER BY a.start_time desc"
+	sqlstr := fmt.Sprintf(sql, tbname, s.DeviceNo, s.StartTime, s.EndTime)
+	return sqlstr
 }
