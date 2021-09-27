@@ -20,7 +20,7 @@ func (o *Status) ListHandler(c *gin.Context) {
 		ctx.JSONWriteError(err, c)
 		return
 	}
-	_, m := mnger.Dev.GetModel(param.DeviceNo)
+	_, m := mnger.Dev.Model(param.DeviceNo)
 	var rows []model.DevStatus
 	totalCount, err := orm.DbPage(m, param.Where()).Scan(param.PageNum, param.PageSize, &rows)
 	if err == nil {
@@ -37,7 +37,7 @@ func (o *Status) GetHandler(c *gin.Context) {
 		ctx.JSONWriteError(err, c)
 		return
 	}
-	_, data := mnger.Dev.GetModel(param.DeviceNo)
+	_, data := mnger.Dev.Model(param.DeviceNo)
 	if err := orm.DbFirstById(data, param.StatusId); err != nil {
 		ctx.JSONWriteError(err, c)
 		return

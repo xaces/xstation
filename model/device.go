@@ -18,13 +18,13 @@ func (t *JDevStatus) Scan(v interface{}) error {
 }
 
 type DeviceOpt struct {
-	Id        uint64   `json:"id" gorm:"primary_key"`
-	No        string   `json:"no" gorm:"type:varchar(24);"`
-	Name      string   `json:"name" gorm:"type:varchar(20);"`
-	ChlNumber int      `json:"chlNumber"`
-	ChlNames  JStrings `json:"chlNames"`
-	Icon      string   `json:"icon" gorm:"type:varchar(64);"`
-	Remark    string   `json:"remark" gorm:"size:500;"`
+	Id        uint64 `json:"id" gorm:"primary_key"`
+	No        string `json:"no" gorm:"type:varchar(24);"`
+	Name      string `json:"name" gorm:"type:varchar(20);"`
+	ChlNumber int    `json:"chlNumber"`
+	ChlNames  string `json:"chlNames" gorm:"type:varchar(64);"`
+	Icon      string `json:"icon" gorm:"type:varchar(64);"`
+	Remark    string `json:"remark" gorm:"size:500;"`
 }
 
 type Device struct {

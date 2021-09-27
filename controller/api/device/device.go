@@ -23,7 +23,7 @@ func (o *Device) ListHandler(c *gin.Context) {
 	var rows []model.Device
 	totalCount, err := orm.DbPage(&model.Device{}, param.Where()).Find(param.PageNum, param.PageSize, &rows)
 	if err == nil {
-		ctx.JSONOk().WriteData(gin.H{"total": totalCount, "rows": rows}, c)
+		ctx.JSONOk().Write(gin.H{"total": totalCount, "rows": rows}, c)
 		return
 	}
 	ctx.JSONWriteError(err, c)

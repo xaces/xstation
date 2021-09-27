@@ -18,15 +18,12 @@ func (o *Alarm) ListHandler(c *gin.Context) {
 		return
 	}
 	var rows []alarmData
-	if err := orm.DB().Raw(p.Where()).Scan(&rows).Error; err != nil {
+	total, err := orm.DbPageRawScan(p.Where(), &rows, p.PageNum, p.PageSize)
+	if err != nil {
 		ctx.JSONWriteError(err, c)
 		return
 	}
-	total := len(rows)
-	if p.PageSize > 0 {
-		rows = rows[p.PageSize*(p.PageNum-1) : p.PageSize*p.PageNum]
-	}
-	ctx.JSONOk().WriteData(gin.H{"total": total, "rows": rows}, c)
+	ctx.JSONOk().Write(gin.H{"total": total, "rows": rows}, c)
 }
 
 // GetByStatusIdHandler 获取指定id

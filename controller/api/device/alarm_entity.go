@@ -22,9 +22,9 @@ type alarmData struct {
 
 // Where 初始化
 func (s *alarmPage) Where() string {
-	tbname, _ := mnger.Dev.GetModel(s.DeviceNo)
+	tbname, _ := mnger.Dev.Model(s.DeviceNo)
 	sql := "SELECT a.*, s.gps FROM t_devalarm a JOIN %s s" +
-		" ON a.device_no like '%s' AND a.start_time >= '%s' AND a.end_time <= '%s' AND a.status_id = s.id ORDER BY a.start_time desc"
+		" ON a.device_no like '%s' AND a.start_time >= '%s' AND a.start_time <= '%s' AND a.status_id = s.id ORDER BY a.start_time desc"
 	sqlstr := fmt.Sprintf(sql, tbname, s.DeviceNo, s.StartTime, s.EndTime)
 	return sqlstr
 }
