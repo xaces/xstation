@@ -1,9 +1,10 @@
 package device
 
 import (
+	"xstation/app/mnger"
 	"xstation/internal"
-	"xstation/mnger"
 	"xstation/model"
+	"xstation/service"
 
 	"github.com/wlgd/xutils/ctx"
 	"github.com/wlgd/xutils/orm"
@@ -15,7 +16,7 @@ type Device struct {
 }
 
 func (o *Device) ListHandler(c *gin.Context) {
-	var param devicePage
+	var param service.DevicePage
 	if err := c.ShouldBind(&param); err != nil {
 		ctx.JSONWriteError(err, c)
 		return
@@ -58,13 +59,13 @@ func (o *Device) AddHandler(c *gin.Context) {
 		ctx.JSONWriteError(err, c)
 		return
 	}
-	mnger.Dev.Add(&data)
+	mnger.Devs.Add(&data)
 	ctx.JSONOk().WriteTo(c)
 }
 
 // UpdateHandler 修改
 func (o *Device) UpdateHandler(c *gin.Context) {
-	var param deviceUpdate
+	var param service.DeviceUpdate
 	//获取参数
 	if err := c.ShouldBind(&param); err != nil {
 		ctx.JSONWriteError(err, c)
@@ -88,9 +89,26 @@ func (o *Device) DeleteHandler(c *gin.Context) {
 		return
 	}
 	ids := internal.StringToIntSlice(idstr, ",")
-	if err := deleteDevices(ids); err != nil {
-		ctx.JSONWriteError(err, c)
+	var devs []model.Device
+	if _, err := orm.DbFindBy(&devs, "id in (?)", ids); err != nil {
+		ctx.JSONError().WriteTo(c)
 		return
 	}
+	if err := orm.DbDeletes(&devs); err != nil {
+		ctx.JSONError().WriteTo(c)
+		return
+	}
+	for _, v := range devs {
+		mnger.Devs.Delete(v.No)
+	}
 	ctx.JSONOk().WriteTo(c)
+}
+
+func Router(r *gin.RouterGroup) {
+	d := Device{}
+	r.GET("/list", d.ListHandler)
+	r.GET("/:id", d.GetHandler)
+	r.POST("", d.AddHandler)
+	r.PUT("", d.UpdateHandler)
+	r.DELETE("/:id", d.DeleteHandler)
 }

@@ -1,9 +1,9 @@
-package device
+package service
 
 import "github.com/wlgd/xutils/orm"
 
 // statusPage 分页
-type onlinePage struct {
+type OnlinePage struct {
 	PageNum   int    `form:"pageNum"`  // 当前页码
 	PageSize  int    `form:"pageSize"` // 每页数
 	StartTime string `form:"startTime"`
@@ -12,7 +12,7 @@ type onlinePage struct {
 }
 
 // Where 初始化
-func (s *onlinePage) Where() *orm.DbWhere {
+func (s *OnlinePage) Where() *orm.DbWhere {
 	var where orm.DbWhere
 	where.Append("device_no like ?", s.DeviceNo)
 	where.Append("on_time >= ?", s.StartTime)

@@ -1,9 +1,10 @@
 package sys
 
 import (
+	"xstation/app/mnger"
 	"xstation/internal"
-	"xstation/mnger"
 	"xstation/model"
+	"xstation/service"
 
 	"github.com/wlgd/xutils/orm"
 
@@ -50,7 +51,7 @@ func (o *Serve) AddHandler(c *gin.Context) {
 		ctx.JSONWriteError(err, c)
 		return
 	}
-	mnger.Serve.Add(&param)
+	mnger.Serves.Add(&param)
 	// 同步信息到服务管理
 	ctx.JSONOk().WriteTo(c)
 }
@@ -71,12 +72,12 @@ func (o *Serve) UpdateHandler(c *gin.Context) {
 
 // UpdateStatusHandler
 func (o *Serve) UpdateStatusHandler(c *gin.Context) {
-	var param serveOpt
+	var param service.ServeOpt
 	if err := c.ShouldBind(&param); err != nil {
 		ctx.JSONWriteError(err, c)
 		return
 	}
-	if err := mnger.Serve.UpdateStatus(param.Guids, param.Status); err != nil {
+	if err := mnger.Serves.UpdateStatus(param.Guids, param.Status); err != nil {
 		ctx.JSONWriteError(err, c)
 		return
 	}
@@ -85,20 +86,32 @@ func (o *Serve) UpdateStatusHandler(c *gin.Context) {
 
 // StatusListHandler
 func (o *Serve) StatusListHandler(c *gin.Context) {
-	data := mnger.Serve.GetAll()
+	data := mnger.Serves.GetAll()
 	ctx.JSONOk().WriteData(data, c)
 }
 
 // DeleteHandler 删除
 func (o *Serve) DeleteHandler(c *gin.Context) {
-	var param serveOpt
+	var param service.ServeOpt
 	if err := c.ShouldBind(&param); err != nil {
 		ctx.JSONWriteError(err, c)
 		return
 	}
-	if err := deleteServes(param.Guids); err != nil {
+	if _, err := orm.DbDeleteBy(&model.SysServe{}, "guid in (?)", param.Guids); err != nil {
 		ctx.JSONWriteError(err, c)
 		return
 	}
 	ctx.JSONOk().WriteTo(c)
+}
+
+// ServerRouter 服务路由
+func ServerRouter(r *gin.RouterGroup) {
+	s := Serve{}
+	r.GET("/serve/list", s.ListHandler)
+	r.GET("/serve/get/:guid", s.GetHandler)
+	r.POST("/serve", s.AddHandler)
+	r.PUT("/serve", s.UpdateHandler)
+	r.PUT("/serve/status", s.UpdateStatusHandler)    // 设置子服务
+	r.GET("/serve/status/list", s.StatusListHandler) // 获取子服务状态
+	r.DELETE("/serve", s.DeleteHandler)
 }

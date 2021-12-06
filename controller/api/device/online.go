@@ -2,17 +2,18 @@ package device
 
 import (
 	"xstation/model"
+	"xstation/service"
 
 	"github.com/gin-gonic/gin"
 	"github.com/wlgd/xutils/ctx"
 	"github.com/wlgd/xutils/orm"
 )
 
-type OnLine struct {
+type Online struct {
 }
 
-func (o *OnLine) ListHandler(c *gin.Context) {
-	var param onlinePage
+func (o *Online) ListHandler(c *gin.Context) {
+	var param service.OnlinePage
 	if err := c.ShouldBind(&param); err != nil {
 		ctx.JSONWriteError(err, c)
 		return
@@ -26,7 +27,7 @@ func (o *OnLine) ListHandler(c *gin.Context) {
 	ctx.JSONWriteError(err, c)
 }
 
-func (o *OnLine) AddHandler(c *gin.Context) {
+func (o *Online) AddHandler(c *gin.Context) {
 	var data model.DevOnline
 	//获取参数
 	if err := c.ShouldBind(&data); err != nil {
@@ -38,4 +39,11 @@ func (o *OnLine) AddHandler(c *gin.Context) {
 		return
 	}
 	ctx.JSONOk().WriteTo(c)
+}
+
+
+func OnlineRouter(r *gin.RouterGroup) {
+	on := Online{}
+	r.POST("/online", on.AddHandler)
+	r.GET("/online/list", on.ListHandler)
 }

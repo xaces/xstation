@@ -150,8 +150,11 @@ type DevStatus struct {
 	Mobile    JMobile  `json:"mobile"`                            // 移动网络 json 字符串
 	Disks     JDisks   `json:"disks"`                             // 磁盘 json 字符串
 	People    JPeople  `json:"people"`                            // 人数统计 json 字符串
-	TableIdx  int      `json:"-" gorm:"-"`
 }
+
+const (
+	DevStatusTabs = 2
+)
 
 // TableName 表名
 func (s *DevStatus) TableName() string {
@@ -180,4 +183,26 @@ type DevStatus4 DevStatus
 
 func (s *DevStatus4) TableName() string {
 	return "t_devstatus4"
+}
+
+// StatusModel 获取model模型
+func Status(devId uint64) (string, interface{}) {
+	tabIdx := int(devId) % DevStatusTabs
+	switch tabIdx {
+	case 1:
+		m := &DevStatus1{}
+		return m.TableName(), m
+	case 2:
+		m := &DevStatus2{}
+		return m.TableName(), m
+	case 3:
+		m := &DevStatus3{}
+		return m.TableName(), m
+	case 4:
+		m := &DevStatus4{}
+		return m.TableName(), m
+	default:
+	}
+	m := &DevStatus{}
+	return m.TableName(), m
 }

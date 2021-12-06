@@ -1,10 +1,11 @@
-package app
+package controller
 
 import (
+	"fmt"
 	"log"
 	"time"
+	"xstation/app/mnger"
 	"xstation/internal"
-	"xstation/mnger"
 	"xstation/model"
 	"xstation/service"
 
@@ -27,10 +28,10 @@ func NewXNotify() *XNotify {
 }
 
 // AddDbStatus 转化成Model数据格式
-func (x *XNotify) AddDbStatus(st *xproto.Status) uint64 {
-	dev := mnger.Dev.Get(st.DeviceNo)
+func (x *XNotify) AddDbStatus(st *xproto.Status) *model.DevStatus {
+	dev := mnger.Devs.Get(st.DeviceNo)
 	if dev == nil {
-		return 0
+		return nil
 	}
 	o := model.DevStatus{}
 	o.Id = service.PrimaryKey()
@@ -52,19 +53,18 @@ func (x *XNotify) AddDbStatus(st *xproto.Status) uint64 {
 	o.Mobile = model.JMobile(st.Mobile)
 	o.Disks = model.JDisks(st.Disks)
 	o.People = model.JPeople(st.People)
-	o.TableIdx = int(dev.Id) % service.StatusTableNum
 	x.Status <- o
 	dev.LastStatus = model.JDevStatus(o)
-	return o.Id
+	return &o
 }
 
 // AccessHandler 设备接入
 func (o *XNotify) AccessHandler(data []byte, arg *interface{}, x *xproto.Access) error {
-	log.Printf("%s\n", string(data))
-	m := mnger.Dev.Get(x.DeviceNo)
+	m := mnger.Devs.Get(x.DeviceNo)
 	if m == nil {
-		return xproto.ErrInvalidDevice
+		return fmt.Errorf("deviceNo:%s invalid", x.DeviceNo)
 	}
+	log.Printf("%s\n", string(data))
 	if x.LinkType == xproto.LINK_Signal {
 		m.Version = x.Version
 		m.Type = x.Type
@@ -96,27 +96,31 @@ func (x *XNotify) AlarmHandler(data []byte, xalr *xproto.Alarm) {
 	xproto.LogAlarm(data, xalr)
 	flag := xalr.Status.Flag
 	xalr.Status.Flag = 2
-	statusId := x.AddDbStatus(xalr.Status)
-	if statusId <= 0 {
-		return
+	if xalr.EndTime != "" {
+		xalr.Status.Flag = 3
 	}
+	status := x.AddDbStatus(xalr.Status)
 	alarm := model.DevAlarm{
+		Guid:      xalr.UUID,
 		DeviceNo:  xalr.DeviceNo,
-		Guid:      internal.UUID(),
-		UUID:      xalr.UUID,
-		StatusId:  statusId,
 		Flag:      flag,
 		Type:      xalr.Type,
 		StartTime: xalr.StartTime,
 		EndTime:   xalr.EndTime,
+		Status:    model.JDevStatus(*status),
+		StatusId:  status.Id,
 		Data:      internal.ToJString(xalr.Data),
+	}
+	if xalr.EndTime != "" && orm.DbUpdateColBy(&model.DevAlarm{}, "end_time", xalr.EndTime, "guid = ?", xalr.UUID) == nil {
+		return
 	}
 	orm.DbCreate(&alarm)
 }
 
 // DbStatusHandler 批量处理数据
 func (x *XNotify) DbInsertHandler() {
-	stArray := make([][]model.DevStatus, service.StatusTableNum)
+
+	stArray := make([][]model.DevStatus, model.DevStatusTabs)
 	ticker := time.NewTicker(time.Second * 2)
 	p, _ := ants.NewPoolWithFunc(5, service.DbStatusTaskFunc) // 协程池
 	defer p.Release()
@@ -124,10 +128,10 @@ func (x *XNotify) DbInsertHandler() {
 	for {
 		select {
 		case d := <-x.Status:
-			tabIdx := d.TableIdx
+			tabIdx := d.DeviceId % model.DevStatusTabs
 			stArray[tabIdx] = append(stArray[tabIdx], d)
 		case <-ticker.C:
-			for i := 0; i < service.StatusTableNum; i++ {
+			for i := 0; i < model.DevStatusTabs; i++ {
 				if err := x.DbInsertStatus(p, i, stArray[i]); err != nil {
 					continue
 				}

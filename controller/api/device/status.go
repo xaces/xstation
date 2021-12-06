@@ -1,8 +1,9 @@
 package device
 
 import (
-	"xstation/mnger"
+	"xstation/app/mnger"
 	"xstation/model"
+	"xstation/service"
 
 	"github.com/wlgd/xutils/orm"
 
@@ -15,12 +16,12 @@ type Status struct {
 }
 
 func (o *Status) ListHandler(c *gin.Context) {
-	var param statusPage
+	var param service.StatusPage
 	if err := c.ShouldBind(&param); err != nil {
 		ctx.JSONWriteError(err, c)
 		return
 	}
-	_, m := mnger.Dev.Model(param.DeviceNo)
+	_, m := mnger.Devs.Model(param.DeviceNo)
 	var rows []model.DevStatus
 	totalCount, err := orm.DbPage(m, param.Where()).Scan(param.PageNum, param.PageSize, &rows)
 	if err == nil {
@@ -32,15 +33,21 @@ func (o *Status) ListHandler(c *gin.Context) {
 
 // GetHandler 获取指定id
 func (o *Status) GetHandler(c *gin.Context) {
-	param := statusGet{}
+	param := service.StatusGet{}
 	if err := c.ShouldBind(&param); err != nil {
 		ctx.JSONWriteError(err, c)
 		return
 	}
-	_, data := mnger.Dev.Model(param.DeviceNo)
+	_, data := mnger.Devs.Model(param.DeviceNo)
 	if err := orm.DbFirstById(data, param.StatusId); err != nil {
 		ctx.JSONWriteError(err, c)
 		return
 	}
 	ctx.JSONOk().WriteData(data, c)
+}
+
+func StatusRouter(r *gin.RouterGroup) {
+	s := Status{}
+	r.GET("/status/list", s.ListHandler)
+	r.GET("/status", s.GetHandler)
 }

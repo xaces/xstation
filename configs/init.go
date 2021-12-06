@@ -31,6 +31,9 @@ type ymlConfigure struct {
 		Name string `yaml:"name"`
 		Key  string `yaml:"key"`
 	} `yaml:"map"`
+
+	License string `yaml:"license"`
+	Public  string `yaml:"public"`
 }
 
 // Default 所有配置参数
@@ -41,8 +44,11 @@ var (
 )
 
 // Load 初始化配置参数
-func Load(license, path string) error {
-	lice, err := xutils.LicenseRead(license)
+func Load(path string) error {
+	if err := xutils.YMLConf(path, &Default); err != nil {
+		return err
+	}
+	lice, err := xutils.LicenseRead(Default.License)
 	if err != nil {
 		return err
 	}
@@ -51,5 +57,5 @@ func Load(license, path string) error {
 	Local.MaxDevNumber = lice.MaxNumber
 	//TODO address
 	SuperAddress = lice.Address
-	return xutils.YMLConf(path, &Default)
+	return nil
 }

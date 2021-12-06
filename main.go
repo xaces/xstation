@@ -3,55 +3,51 @@ package main
 import (
 	"log"
 	"os"
-	"os/signal"
-	"syscall"
+	"xstation/app"
 	"xstation/configs"
 
-	"github.com/urfave/cli/v2"
+	svc "github.com/kardianos/service"
 )
 
-// 启动流程
-// 1、初始化数据库
-// 2、获取向中心服务配置信息
-func main() {
-	app := &cli.App{
-		Name:        "mdvr's workstation",
-		Version:     "0.3.0",
-		Description: "This is mdvr access application",
-		Authors: []*cli.Author{{
-			Name:  "don.wang",
-			Email: "wanguandong@126.com",
-		},
-		},
-		Flags: []cli.Flag{
-			&cli.StringFlag{
-				Name:  "c",
-				Usage: "config file",
-				Value: ".config.yml",
-			},
-			&cli.StringFlag{
-				Name:  "ces",
-				Usage: "licences file",
-				Value: "localtest.lice",
-			},
-		},
-		Before: func(c *cli.Context) error {
-			return configs.Load(c.String("ces"), c.String("c"))
-		},
-		Action: func(c *cli.Context) error {
-			if err := AppRun(); err != nil {
-				return err
-			}
-			quit := make(chan os.Signal)
-			// kill (no param) default send syscanll.SIGTERM
-			// kill -2 is syscall.SIGINT
-			// kill -9 is syscall. SIGKILL but can"t be catch, so don't need add it
-			signal.Notify(quit, syscall.SIGINT, syscall.SIGTERM)
-			<-quit
-			AppShutdown()
-			log.Println("AppShutdown done")
-			return nil
-		},
+type program struct {
+}
+
+func (p *program) Start(s svc.Service) error {
+	if err := configs.Load(".config.yml"); err != nil {
+		return err
 	}
-	log.Println(app.Run(os.Args))
+	return p.run()
+}
+
+func (p *program) run() error {
+	return app.Run()
+}
+
+func (p *program) Stop(s svc.Service) error {
+	return app.Shutdown()
+}
+
+func main() {
+	svvconfig := &svc.Config{
+		Name:        "xvms.workstation",
+		DisplayName: "xstation",
+		Description: "This is mdvr access application",
+	}
+	s, err := svc.New(&program{}, svvconfig)
+	if err != nil {
+		log.Fatal(err)
+	}
+	if len(os.Args) > 1 {
+		if os.Args[1] == "install" {
+			err = s.Install()
+		} else if os.Args[1] == "uninstall" {
+			err = s.Uninstall()
+		}
+		log.Println(err)
+		return
+	}
+	err = s.Run()
+	if err != nil {
+		log.Fatal(err)
+	}
 }

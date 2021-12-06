@@ -322,3 +322,28 @@ func CloseLinkHandler(c *gin.Context) {
 	}
 	ctx.JSONOk().WriteTo(c)
 }
+
+func RequestRouter(r *gin.RouterGroup) {
+	p := r.Group("/device/request")
+	p.POST("/liveStream", LiveStreamHandler)
+	p.POST("/voice", VoiceHandler)
+	p.POST("/playback", PlaybackHandler)
+	p.POST("/query", QueryHandler)
+	p.POST("/parameters", ParametersHandler)
+	p.POST("/fileTransfer", FileTransferHandler)
+	p.POST("/ftpTransfer", FtpTransferHandler)
+	p.POST("/jt808", Jt808Handler)
+	p.POST("/close", CloseLinkHandler)
+
+}
+
+func ControllerRouter(r *gin.RouterGroup) {
+	ctrl := r.Group("/device/control")
+	ctrl.POST("/ptz", ControlPTZHandler)
+	ctrl.POST("/reboot", ControlRebootHandler)
+	ctrl.POST("/capture", ControlCaptureHandler)
+	ctrl.POST("/osd", ControlOsdHandler)
+	ctrl.POST("/reset", ControlResetHandler)
+	ctrl.POST("/vehicle", ControlVehicleHandler)
+	ctrl.POST("/gsensor", ControlGsensorHandler)
+}

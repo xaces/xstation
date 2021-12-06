@@ -1,11 +1,11 @@
-package device
+package service
 
 import (
 	"github.com/wlgd/xutils/orm"
 )
 
-// statusPage 分页
-type statusPage struct {
+// StatusPage 分页
+type StatusPage struct {
 	PageNum   int    `form:"pageNum"`  // 当前页码
 	PageSize  int    `form:"pageSize"` // 每页数
 	StartTime string `form:"startTime"`
@@ -16,7 +16,7 @@ type statusPage struct {
 }
 
 // Where 初始化
-func (s *statusPage) Where() *orm.DbWhere {
+func (s *StatusPage) Where() *orm.DbWhere {
 	var where orm.DbWhere
 	where.Append("device_no like ?", s.DeviceNo)
 	where.Append("dtu >= ?", s.StartTime+" 00:00:00")
@@ -28,8 +28,8 @@ func (s *statusPage) Where() *orm.DbWhere {
 	return &where
 }
 
-// statusGet 获取
-type statusGet struct {
+// StatusGet 获取
+type StatusGet struct {
 	DeviceNo string `form:"deviceNo"` //
 	StatusId uint64 `form:"statusId"` //
 }

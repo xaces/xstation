@@ -1,14 +1,13 @@
-package device
+package service
 
 import (
-	"xstation/mnger"
 	"xstation/model"
 
 	"github.com/wlgd/xutils/orm"
 )
 
-// devicePage 分页
-type devicePage struct {
+// DevicePage 分页
+type DevicePage struct {
 	PageNum   int    `form:"pageNum"`  // 当前页码
 	PageSize  int    `form:"pageSize"` // 每页数
 	StartTime string `form:"startTime"`
@@ -18,7 +17,7 @@ type devicePage struct {
 }
 
 // Where 初始化
-func (s *devicePage) Where() *orm.DbWhere {
+func (s *DevicePage) Where() *orm.DbWhere {
 	var where orm.DbWhere
 	if s.StartTime != "" {
 		where.Append("created_at >= ?", s.StartTime)
@@ -35,22 +34,8 @@ func (s *devicePage) Where() *orm.DbWhere {
 	return &where
 }
 
-// deviceUpdate 更新
-type deviceUpdate struct {
+// DeviceUpdate 更新
+type DeviceUpdate struct {
 	model.DeviceOpt
 	Id uint64 `json:"id"`
-}
-
-func deleteDevices(ids []int) error {
-	var devs []model.Device
-	if _, err := orm.DbFindBy(&devs, "id in (?)", ids); err != nil {
-		return err
-	}
-	if err := orm.DbDeletes(&devs); err != nil {
-		return err
-	}
-	for _, dev := range devs {
-		mnger.Dev.Delete(dev.No)
-	}
-	return nil
 }

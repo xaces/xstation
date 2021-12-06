@@ -1,6 +1,8 @@
-package app
+package gw
 
 import (
+	"xstation/controller"
+
 	"github.com/wlgd/xproto"
 	"github.com/wlgd/xproto/ho"
 	"github.com/wlgd/xproto/jt"
@@ -27,9 +29,9 @@ var (
 	_xproto *xproto.Serve = nil
 )
 
-// XprotoStart 启动
-func XprotoStart(host string, port uint16) error {
-	xnotify := NewXNotify()
+// Start 启动
+func Start(host string, port uint16) error {
+	xnotify := controller.NewXNotify()
 	s, err := xproto.NewServe(&xproto.Options{
 		RequestTimeout: 50,
 		RecvTimeout:    30,
@@ -47,7 +49,7 @@ func XprotoStart(host string, port uint16) error {
 	return err
 }
 
-// XprotoStop 停止
-func XprotoStop() {
+// Stop 停止
+func Stop() {
 	_xproto.Release()
 }

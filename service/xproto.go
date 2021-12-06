@@ -54,25 +54,3 @@ func DbStatusTaskFunc(obj interface{}) {
 	}
 	orm.DbCreate(data)
 }
-
-// StatusModel 获取model模型
-func StatusModel(devId uint64) (string, interface{}) {
-	tabIdx := int(devId) % StatusTableNum
-	switch tabIdx {
-	case 1:
-		m := &model.DevStatus1{}
-		return m.TableName(), m
-	case 2:
-		m := &model.DevStatus2{}
-		return m.TableName(), m
-	case 3:
-		m := &model.DevStatus3{}
-		return m.TableName(), m
-	case 4:
-		m := &model.DevStatus4{}
-		return m.TableName(), m
-	default:
-	}
-	m := &model.DevStatus{}
-	return m.TableName(), m
-}

@@ -15,10 +15,6 @@ import (
 	"gorm.io/gorm/schema"
 )
 
-const (
-	StatusTableNum = 2
-)
-
 func initTables(db *gorm.DB) {
 	db.AutoMigrate(
 		&model.SysServe{},
