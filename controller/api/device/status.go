@@ -23,7 +23,7 @@ func (o *Status) ListHandler(c *gin.Context) {
 	}
 	_, m := mnger.Devs.Model(param.DeviceNo)
 	var data []model.DevStatus
-	total, _ := orm.DbPage(m, param.Where()).Scan(param.PageNum, param.PageSize, &data)
+   	total, _ := orm.DbPage(m, param.Where()).Find(param.PageNum, param.PageSize, &data)
 	ctx.JSONOk().Write(gin.H{"total": total, "data": data}, c)
 }
 

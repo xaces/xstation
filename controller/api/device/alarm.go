@@ -19,7 +19,7 @@ func (o *Alarm) ListHandler(c *gin.Context) {
 		return
 	}
 	var data []model.DevAlarm
-	total, _ := orm.DbPage(&model.DevOnline{}, param.Where()).Scan(param.PageNum, param.PageSize, &data)
+	total, _ := orm.DbPage(&model.DevOnline{}, param.Where()).Find(param.PageNum, param.PageSize, &data)
 	ctx.JSONOk().Write(gin.H{"total": total, "data": data}, c)
 }
 

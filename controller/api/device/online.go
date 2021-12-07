@@ -19,7 +19,7 @@ func (o *Online) ListHandler(c *gin.Context) {
 		return
 	}
 	var data []model.DevOnline
-	total, _ := orm.DbPage(&model.DevOnline{}, param.Where()).Scan(param.PageNum, param.PageSize, &data)
+	total, _ := orm.DbPage(&model.DevOnline{}, param.Where()).Find(param.PageNum, param.PageSize, &data)
 	ctx.JSONOk().WriteData(gin.H{"total": total, "data": data}, c)
 }
 
