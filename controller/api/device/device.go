@@ -21,13 +21,9 @@ func (o *Device) ListHandler(c *gin.Context) {
 		ctx.JSONWriteError(err, c)
 		return
 	}
-	var rows []model.Device
-	totalCount, err := orm.DbPage(&model.Device{}, param.Where()).Find(param.PageNum, param.PageSize, &rows)
-	if err == nil {
-		ctx.JSONOk().Write(gin.H{"total": totalCount, "rows": rows}, c)
-		return
-	}
-	ctx.JSONWriteError(err, c)
+	var data []model.Device
+	total, _ := orm.DbPage(&model.Device{}, param.Where()).Find(param.PageNum, param.PageSize, &data)
+	ctx.JSONOk().Write(gin.H{"total": total, "data": data}, c)
 }
 
 // GetHandler 获取指定id

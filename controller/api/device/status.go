@@ -22,13 +22,9 @@ func (o *Status) ListHandler(c *gin.Context) {
 		return
 	}
 	_, m := mnger.Devs.Model(param.DeviceNo)
-	var rows []model.DevStatus
-	totalCount, err := orm.DbPage(m, param.Where()).Scan(param.PageNum, param.PageSize, &rows)
-	if err == nil {
-		ctx.JSONOk().Write(gin.H{"total": totalCount, "rows": rows}, c)
-		return
-	}
-	ctx.JSONWriteError(err, c)
+	var data []model.DevStatus
+	total, _ := orm.DbPage(m, param.Where()).Scan(param.PageNum, param.PageSize, &data)
+	ctx.JSONOk().Write(gin.H{"total": total, "data": data}, c)
 }
 
 // GetHandler 获取指定id

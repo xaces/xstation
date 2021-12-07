@@ -23,7 +23,7 @@ func NewXNotify() *XNotify {
 	xdata := &XNotify{
 		Status: make(chan model.DevStatus),
 	}
-	go xdata.DbInsertHandler()
+	go xdata.DbStatusHandler()
 	return xdata
 }
 
@@ -58,6 +58,25 @@ func (x *XNotify) AddDbStatus(st *xproto.Status) *model.DevStatus {
 	return &o
 }
 
+// 上线下线处理
+func onlineHandler(x *xproto.Access) error {
+	ofline := &model.DevOnline{
+		Guid:          x.Session,
+		DeviceNo:      x.DeviceNo,
+		RemoteAddress: x.RemoteAddress,
+		NetType:       int(x.NetType),
+		Type:          int(x.LinkType),
+		UpTraffic:     x.UpTraffic,
+		DownTraffic:   x.DownTraffic,
+	}
+	if x.OnLine {
+		ofline.OnTime = x.DeviceTime
+	} else {
+		ofline.OffTime = x.DeviceTime
+	}
+	return service.OnlineUpdate(ofline)
+}
+
 // AccessHandler 设备接入
 func (o *XNotify) AccessHandler(data []byte, arg *interface{}, x *xproto.Access) error {
 	m := mnger.Devs.Get(x.DeviceNo)
@@ -82,7 +101,7 @@ func (o *XNotify) AccessHandler(data []byte, arg *interface{}, x *xproto.Access)
 			xproto.DownloadFile(x, filename, arg)
 		}
 	}
-	return service.DbUpdateOnline(x)
+	return onlineHandler(x)
 }
 
 // StatusHandler 接收状态数据
@@ -118,11 +137,10 @@ func (x *XNotify) AlarmHandler(data []byte, xalr *xproto.Alarm) {
 }
 
 // DbStatusHandler 批量处理数据
-func (x *XNotify) DbInsertHandler() {
-
+func (x *XNotify) DbStatusHandler() {
 	stArray := make([][]model.DevStatus, model.DevStatusTabs)
 	ticker := time.NewTicker(time.Second * 2)
-	p, _ := ants.NewPoolWithFunc(5, service.DbStatusTaskFunc) // 协程池
+	p, _ := ants.NewPoolWithFunc(5, service.StatusCreates) // 协程池
 	defer p.Release()
 	defer close(x.Status)
 	for {
@@ -141,7 +159,7 @@ func (x *XNotify) DbInsertHandler() {
 	}
 }
 
-// insertStatus
+// DbInsertStatus
 func (x *XNotify) DbInsertStatus(p *ants.PoolWithFunc, tabIdx int, data []model.DevStatus) error {
 	size := len(data)
 	if size <= 0 {

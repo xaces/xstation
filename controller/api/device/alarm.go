@@ -13,18 +13,14 @@ type Alarm struct {
 }
 
 func (o *Alarm) ListHandler(c *gin.Context) {
-	var p service.AlarmPage
-	if err := c.ShouldBind(&p); err != nil {
+	var param service.AlarmPage
+	if err := c.ShouldBind(&param); err != nil {
 		ctx.JSONWriteError(err, c)
 		return
 	}
-	var rows []service.AlarmData
-	total, err := orm.DbPageRawScan(p.Where(), &rows, p.PageNum, p.PageSize)
-	if err != nil {
-		ctx.JSONWriteError(err, c)
-		return
-	}
-	ctx.JSONOk().Write(gin.H{"total": total, "rows": rows}, c)
+	var data []model.DevAlarm
+	total, _ := orm.DbPage(&model.DevOnline{}, param.Where()).Scan(param.PageNum, param.PageSize, &data)
+	ctx.JSONOk().Write(gin.H{"total": total, "data": data}, c)
 }
 
 // GetByStatusIdHandler 获取指定id

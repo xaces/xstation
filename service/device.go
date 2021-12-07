@@ -8,29 +8,21 @@ import (
 
 // DevicePage 分页
 type DevicePage struct {
-	PageNum   int    `form:"pageNum"`  // 当前页码
-	PageSize  int    `form:"pageSize"` // 每页数
-	StartTime string `form:"startTime"`
-	EndTime   string `form:"endTime"`
-	No        string `form:"no"`
-	Name      string `form:"name"`
+	PageNum    int    `form:"pageNum"`  // 当前页码
+	PageSize   int    `form:"pageSize"` // 每页数
+	StartTime  string `form:"startTime"`
+	EndTime    string `form:"endTime"`
+	DeviceNo   string `form:"deviceNo"`
+	DeviceName string `form:"deviceName"`
 }
 
 // Where 初始化
 func (s *DevicePage) Where() *orm.DbWhere {
 	var where orm.DbWhere
-	if s.StartTime != "" {
-		where.Append("created_at >= ?", s.StartTime)
-	}
-	if s.EndTime != "" {
-		where.Append("created_at <= ?", s.EndTime)
-	}
-	if s.No != "" {
-		where.Append("no like ?", s.No)
-	}
-	if s.Name != "" {
-		where.Append("name like ?", s.Name)
-	}
+	where.String("created_at >= ?", s.StartTime)
+	where.String("created_at <= ?", s.EndTime)
+	where.String("no like ?", s.DeviceNo)
+	where.String("name like ?", s.DeviceName)
 	return &where
 }
 

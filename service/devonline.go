@@ -1,6 +1,10 @@
 package service
 
-import "github.com/wlgd/xutils/orm"
+import (
+	"xstation/model"
+
+	"github.com/wlgd/xutils/orm"
+)
 
 // statusPage 分页
 type OnlinePage struct {
@@ -14,9 +18,17 @@ type OnlinePage struct {
 // Where 初始化
 func (s *OnlinePage) Where() *orm.DbWhere {
 	var where orm.DbWhere
-	where.Append("device_no like ?", s.DeviceNo)
-	where.Append("on_time >= ?", s.StartTime)
-	where.Append("off_time <= ?", s.EndTime)
+	where.String("device_no like ?", s.DeviceNo)
+	where.String("on_time >= ?", s.StartTime)
+	where.String("off_time <= ?", s.EndTime)
 	where.Orders = append(where.Orders, "on_time desc")
 	return &where
+}
+
+// OnlineUpdate 更新链路信息
+func OnlineUpdate(m *model.DevOnline) error {
+	if m.OffTime == "" {
+		return orm.DbCreate(m)
+	}
+	return orm.DbUpdateModelBy(m, "guid = ?", m.Guid)
 }

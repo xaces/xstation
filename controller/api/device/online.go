@@ -18,13 +18,9 @@ func (o *Online) ListHandler(c *gin.Context) {
 		ctx.JSONWriteError(err, c)
 		return
 	}
-	var rows []model.DevOnline
-	totalCount, err := orm.DbPage(&model.DevOnline{}, param.Where()).Scan(param.PageNum, param.PageSize, &rows)
-	if err == nil {
-		ctx.JSONOk().WriteData(gin.H{"total": totalCount, "rows": rows}, c)
-		return
-	}
-	ctx.JSONWriteError(err, c)
+	var data []model.DevOnline
+	total, _ := orm.DbPage(&model.DevOnline{}, param.Where()).Scan(param.PageNum, param.PageSize, &data)
+	ctx.JSONOk().WriteData(gin.H{"total": total, "data": data}, c)
 }
 
 func (o *Online) AddHandler(c *gin.Context) {
@@ -40,7 +36,6 @@ func (o *Online) AddHandler(c *gin.Context) {
 	}
 	ctx.JSONOk().WriteTo(c)
 }
-
 
 func OnlineRouter(r *gin.RouterGroup) {
 	on := Online{}
