@@ -19,7 +19,18 @@ func (o *Alarm) ListHandler(c *gin.Context) {
 		return
 	}
 	var data []model.DevAlarm
-	total, _ := orm.DbPage(&model.DevOnline{}, param.Where()).Find(param.PageNum, param.PageSize, &data)
+	total, _ := orm.DbPage(&model.DevAlarm{}, param.Where()).Find(param.PageNum, param.PageSize, &data)
+	ctx.JSONOk().Write(gin.H{"total": total, "data": data}, c)
+}
+
+func (o *Alarm) ListLinkHandler(c *gin.Context) {
+	var param service.AlarmLinkPage
+	if err := c.ShouldBind(&param); err != nil {
+		ctx.JSONWriteError(err, c)
+		return
+	}
+	var data []model.DevAlarmLink
+	total, _ := orm.DbPage(&model.DevAlarmLink{}, param.Where()).Find(param.PageNum, param.PageSize, &data)
 	ctx.JSONOk().Write(gin.H{"total": total, "data": data}, c)
 }
 
@@ -42,5 +53,6 @@ func (o *Alarm) GetByStatusIdHandler(c *gin.Context) {
 func AlarmRouter(r *gin.RouterGroup) {
 	alr := Alarm{}
 	r.GET("/alarm/list", alr.ListHandler)
+	r.GET("/alarm/link/list", alr.ListLinkHandler)
 	r.GET("/alarm/bystatus/:statusId", alr.GetByStatusIdHandler)
 }

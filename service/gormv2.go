@@ -21,6 +21,7 @@ func initTables(db *gorm.DB) {
 		&model.Device{},
 		&model.DevOnline{},
 		&model.DevAlarm{},
+		&model.DevAlarmLink{},
 		&model.DevStatus{},
 		&model.DevStatus1{},
 	)

@@ -121,19 +121,17 @@ func (x *XNotify) AlarmHandler(data []byte, xalr *xproto.Alarm) {
 	status := x.AddDbStatus(xalr.Status)
 	alarm := model.DevAlarm{
 		Guid:      xalr.UUID,
-		DeviceNo:  xalr.DeviceNo,
 		Flag:      flag,
-		Type:      xalr.Type,
 		StartTime: xalr.StartTime,
 		EndTime:   xalr.EndTime,
-		Status:    model.JDevStatus(*status),
+		DevStatus: model.JDevStatus(*status),
 		StatusId:  status.Id,
-		Data:      internal.ToJString(xalr.Data),
 	}
-	if xalr.EndTime != "" && orm.DbUpdateColBy(&model.DevAlarm{}, "end_time", xalr.EndTime, "guid = ?", xalr.UUID) == nil {
-		return
-	}
-	orm.DbCreate(&alarm)
+	alarm.DTU = xalr.DTU
+	alarm.DeviceNo = xalr.DeviceNo
+	alarm.Type = xalr.Type
+	alarm.Data = internal.ToJString(xalr.Data)
+	service.AlarmDbAdd(&alarm)
 }
 
 // DbStatusHandler 批量处理数据

@@ -2,6 +2,7 @@ package model
 
 // ServeOpt 服务配置信息
 type SysServeOpt struct {
+	Id         uint64 `json:"id" gorm:"primary_key"`
 	Name       string `json:"name" gorm:"not null;unique;comment:名称;"`
 	Role       int    `json:"role" gorm:"comment:角色;"`
 	HttpPort   uint16 `json:"httpPort" gorm:"comment:端口号;"`
@@ -12,8 +13,8 @@ type SysServeOpt struct {
 
 // Serve 服务详细信息
 type SysServe struct {
-	Model
 	Guid string `json:"guid" gorm:"comment:唯一标识;"`
+	ModelTime
 	SysServeOpt
 }
 

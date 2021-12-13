@@ -9,16 +9,10 @@ import (
 	"gorm.io/gorm"
 )
 
-type Model struct {
-	Id        uint64         `json:"id" gorm:"primary_key"`
-	CreatedAt jtime          `json:"createTime"`
-	UpdatedAt jtime          `json:"updateTime"`
-	DeletedAt gorm.DeletedAt `json:"deleteTime"`
-}
-type TimeModel struct {
-	CreatedAt jtime          `json:"createTime"`
-	UpdatedAt jtime          `json:"updateTime"`
-	DeletedAt gorm.DeletedAt `json:"deleteTime"`
+type ModelTime struct {
+	CreatedAt jtime          `json:"createdTime"`
+	UpdatedAt jtime          `json:"updatedTime"`
+	DeletedAt gorm.DeletedAt `json:"deletedTime"`
 }
 
 // jtime format json time field by myself

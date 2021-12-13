@@ -34,7 +34,7 @@ type Device struct {
 	Version    string     `json:"version" gorm:"type:varchar(20);"`
 	Online     bool       `json:"online"`
 	LastStatus JDevStatus `json:"lastStatus" gorm:"comment:离线时状态;"`
-	TimeModel
+	ModelTime
 }
 
 // TableName 表名
