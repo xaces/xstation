@@ -324,7 +324,7 @@ func CloseLinkHandler(c *gin.Context) {
 }
 
 func RequestRouter(r *gin.RouterGroup) {
-	p := r.Group("/device/request")
+	p := r.Group("/request")
 	p.POST("/liveStream", LiveStreamHandler)
 	p.POST("/voice", VoiceHandler)
 	p.POST("/playback", PlaybackHandler)
@@ -337,8 +337,8 @@ func RequestRouter(r *gin.RouterGroup) {
 
 }
 
-func ControllerRouter(r *gin.RouterGroup) {
-	ctrl := r.Group("/device/control")
+func ControlRouter(r *gin.RouterGroup) {
+	ctrl := r.Group("/control")
 	ctrl.POST("/ptz", ControlPTZHandler)
 	ctrl.POST("/reboot", ControlRebootHandler)
 	ctrl.POST("/capture", ControlCaptureHandler)

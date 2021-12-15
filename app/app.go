@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"log"
 	"xstation/app/db"
+	"xstation/app/ftp"
 	"xstation/app/gw"
 	"xstation/app/web"
 	"xstation/configs"
@@ -14,7 +15,7 @@ import (
 
 func loginServe() error {
 	url := fmt.Sprintf("http://%s/station/online", configs.SuperAddress)
-	address := fmt.Sprintf("%s:%d", configs.Default.Http.Host, configs.Default.Http.Port)
+	address := fmt.Sprintf("%s:%d", configs.Default.Host, configs.Default.Http.Port)
 	req := gin.H{"serveId": configs.Local.Id, "address": address}
 	return xutils.HttpPost(url, req, nil)
 }
@@ -27,8 +28,22 @@ func Run() error {
 	// if err := loginServe(); err != nil {
 	// 	return err
 	// }
-	log.Printf("Xproto ListenAndServe at %s:%d\n", configs.Default.Access.Host, configs.Default.Access.Port)
-	if err := gw.Start(configs.Default.Access.Host, configs.Default.Access.Port); err != nil {
+	if configs.Default.Ftp.Enable {
+		fopt := &ftp.Options{
+			User: configs.Default.Ftp.User,
+			Port: configs.Default.Ftp.Port,
+			Pswd: configs.Default.Ftp.Pswd,
+		}
+		if configs.Default.Ftp.Url == "" {
+			configs.Default.Ftp.Url = fmt.Sprintf("ftp://%s:%s@%s:%d", configs.Default.Ftp.User, configs.Default.Ftp.Pswd, configs.Default.Host, configs.Default.Ftp.Port)
+		}
+		log.Printf("Xftp ListenAndServe at %s\n", configs.Default.Ftp.Url)
+		if err := ftp.New(fopt, configs.Default.Public); err != nil {
+			return err
+		}
+	}
+	log.Printf("Xproto ListenAndServe at %s:%d\n", configs.Default.Host, configs.Default.Access.Port)
+	if err := gw.Start(configs.Default.Host, configs.Default.Access.Port); err != nil {
 		return err
 	}
 	// if err := rpcxStart(s.RpcPort); err != nil {
@@ -38,7 +53,7 @@ func Run() error {
 	// if err := hook.MqttStart(); err != nil {
 	// 	return err
 	// }
-	log.Printf("Http ListenAndServe at %s:%d\n", configs.Default.Http.Host, configs.Default.Http.Port)
+	log.Printf("Http ListenAndServe at %s:%d\n", configs.Default.Host, configs.Default.Http.Port)
 	web.Start(configs.Default.Http.Port)
 	return nil
 }

@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"net/http"
 	"time"
+	"xstation/configs"
 	"xstation/controller/api"
 	"xstation/middleware"
 
@@ -21,11 +22,12 @@ func newRouters() *gin.Engine {
 	root := r.Group("/station")
 	v1 := root.Group("/api")
 	v1.POST("/upload", api.UploadHandler)
+	v1.StaticFS("/public", http.Dir(configs.Default.Public))
 	sys.ServerRouter(v1)
 	dev := v1.Group("/device")
 	device.Router(dev)
 	device.RequestRouter(dev)
-	device.ControllerRouter(dev)
+	device.ControlRouter(dev)
 	device.StatusRouter(dev)
 	device.OnlineRouter(dev)
 	device.AlarmRouter(dev)

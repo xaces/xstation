@@ -25,6 +25,7 @@ type DeviceOpt struct {
 	ChlNames  string `json:"chlNames" gorm:"type:varchar(64);"`
 	Icon      string `json:"icon" gorm:"type:varchar(64);"`
 	Remark    string `json:"remark" gorm:"size:500;"`
+	AutoFtp   bool   `json:"autoFtp"`
 }
 
 type Device struct {

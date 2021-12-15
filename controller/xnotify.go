@@ -5,6 +5,7 @@ import (
 	"log"
 	"time"
 	"xstation/app/mnger"
+	"xstation/configs"
 	"xstation/internal"
 	"xstation/model"
 	"xstation/service"
@@ -110,6 +111,16 @@ func (x *XNotify) StatusHandler(tag string, xst *xproto.Status) {
 	x.AddDbStatus(xst)
 }
 
+// EventHandler 事件
+func (x *XNotify) EventHandler(data []byte, e *xproto.Event) {
+	xproto.LogEvent(data, e)
+	switch e.Type {
+	case xproto.EVENT_FtpTransfer:
+	case xproto.EVENT_LittleFile:
+		fileEventHandler(e)
+	}
+}
+
 // AlarmHandler 接收报警数据
 func (x *XNotify) AlarmHandler(data []byte, xalr *xproto.Alarm) {
 	xproto.LogAlarm(data, xalr)
@@ -129,8 +140,9 @@ func (x *XNotify) AlarmHandler(data []byte, xalr *xproto.Alarm) {
 	}
 	alarm.DTU = xalr.DTU
 	alarm.DeviceNo = xalr.DeviceNo
-	alarm.Type = xalr.Type
+	alarm.AlarmType = xalr.Type
 	alarm.Data = internal.ToJString(xalr.Data)
+	mnger.Alarm.Add(alarm)
 	service.AlarmDbAdd(&alarm)
 }
 
@@ -169,4 +181,49 @@ func (x *XNotify) DbInsertStatus(p *ants.PoolWithFunc, tabIdx int, data []model.
 	task.Data = make([]model.DevStatus, task.Size)
 	copy(task.Data, data)
 	return p.Invoke(task)
+}
+
+// fileEventHandler 新文件通知
+func fileEventHandler(e *xproto.Event) {
+	if e.Type == xproto.EVENT_LittleFile {
+		m := mnger.Devs.Get(e.DeviceNo)
+		if !m.AutoFtp {
+			return
+		}
+		v := e.Data.(xproto.EventLittleFile)
+		dst := internal.StringIndex(v.FileName, "/", 3)
+		fpName := fmt.Sprintf("%s/%s", e.DeviceNo, dst)
+		ftp := xproto.FtpTransfer{
+			FtpURL:   configs.Default.Ftp.Url,
+			FileSrc:  v.FileName,
+			FileDst:  fpName,
+			Action:   xproto.ACTION_Download,
+			FileType: v.FileType,
+			Session:  e.Session,
+		}
+		if xproto.SyncSend(xproto.REQ_FtpTransfer, ftp, nil, e.DeviceNo) == nil {
+			v.FileName = fpName
+			littleFileHandler(e, &v)
+		}
+	}
+}
+
+// littleFileHandler ftp结果通知
+func littleFileHandler(e *xproto.Event, f *xproto.EventLittleFile) {
+	alr := mnger.Alarm.Get(e.Session) // 从缓存中获取数据
+	if alr == nil {
+		return
+	}
+	fl := &model.DevAlarmFile{}
+	fl.Guid = e.Session
+	fl.LinkType = model.AlarmLinkFtpFile
+	fl.DeviceNo = e.DeviceNo
+	fl.AlarmType = alr.AlarmType
+	fl.DTU = e.DTU
+	fl.Channel = f.Channel
+	fl.Size = f.Size
+	fl.Duration = f.Duration
+	fl.FileType = f.FileType
+	fl.Name = f.FileName
+	orm.DbCreate(fl)
 }

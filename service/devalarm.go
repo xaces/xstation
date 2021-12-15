@@ -29,7 +29,7 @@ func (s *AlarmPage) Where() *orm.DbWhere {
 	where.String("start_time >= ?", s.StartTime)
 	where.String("start_time <= ?", s.EndTime)
 	where.String("device_no like ?", s.DeviceNo)
-	where.Orders = append(where.Orders, "start_time desc")
+	where.Orders = append(where.Orders, "dtu desc")
 	return &where
 }
 
@@ -67,23 +67,28 @@ func alarmLinkCreate(alr *model.DevAlarm) error {
 	l.DevAlarmOpt = alr.DevAlarmOpt
 	l.LinkType = model.AlarmLinkDev
 	l.DevStatus = alr.DevStatus
+	l.Status = alr.Status
 	return orm.DbCreate(&l)
 }
 
 func AlarmDbAdd(alr *model.DevAlarm) error {
-	alarmLinkCreate(alr)
 	upfields := []string{"status", "dtu"}
-	if alr.DTU != alr.StartTime {
-		if alr.EndTime != "" {
-			alr.Status = 1
-			upfields = append(upfields, "end_time")
-		} else {
-			upfields = append(upfields, "data")
-			alr.Status = 2
+	isupdate := true
+	if alr.EndTime != "" {
+		alr.Status = 1
+		upfields = append(upfields, "end_time")
+		if alr.EndTime == alr.StartTime {
+			isupdate = false
 		}
-		if orm.DbUpdateSelectWhere(alr, upfields, "guid = ?", alr.Guid) == nil {
-			return nil
-		}
+	} else if alr.DTU != alr.StartTime {
+		upfields = append(upfields, "data")
+		alr.Status = 2
+	} else {
+		isupdate = false
+	}
+	alarmLinkCreate(alr)
+	if isupdate && orm.DbUpdateSelectWhere(alr, upfields, "guid = ?", alr.Guid) == nil {
+		return nil
 	}
 	return orm.DbCreate(alr)
 }

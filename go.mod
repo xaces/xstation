@@ -3,6 +3,7 @@ module xstation
 go 1.16
 
 require (
+	github.com/FishGoddess/cachego v0.2.5
 	github.com/dgrijalva/jwt-go v3.2.0+incompatible
 	github.com/gin-gonic/gin v1.7.2
 	github.com/goftp/file-driver v0.0.0-20180502053751-5d604a0fc0c9

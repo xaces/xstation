@@ -12,13 +12,11 @@ type localConfigure struct {
 }
 
 type ymlConfigure struct {
+	Host string `yaml:"host"`
 	Http struct {
-		Host string `yaml:"host"`
 		Port uint16 `yaml:"port"`
 	} `yaml:"http"`
-
 	Access struct {
-		Host string `yaml:"host"`
 		Port uint16 `yaml:"port"`
 	} `yaml:"access"`
 
@@ -26,12 +24,17 @@ type ymlConfigure struct {
 		Name    string `yaml:"name"`
 		Address string `yaml:"address"`
 	} `yaml:"sql"`
-
+	Ftp struct {
+		Enable bool   `yaml:"enable"`
+		Url    string `yaml:"url"`
+		Port   uint16 `yaml:"port"`
+		User   string `yaml:"user"`
+		Pswd   string `yaml:"pswd"`
+	} `yaml:"ftp"`
 	Map struct {
 		Name string `yaml:"name"`
 		Key  string `yaml:"key"`
 	} `yaml:"map"`
-
 	License string `yaml:"license"`
 	Public  string `yaml:"public"`
 }

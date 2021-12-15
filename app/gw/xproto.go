@@ -41,7 +41,7 @@ func Start(host string, port uint16) error {
 		AccessNotify:   xnotify.AccessHandler,
 		StatusNotify:   xnotify.StatusHandler,
 		AlarmNotify:    xnotify.AlarmHandler,
-		EventNotify:    xproto.LogEvent,
+		EventNotify:    xnotify.EventHandler,
 		AVFrameNotify:  xproto.LogAVFrame,
 		RawNotify:      xproto.LogRawFrame,
 	})
