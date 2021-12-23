@@ -56,3 +56,16 @@ func (j JStrings) Value() (driver.Value, error) {
 func (t *JStrings) Scan(v interface{}) error {
 	return json.Unmarshal(v.([]byte), t)
 }
+
+type JReserve struct {
+}
+
+// Value insert
+func (j JReserve) Value() (driver.Value, error) {
+	return json.Marshal(&j)
+}
+
+// Scan valueof
+func (t *JReserve) Scan(v interface{}) error {
+	return json.Unmarshal(v.([]byte), t)
+}

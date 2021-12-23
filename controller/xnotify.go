@@ -116,8 +116,10 @@ func (x *XNotify) EventHandler(data []byte, e *xproto.Event) {
 	xproto.LogEvent(data, e)
 	switch e.Type {
 	case xproto.EVENT_FtpTransfer:
-	case xproto.EVENT_LittleFile:
-		fileEventHandler(e)
+	case xproto.EVENT_FileLittle:
+		littleFileHandler(e)
+	case xproto.EVENT_FileTimedCapture:
+		timedCaptureHandler(e)
 	}
 }
 
@@ -183,33 +185,63 @@ func (x *XNotify) DbInsertStatus(p *ants.PoolWithFunc, tabIdx int, data []model.
 	return p.Invoke(task)
 }
 
-// fileEventHandler 新文件通知
-func fileEventHandler(e *xproto.Event) {
-	if e.Type == xproto.EVENT_LittleFile {
-		m := mnger.Devs.Get(e.DeviceNo)
-		if !m.AutoFtp {
-			return
-		}
-		v := e.Data.(xproto.EventLittleFile)
-		dst := internal.StringIndex(v.FileName, "/", 3)
-		fpName := fmt.Sprintf("%s/%s", e.DeviceNo, dst)
-		ftp := xproto.FtpTransfer{
-			FtpURL:   configs.Default.Ftp.Url,
-			FileSrc:  v.FileName,
-			FileDst:  fpName,
-			Action:   xproto.ACTION_Download,
-			FileType: v.FileType,
-			Session:  e.Session,
-		}
-		if xproto.SyncSend(xproto.REQ_FtpTransfer, ftp, nil, e.DeviceNo) == nil {
-			v.FileName = fpName
-			littleFileHandler(e, &v)
-		}
+// littleFileHandler 新文件通知
+func littleFileHandler(e *xproto.Event) {
+	m := mnger.Devs.Get(e.DeviceNo)
+	if m == nil || !m.AutoFtp {
+		return
+	}
+	v := e.Data.(xproto.EventFileLittle)
+	dst := internal.StringIndex(v.FileName, "/", 3)
+	fpName := fmt.Sprintf("%s/%s", e.DeviceNo, dst)
+	ftp := xproto.FtpTransfer{
+		FtpURL:   configs.Default.Ftp.Url,
+		FileSrc:  v.FileName,
+		FileDst:  fpName,
+		Action:   xproto.ACTION_Download,
+		FileType: v.FileType,
+		Session:  e.Session,
+	}
+	if xproto.SyncSend(xproto.REQ_FtpTransfer, ftp, nil, e.DeviceNo) == nil {
+		v.FileName = fpName
+		ftpFileHandler(e, &v)
 	}
 }
 
-// littleFileHandler ftp结果通知
-func littleFileHandler(e *xproto.Event, f *xproto.EventLittleFile) {
+//
+func timedCaptureHandler(e *xproto.Event) {
+	m := mnger.Devs.Get(e.DeviceNo)
+	if m == nil || !m.AutoFtp {
+		return
+	}
+	v := e.Data.(xproto.EventFileTimedCapture)
+	dst := internal.StringIndex(v.FileName, "/", 3)
+	fpName := fmt.Sprintf("%s/%s", e.DeviceNo, dst)
+	ftp := xproto.FtpTransfer{
+		FtpURL:   configs.Default.Ftp.Url,
+		FileSrc:  v.FileName,
+		FileDst:  fpName,
+		Action:   xproto.ACTION_Download,
+		FileType: xproto.FILE_NormalPic,
+		Session:  e.Session,
+	}
+	if xproto.SyncSend(xproto.REQ_FtpTransfer, ftp, nil, e.DeviceNo) != nil {
+		return
+	}
+	data := &model.DevCapture{
+		DeviceNo:  e.DeviceNo,
+		DTU:       e.DTU,
+		Channel:   v.Channel,
+		Latitude:  v.Latitude,
+		Longitude: v.Longitude,
+		Speed:     v.Speed,
+		Name:      v.FileName,
+	}
+	orm.DbCreate(data)
+}
+
+// ftpFileHandler ftp结果通知
+func ftpFileHandler(e *xproto.Event, f *xproto.EventFileLittle) {
 	alr := mnger.Alarm.Get(e.Session) // 从缓存中获取数据
 	if alr == nil {
 		return

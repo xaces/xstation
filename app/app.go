@@ -15,7 +15,7 @@ import (
 
 func loginServe() error {
 	url := fmt.Sprintf("http://%s/station/online", configs.SuperAddress)
-	address := fmt.Sprintf("%s:%d", configs.Default.Host, configs.Default.Http.Port)
+	address := fmt.Sprintf("%s:%d", configs.Default.Host, configs.Default.Port.Http)
 	req := gin.H{"serveId": configs.Local.Id, "address": address}
 	return xutils.HttpPost(url, req, nil)
 }
@@ -42,8 +42,8 @@ func Run() error {
 			return err
 		}
 	}
-	log.Printf("Xproto ListenAndServe at %s:%d\n", configs.Default.Host, configs.Default.Access.Port)
-	if err := gw.Start(configs.Default.Host, configs.Default.Access.Port); err != nil {
+	log.Printf("Xproto ListenAndServe at %s:%d\n", configs.Default.Host, configs.Default.Port.Access)
+	if err := gw.Start(configs.Default.Host, configs.Default.Port.Access); err != nil {
 		return err
 	}
 	// if err := rpcxStart(s.RpcPort); err != nil {
@@ -53,8 +53,8 @@ func Run() error {
 	// if err := hook.MqttStart(); err != nil {
 	// 	return err
 	// }
-	log.Printf("Http ListenAndServe at %s:%d\n", configs.Default.Host, configs.Default.Http.Port)
-	web.Start(configs.Default.Http.Port)
+	log.Printf("Http ListenAndServe at %s:%d\n", configs.Default.Host, configs.Default.Port.Http)
+	web.Start(configs.Default.Port.Http)
 	return nil
 }
 

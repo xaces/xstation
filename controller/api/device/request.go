@@ -5,6 +5,8 @@ import (
 
 	"github.com/wlgd/xutils/ctx"
 
+	"os"
+
 	"github.com/gin-gonic/gin"
 	"github.com/wlgd/xproto"
 )
@@ -267,6 +269,14 @@ func FileTransferHandler(c *gin.Context) {
 	if err != nil {
 		ctx.JSONWriteError(err, c)
 		return
+	}
+	if param.Action == xproto.ACTION_Upload {
+		f, err := os.Stat(param.FileName)
+		if err != nil {
+			ctx.JSONWriteError(err, c)
+			return
+		}
+		param.FileSize = int(f.Size())
 	}
 	var resp interface{}
 	if err := xproto.SyncSend(xproto.REQ_FileTransfer, param, &resp, i.deviceId); err != nil {

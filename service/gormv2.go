@@ -23,6 +23,7 @@ func initTables(db *gorm.DB) {
 		&model.DevAlarm{},
 		&model.DevAlarmLink{},
 		&model.DevAlarmFile{},
+		&model.DevCapture{},
 		&model.DevStatus{},
 		&model.DevStatus1{},
 	)

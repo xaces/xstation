@@ -12,13 +12,14 @@ type localConfigure struct {
 }
 
 type ymlConfigure struct {
-	Host string `yaml:"host"`
-	Http struct {
-		Port uint16 `yaml:"port"`
-	} `yaml:"http"`
-	Access struct {
-		Port uint16 `yaml:"port"`
-	} `yaml:"access"`
+	Host    string `yaml:"host"`
+	License string `yaml:"license"`
+	Public  string `yaml:"public"`
+
+	Port struct {
+		Http   uint16 `yaml:"http"`
+		Access uint16 `yaml:"access"`
+	} `yaml:"port"`
 
 	SQL struct {
 		Name    string `yaml:"name"`
@@ -35,8 +36,6 @@ type ymlConfigure struct {
 		Name string `yaml:"name"`
 		Key  string `yaml:"key"`
 	} `yaml:"map"`
-	License string `yaml:"license"`
-	Public  string `yaml:"public"`
 }
 
 // Default 所有配置参数
