@@ -8,18 +8,12 @@ import (
 	"github.com/goftp/server"
 )
 
-type Options struct {
-	Port uint16
-	User string
-	Pswd string
-}
-
 var (
 	ftp *server.Server
 )
 
-// NewFtp start server
-func New(opt *Options, root string) error {
+// Run start server
+func Run(port int, user, pswd, root string) error {
 	os.MkdirAll(root, os.ModePerm)
 	var perm = server.NewSimplePerm("test", "test")
 	fopt := &server.ServerOpts{
@@ -28,10 +22,10 @@ func New(opt *Options, root string) error {
 			RootPath: root,
 			Perm:     perm,
 		},
-		Port: int(opt.Port),
+		Port: port,
 		Auth: &server.SimpleAuth{
-			Name:     opt.User,
-			Password: opt.Pswd,
+			Name:     user,
+			Password: pswd,
 		},
 		Logger: new(server.DiscardLogger),
 	}
@@ -42,7 +36,7 @@ func New(opt *Options, root string) error {
 	return nil
 }
 
-func Shutdown() {
+func Stop() {
 	if ftp != nil {
 		ftp.Shutdown()
 	}

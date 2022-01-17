@@ -304,7 +304,7 @@ func FtpTransferHandler(c *gin.Context) {
 
 // Jt808Handler
 func Jt808Handler(c *gin.Context) {
-	var param xproto.Jt808
+	var param xproto.UserDefine
 	i, err := checkParam(c, &param)
 	if err != nil {
 		ctx.JSONWriteError(err, c)

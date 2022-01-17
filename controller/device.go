@@ -40,11 +40,11 @@ func (x *XNotify) AddDbStatus(st *xproto.Status) *model.DevStatus {
 	o.DeviceNo = st.DeviceNo
 	o.DTU = st.DTU
 	o.Flag = st.Flag
-	if st.Gps.Speed < 1 {
-		st.Gps.Speed = 0
+	if st.Location.Speed < 1 {
+		st.Location.Speed = 0
 	}
 	o.Acc = st.Acc
-	o.Gps = model.JGps(st.Gps)
+	o.Location = model.JLocation(st.Location)
 	o.Tempers = model.JFloats(st.Tempers)
 	o.Humiditys = model.JFloats(st.Humiditys)
 	o.Mileage = model.JMileage(st.Mileage)
@@ -70,7 +70,7 @@ func onlineHandler(x *xproto.Access) error {
 		UpTraffic:     x.UpTraffic,
 		DownTraffic:   x.DownTraffic,
 	}
-	if x.OnLine {
+	if x.Online {
 		ofline.OnTime = x.DeviceTime
 	} else {
 		ofline.OffTime = x.DeviceTime
@@ -80,15 +80,15 @@ func onlineHandler(x *xproto.Access) error {
 
 // AccessHandler 设备接入
 func (o *XNotify) AccessHandler(data []byte, arg *interface{}, x *xproto.Access) error {
+	log.Printf("%s\n", string(data))
 	m := mnger.Devs.Get(x.DeviceNo)
 	if m == nil {
 		return fmt.Errorf("deviceNo:%s invalid", x.DeviceNo)
 	}
-	log.Printf("%s\n", string(data))
 	if x.LinkType == xproto.LINK_Signal {
 		m.Version = x.Version
 		m.Type = x.Type
-		m.Online = x.OnLine
+		m.Online = x.Online
 		fields := []string{"version", "type", "last_time", "online"}
 		if !m.Online {
 			fields = append(fields, "last_status")
@@ -195,7 +195,7 @@ func littleFileHandler(e *xproto.Event) {
 	dst := internal.StringIndex(v.FileName, "/", 3)
 	fpName := fmt.Sprintf("%s/%s", e.DeviceNo, dst)
 	ftp := xproto.FtpTransfer{
-		FtpURL:   configs.Default.Ftp.Url,
+		FtpURL:   configs.Default.Ftp.Address,
 		FileSrc:  v.FileName,
 		FileDst:  fpName,
 		Action:   xproto.ACTION_Download,
@@ -218,7 +218,7 @@ func timedCaptureHandler(e *xproto.Event) {
 	dst := internal.StringIndex(v.FileName, "/", 3)
 	fpName := fmt.Sprintf("%s/%s", e.DeviceNo, dst)
 	ftp := xproto.FtpTransfer{
-		FtpURL:   configs.Default.Ftp.Url,
+		FtpURL:   configs.Default.Ftp.Address,
 		FileSrc:  v.FileName,
 		FileDst:  fpName,
 		Action:   xproto.ACTION_Download,
@@ -235,7 +235,7 @@ func timedCaptureHandler(e *xproto.Event) {
 		Latitude:  v.Latitude,
 		Longitude: v.Longitude,
 		Speed:     v.Speed,
-		Name:      v.FileName,
+		Name:      fpName,
 	}
 	orm.DbCreate(data)
 }

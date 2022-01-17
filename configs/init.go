@@ -20,17 +20,13 @@ type ymlConfigure struct {
 		Http   uint16 `yaml:"http"`
 		Access uint16 `yaml:"access"`
 	} `yaml:"port"`
-
 	SQL struct {
 		Name    string `yaml:"name"`
 		Address string `yaml:"address"`
 	} `yaml:"sql"`
 	Ftp struct {
-		Enable bool   `yaml:"enable"`
-		Url    string `yaml:"url"`
-		Port   uint16 `yaml:"port"`
-		User   string `yaml:"user"`
-		Pswd   string `yaml:"pswd"`
+		Enable  bool   `yaml:"enable"`
+		Address string `yaml:"address"`
 	} `yaml:"ftp"`
 	Map struct {
 		Name string `yaml:"name"`

@@ -95,7 +95,7 @@ func (o *Device) DeleteHandler(c *gin.Context) {
 		return
 	}
 	for _, v := range devs {
-		mnger.Devs.Delete(v.No)
+		mnger.Devs.Delete(v.DeviceNo)
 	}
 	ctx.JSONOk().WriteTo(c)
 }

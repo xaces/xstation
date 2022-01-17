@@ -39,3 +39,14 @@ func StringIndex(s, sep string, n int) string {
 	}
 	return s[pos:]
 }
+
+// ftp://admin:123456@127.0.0.1:2211
+func StringParseFtpUri(s string) (port int, user, pswd string) {
+	arrs := strings.Split(s, "@")
+	s1 := strings.Split(arrs[0], ":")
+	user = s1[1][2:]
+	pswd = s1[2]
+	s2 := strings.Split(arrs[1], ":")
+	port, _ = strconv.Atoi(s2[1])
+	return
+}

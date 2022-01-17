@@ -11,10 +11,7 @@ port:
 # Ftp服务
 ftp:
   enable: true
-  user: "admin"
-  pswd: "123456"
-  port: 2211
-  url: ""
+  address: "ftp://admin:123456@127.0.0.1:2211"
 
 ### 地图
 map: 

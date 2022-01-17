@@ -18,7 +18,7 @@ var (
 
 func (o *DevMapper) Set(devs []model.Device) {
 	for i := 0; i < len(devs); i++ {
-		o.lDevMap[devs[i].No] = &devs[i]
+		o.lDevMap[devs[i].DeviceNo] = &devs[i]
 	}
 }
 
@@ -36,7 +36,7 @@ func (o *DevMapper) Get(deviceNo string) *model.Device {
 func (o *DevMapper) Add(dev *model.Device) {
 	o.lock.Lock()
 	defer o.lock.Unlock()
-	o.lDevMap[dev.No] = dev
+	o.lDevMap[dev.DeviceNo] = dev
 }
 
 // Delete 删除
