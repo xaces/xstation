@@ -59,50 +59,64 @@ func (x *XNotify) AddDbStatus(st *xproto.Status) *model.DevStatus {
 	return &o
 }
 
-// 上线下线处理
-func onlineHandler(x *xproto.Access) error {
-	ofline := &model.DevOnline{
-		Guid:          x.Session,
-		DeviceNo:      x.DeviceNo,
-		RemoteAddress: x.RemoteAddress,
-		NetType:       int(x.NetType),
-		Type:          int(x.LinkType),
-		UpTraffic:     x.UpTraffic,
-		DownTraffic:   x.DownTraffic,
+// 转换
+func toOnlineModel(a *xproto.Access) *model.DevOnline {
+	v := &model.DevOnline{
+		Guid:          a.Session,
+		DeviceNo:      a.DeviceNo,
+		RemoteAddress: a.RemoteAddress,
+		NetType:       int(a.NetType),
+		Type:          int(a.LinkType),
+		UpTraffic:     a.UpTraffic,
+		DownTraffic:   a.DownTraffic,
 	}
-	if x.Online {
-		ofline.OnTime = x.DeviceTime
-	} else {
-		ofline.OffTime = x.DeviceTime
-	}
-	return service.OnlineUpdate(ofline)
+	return v
 }
 
 // AccessHandler 设备接入
-func (o *XNotify) AccessHandler(data []byte, arg *interface{}, x *xproto.Access) error {
-	log.Printf("%s\n", string(data))
-	m := mnger.Devs.Get(x.DeviceNo)
+func (x *XNotify) AccessHandler(b []byte, a *xproto.Access) (interface{}, error) {
+	log.Printf("%s\n", b)
+	m := mnger.Devs.Get(a.DeviceNo)
 	if m == nil {
-		return fmt.Errorf("deviceNo:%s invalid", x.DeviceNo)
+		return nil, fmt.Errorf("deviceNo<%s> invalid", a.DeviceNo)
 	}
-	if x.LinkType == xproto.LINK_Signal {
-		m.Version = x.Version
-		m.Type = x.Type
-		m.Online = x.Online
-		fields := []string{"version", "type", "last_time", "online"}
-		if !m.Online {
-			fields = append(fields, "last_status")
-		}
-		orm.DbUpdates(m, fields)
-	} else if x.LinkType == xproto.LINK_FileTransfer {
-		filename, act := xproto.FileOfSess(x.Session)
+	if a.LinkType == xproto.LINK_Signal {
+		m.Version = a.Version
+		m.Type = a.Type
+		m.Online = true
+		orm.DbUpdates(m, []string{"version", "type", "last_time", "online"})
+	}
+	data := toOnlineModel(a)
+	data.OnTime = a.DeviceTime
+	service.OnlineUpdate(data)
+	if a.LinkType == xproto.LINK_FileTransfer {
+		filename, act := xproto.FileOfSess(a.Session)
 		if act == xproto.ACTION_Upload {
-			xproto.UploadFile(x, filename, true)
-		} else {
-			xproto.DownloadFile(x, filename, arg)
+			return nil, xproto.UploadFile(a, filename, true)
+		}
+		return xproto.DownloadFile(configs.Default.Public+"/"+filename, nil)
+	}
+	return nil, nil
+}
+
+func (x *XNotify) DroppedHandler(v interface{}, a *xproto.Access, err error) {
+	log.Println(err)
+	m := mnger.Devs.Get(a.DeviceNo)
+	if m == nil {
+		return
+	}
+	if a.LinkType == xproto.LINK_Signal {
+		m.Online = false
+		orm.DbUpdates(m, []string{"last_time", "online", "last_status"})
+	} else if a.LinkType == xproto.LINK_FileTransfer {
+		_, act := xproto.FileOfSess(a.Session)
+		if act == xproto.ACTION_Upload {
+			xproto.DownloadFile("", v)
 		}
 	}
-	return onlineHandler(x)
+	data := toOnlineModel(a)
+	data.OffTime = a.DeviceTime
+	service.OnlineUpdate(data)
 }
 
 // StatusHandler 接收状态数据
@@ -114,25 +128,29 @@ func (x *XNotify) StatusHandler(tag string, xst *xproto.Status) {
 // EventHandler 事件
 func (x *XNotify) EventHandler(data []byte, e *xproto.Event) {
 	xproto.LogEvent(data, e)
+	m := mnger.Devs.Get(e.DeviceNo)
+	if m == nil || !m.AutoFtp {
+		return
+	}
 	switch e.Type {
 	case xproto.EVENT_FtpTransfer:
 	case xproto.EVENT_FileLittle:
-		littleFileHandler(e)
+		ftpLittleFileHandler(e)
 	case xproto.EVENT_FileTimedCapture:
-		timedCaptureHandler(e)
+		ftpTimedCaptureHandler(e)
 	}
 }
 
 // AlarmHandler 接收报警数据
-func (x *XNotify) AlarmHandler(data []byte, xalr *xproto.Alarm) {
-	xproto.LogAlarm(data, xalr)
+func (x *XNotify) AlarmHandler(b []byte, xalr *xproto.Alarm) {
+	xproto.LogAlarm(b, xalr)
 	flag := xalr.Status.Flag
 	xalr.Status.Flag = 2
 	if xalr.EndTime != "" {
 		xalr.Status.Flag = 3
 	}
 	status := x.AddDbStatus(xalr.Status)
-	alarm := model.DevAlarm{
+	data := model.DevAlarm{
 		Guid:      xalr.UUID,
 		Flag:      flag,
 		StartTime: xalr.StartTime,
@@ -140,12 +158,12 @@ func (x *XNotify) AlarmHandler(data []byte, xalr *xproto.Alarm) {
 		DevStatus: model.JDevStatus(*status),
 		StatusId:  status.Id,
 	}
-	alarm.DTU = xalr.DTU
-	alarm.DeviceNo = xalr.DeviceNo
-	alarm.AlarmType = xalr.Type
-	alarm.Data = internal.ToJString(xalr.Data)
-	mnger.Alarm.Add(alarm)
-	service.AlarmDbAdd(&alarm)
+	data.DTU = xalr.DTU
+	data.DeviceNo = xalr.DeviceNo
+	data.AlarmType = xalr.Type
+	data.Data = internal.ToJString(xalr.Data)
+	mnger.Alarm.Add(data)
+	service.AlarmDbAdd(&data)
 }
 
 // DbStatusHandler 批量处理数据
@@ -185,12 +203,8 @@ func (x *XNotify) DbInsertStatus(p *ants.PoolWithFunc, tabIdx int, data []model.
 	return p.Invoke(task)
 }
 
-// littleFileHandler 新文件通知
-func littleFileHandler(e *xproto.Event) {
-	m := mnger.Devs.Get(e.DeviceNo)
-	if m == nil || !m.AutoFtp {
-		return
-	}
+// ftpLittleFileHandler 新文件通知
+func ftpLittleFileHandler(e *xproto.Event) {
 	v := e.Data.(xproto.EventFileLittle)
 	dst := internal.StringIndex(v.FileName, "/", 3)
 	fpName := fmt.Sprintf("%s/%s", e.DeviceNo, dst)
@@ -204,16 +218,12 @@ func littleFileHandler(e *xproto.Event) {
 	}
 	if xproto.SyncSend(xproto.REQ_FtpTransfer, ftp, nil, e.DeviceNo) == nil {
 		v.FileName = fpName
-		ftpFileHandler(e, &v)
+		dbFtpFile(e, &v)
 	}
 }
 
 //
-func timedCaptureHandler(e *xproto.Event) {
-	m := mnger.Devs.Get(e.DeviceNo)
-	if m == nil || !m.AutoFtp {
-		return
-	}
+func ftpTimedCaptureHandler(e *xproto.Event) {
 	v := e.Data.(xproto.EventFileTimedCapture)
 	dst := internal.StringIndex(v.FileName, "/", 3)
 	fpName := fmt.Sprintf("%s/%s", e.DeviceNo, dst)
@@ -240,22 +250,22 @@ func timedCaptureHandler(e *xproto.Event) {
 	orm.DbCreate(data)
 }
 
-// ftpFileHandler ftp结果通知
-func ftpFileHandler(e *xproto.Event, f *xproto.EventFileLittle) {
+// dbFtpFile ftp结果通知
+func dbFtpFile(e *xproto.Event, f *xproto.EventFileLittle) {
 	alr := mnger.Alarm.Get(e.Session) // 从缓存中获取数据
 	if alr == nil {
 		return
 	}
-	fl := &model.DevAlarmFile{}
-	fl.Guid = e.Session
-	fl.LinkType = model.AlarmLinkFtpFile
-	fl.DeviceNo = e.DeviceNo
-	fl.AlarmType = alr.AlarmType
-	fl.DTU = e.DTU
-	fl.Channel = f.Channel
-	fl.Size = f.Size
-	fl.Duration = f.Duration
-	fl.FileType = f.FileType
-	fl.Name = f.FileName
-	orm.DbCreate(fl)
+	data := &model.DevAlarmFile{}
+	data.Guid = e.Session
+	data.LinkType = model.AlarmLinkFtpFile
+	data.DeviceNo = e.DeviceNo
+	data.AlarmType = alr.AlarmType
+	data.DTU = e.DTU
+	data.Channel = f.Channel
+	data.Size = f.Size
+	data.Duration = f.Duration
+	data.FileType = f.FileType
+	data.Name = f.FileName
+	orm.DbCreate(data)
 }

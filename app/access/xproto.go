@@ -39,6 +39,7 @@ func Start(host string, port uint16) error {
 		Host:           host,
 		Adapter:        protocolAdapter,
 		AccessNotify:   xnotify.AccessHandler,
+		DroppedNotify:  xnotify.DroppedHandler,
 		StatusNotify:   xnotify.StatusHandler,
 		AlarmNotify:    xnotify.AlarmHandler,
 		EventNotify:    xnotify.EventHandler,
