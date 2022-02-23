@@ -3,6 +3,7 @@ module xstation
 go 1.16
 
 require (
+	github.com/BurntSushi/toml v0.3.1
 	github.com/FishGoddess/cachego v0.2.5
 	github.com/dgrijalva/jwt-go v3.2.0+incompatible
 	github.com/gin-gonic/gin v1.7.2

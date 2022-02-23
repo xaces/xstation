@@ -1,4 +1,4 @@
-package internal
+package util
 
 import (
 	"errors"
@@ -55,4 +55,16 @@ func (w *Snowflake) NextId() uint64 {
 	}
 	Id := uint64((now-startTime)<<timeShift | (w.workerID << workerShift) | (w.number))
 	return Id
+}
+
+var (
+	_snowflake *Snowflake = nil
+)
+
+func init() {
+	_snowflake, _ = NewSnowflake(0xFF)
+}
+
+func PrimaryKey() uint64 {
+	return _snowflake.NextId()
 }

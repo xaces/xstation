@@ -1,10 +1,10 @@
 package device
 
 import (
-	"xstation/app/mnger"
-	"xstation/internal"
+	"xstation/entity/mnger"
 	"xstation/model"
 	"xstation/service"
+	"xstation/util"
 
 	"github.com/wlgd/xutils/ctx"
 	"github.com/wlgd/xutils/orm"
@@ -50,7 +50,7 @@ func (o *Device) AddHandler(c *gin.Context) {
 		ctx.JSONWriteError(err, c)
 		return
 	}
-	data.Guid = internal.UUID()
+	data.Guid = util.UUID()
 	if err := orm.DbCreate(&data); err != nil {
 		ctx.JSONWriteError(err, c)
 		return
@@ -84,7 +84,7 @@ func (o *Device) DeleteHandler(c *gin.Context) {
 		ctx.JSONError().WriteTo(c)
 		return
 	}
-	ids := internal.StringToIntSlice(idstr, ",")
+	ids := util.StringToIntSlice(idstr, ",")
 	var devs []model.Device
 	if _, err := orm.DbFindBy(&devs, "id in (?)", ids); err != nil {
 		ctx.JSONError().WriteTo(c)

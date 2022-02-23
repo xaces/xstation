@@ -1,22 +1,5 @@
 package model
 
-import (
-	"database/sql/driver"
-	"encoding/json"
-)
-
-type JDevStatus DevStatus
-
-// Value insert
-func (j JDevStatus) Value() (driver.Value, error) {
-	return json.Marshal(&j)
-}
-
-// Scan valueof
-func (t *JDevStatus) Scan(v interface{}) error {
-	return json.Unmarshal(v.([]byte), t)
-}
-
 type DeviceOpt struct {
 	Id        uint64 `json:"id" gorm:"primary_key"`
 	DeviceNo  string `json:"deviceNo"`

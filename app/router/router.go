@@ -11,7 +11,7 @@ import (
 	"xstation/middleware"
 
 	"xstation/controller/api/device"
-	"xstation/controller/api/sys"
+	"xstation/controller/api/system"
 
 	"github.com/gin-gonic/gin"
 )
@@ -25,7 +25,7 @@ func newApp() *gin.Engine {
 	v1 := root.Group("/api")
 	v1.POST("/upload", api.UploadHandler)
 	v1.StaticFS("/public", http.Dir(configs.Default.Public))
-	sys.ServerRouter(v1)
+	system.ServerRouter(v1)
 	dev := v1.Group("/device")
 	device.Router(dev)
 	device.RequestRouter(dev)
@@ -37,14 +37,14 @@ func newApp() *gin.Engine {
 }
 
 var (
-	hs *http.Server
+	s *http.Server
 )
 
 // Run
 func Run(port uint16) {
 	address := fmt.Sprintf(":%d", port)
 	r := newApp()
-	s := &http.Server{
+	s = &http.Server{
 		Addr:           address,
 		Handler:        r,
 		ReadTimeout:    30 * time.Second,
@@ -55,12 +55,9 @@ func Run(port uint16) {
 }
 
 func Stop() {
-	if hs == nil {
-		return
-	}
 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer cancel()
-	if err := hs.Shutdown(ctx); err != nil {
+	if err := s.Shutdown(ctx); err != nil {
 		log.Fatal("Server Shutdown:", err)
 	}
 	<-ctx.Done()

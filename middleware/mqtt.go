@@ -16,14 +16,14 @@ func PublishAlarm(data interface{}) {
 	if _nclient == nil {
 		return
 	}
-	_nclient.Publish("xalarm", data)
+	_nclient.Publish("xstation.device.alarm", data)
 }
 
 func PublishStatus(data interface{}) {
 	if _nclient == nil {
 		return
 	}
-	_nclient.Publish("xstatus", data)
+	_nclient.Publish("xstation.device.status", data)
 }
 
 func realtimeAlarmHandler(data []byte) {
@@ -44,8 +44,8 @@ func MqttStart() error {
 		return err
 	}
 	_nclient = client
-	_nclient.Subscribe("xalarm", realtimeAlarmHandler)
-	_nclient.Subscribe("xstatus", realtimeStatusHandler)
+	_nclient.Subscribe("xstation.device.alarm", realtimeAlarmHandler)
+	_nclient.Subscribe("xstation.device.status", realtimeStatusHandler)
 	return nil
 }
 

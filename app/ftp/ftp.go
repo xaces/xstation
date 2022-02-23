@@ -12,20 +12,27 @@ var (
 	ftp *server.Server
 )
 
+type Options struct {
+	Port int
+	User string
+	Pswd string
+	Path string
+}
+
 // Run start server
-func Run(port int, user, pswd, root string) error {
-	os.MkdirAll(root, os.ModePerm)
+func Run(o *Options) error {
+	os.MkdirAll(o.Path, os.ModePerm)
 	var perm = server.NewSimplePerm("test", "test")
 	fopt := &server.ServerOpts{
 		Name: "test ftpd",
 		Factory: &filedriver.FileDriverFactory{
-			RootPath: root,
+			RootPath: o.Path,
 			Perm:     perm,
 		},
-		Port: port,
+		Port: o.Port,
 		Auth: &server.SimpleAuth{
-			Name:     user,
-			Password: pswd,
+			Name:     o.User,
+			Password: o.Pswd,
 		},
 		Logger: new(server.DiscardLogger),
 	}

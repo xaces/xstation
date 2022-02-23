@@ -151,6 +151,18 @@ type DevStatus struct {
 	People    JPeople   `json:"people"`                             // 人数统计 json 字符串
 }
 
+type JDevStatus DevStatus
+
+// Value insert
+func (j JDevStatus) Value() (driver.Value, error) {
+	return jsoniter.Marshal(&j)
+}
+
+// Scan valueof
+func (t *JDevStatus) Scan(v interface{}) error {
+	return jsoniter.Unmarshal(v.([]byte), t)
+}
+
 const (
 	DevStatusTabs = 2
 )

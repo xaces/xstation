@@ -4,11 +4,11 @@ import (
 	"fmt"
 	"log"
 	"time"
-	"xstation/app/mnger"
 	"xstation/configs"
-	"xstation/internal"
+	"xstation/entity/mnger"
 	"xstation/model"
 	"xstation/service"
+	"xstation/util"
 
 	"github.com/panjf2000/ants/v2"
 	"github.com/wlgd/xproto"
@@ -35,7 +35,7 @@ func (x *XNotify) AddDbStatus(st *xproto.Status) *model.DevStatus {
 		return nil
 	}
 	o := model.DevStatus{}
-	o.Id = service.PrimaryKey()
+	o.Id = util.PrimaryKey()
 	o.DeviceId = dev.Id
 	o.DeviceNo = st.DeviceNo
 	o.DTU = st.DTU
@@ -161,7 +161,7 @@ func (x *XNotify) AlarmHandler(b []byte, xalr *xproto.Alarm) {
 	data.DTU = xalr.DTU
 	data.DeviceNo = xalr.DeviceNo
 	data.AlarmType = xalr.Type
-	data.Data = internal.ToJString(xalr.Data)
+	data.Data = util.ToJString(xalr.Data)
 	mnger.Alarm.Add(data)
 	service.AlarmDbAdd(&data)
 }
@@ -206,10 +206,9 @@ func (x *XNotify) DbInsertStatus(p *ants.PoolWithFunc, tabIdx int, data []model.
 // ftpLittleFileHandler 新文件通知
 func ftpLittleFileHandler(e *xproto.Event) {
 	v := e.Data.(xproto.EventFileLittle)
-	dst := internal.StringIndex(v.FileName, "/", 3)
-	fpName := fmt.Sprintf("%s/%s", e.DeviceNo, dst)
+	fpName := util.FilePath(v.FileName, e.DeviceNo)
 	ftp := xproto.FtpTransfer{
-		FtpURL:   configs.Default.Ftp.Address,
+		FtpURL:   configs.FtpAddr,
 		FileSrc:  v.FileName,
 		FileDst:  fpName,
 		Action:   xproto.ACTION_Download,
@@ -225,10 +224,9 @@ func ftpLittleFileHandler(e *xproto.Event) {
 //
 func ftpTimedCaptureHandler(e *xproto.Event) {
 	v := e.Data.(xproto.EventFileTimedCapture)
-	dst := internal.StringIndex(v.FileName, "/", 3)
-	fpName := fmt.Sprintf("%s/%s", e.DeviceNo, dst)
+	fpName := util.FilePath(v.FileName, e.DeviceNo)
 	ftp := xproto.FtpTransfer{
-		FtpURL:   configs.Default.Ftp.Address,
+		FtpURL:   configs.FtpAddr,
 		FileSrc:  v.FileName,
 		FileDst:  fpName,
 		Action:   xproto.ACTION_Download,

@@ -1,10 +1,10 @@
-package sys
+package system
 
 import (
-	"xstation/app/mnger"
-	"xstation/internal"
+	"xstation/entity/mnger"
 	"xstation/model"
 	"xstation/service"
+	"xstation/util"
 
 	"github.com/wlgd/xutils/orm"
 
@@ -46,7 +46,7 @@ func (o *Serve) AddHandler(c *gin.Context) {
 		ctx.JSONWriteError(err, c)
 		return
 	}
-	param.Guid = internal.ServeId()
+	param.Guid = util.ServeId()
 	if err := orm.DbCreate(&param); err != nil {
 		ctx.JSONWriteError(err, c)
 		return

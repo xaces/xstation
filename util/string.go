@@ -1,6 +1,7 @@
-package internal
+package util
 
 import (
+	"fmt"
 	"strconv"
 	"strings"
 
@@ -38,6 +39,12 @@ func StringIndex(s, sep string, n int) string {
 		pos += (lpos + 1)
 	}
 	return s[pos:]
+}
+
+func FilePath(s, deviceNo string) string {
+	sarr := strings.Split(s, "/")
+	i := len(sarr) - 1
+	return fmt.Sprintf("%s/%s/%s/%s", sarr[i-1], deviceNo, sarr[i-2], sarr[i])
 }
 
 // ftp://admin:123456@127.0.0.1:2211
