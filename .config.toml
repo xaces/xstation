@@ -2,11 +2,12 @@
 Host= "172.16.50.219"
 License= "localstation.lice"
 Public= "public"
-
+######## 工作模式 default默认直接写入数据库，nats消息中间件
+MsgProc= "default"
 ### 端口
 [Port]
-  Http= 12100
-  Access= 22000
+    Http= 12100
+    Access= 22000
 
 # Ftp服务
 [Ftp]
@@ -17,10 +18,21 @@ Public= "public"
     
 ### SQL
 [Sql] 
-  Name= "mysql"
-  Address= "root:123456@tcp(127.0.0.1:3306)/station?charset=utf8&parseTime=True&loc=Local"
+    Name= "mysql"
+    Address= "root:123456@tcp(127.0.0.1:3306)/station?charset=utf8&parseTime=True&loc=Local"
 
 ### 地图
 [Map] 
-  Name= "Baidu"
-  Key= ""
+    Name= "Baidu"
+    Key= ""
+
+### 第三方消息推送
+[RdMQ]
+    Name= "nats"
+    Address= "nats://127.0.0.1:4222"
+
+[RdMQ.Topic]
+    Alarm= "device.alarm"
+    Status= "device.status"
+    Online= "device.online"
+    Event= "device.event"

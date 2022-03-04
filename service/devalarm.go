@@ -71,7 +71,7 @@ func alarmLinkCreate(alr *model.DevAlarm) error {
 	return orm.DbCreate(&l)
 }
 
-func AlarmDbAdd(alr *model.DevAlarm) error {
+func DevAlarmDbAdd(alr *model.DevAlarm) error {
 	upfields := []string{"status", "dtu"}
 	isupdate := true
 	if alr.EndTime != "" {

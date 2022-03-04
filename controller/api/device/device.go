@@ -55,13 +55,19 @@ func (o *Device) AddHandler(c *gin.Context) {
 		ctx.JSONWriteError(err, c)
 		return
 	}
-	mnger.Devs.Add(&data)
+	mnger.Device.Add(&data)
 	ctx.JSONOk().WriteTo(c)
+}
+
+// deviceUpdate 更新
+type deviceUpdate struct {
+	model.DeviceOpt
+	Id uint64 `json:"id"`
 }
 
 // UpdateHandler 修改
 func (o *Device) UpdateHandler(c *gin.Context) {
-	var param service.DeviceUpdate
+	var param deviceUpdate
 	//获取参数
 	if err := c.ShouldBind(&param); err != nil {
 		ctx.JSONWriteError(err, c)
@@ -95,7 +101,7 @@ func (o *Device) DeleteHandler(c *gin.Context) {
 		return
 	}
 	for _, v := range devs {
-		mnger.Devs.Delete(v.DeviceNo)
+		mnger.Device.Delete(v.DeviceNo)
 	}
 	ctx.JSONOk().WriteTo(c)
 }

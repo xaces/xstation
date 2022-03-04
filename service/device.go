@@ -26,8 +26,14 @@ func (s *DevicePage) Where() *orm.DbWhere {
 	return &where
 }
 
-// DeviceUpdate 更新
-type DeviceUpdate struct {
-	model.DeviceOpt
-	Id uint64 `json:"id"`
+func DeviceUpdate(m *model.Device, online bool, version, dtype string) error {
+	m.Online = online
+	if online {
+		m.Version = version
+		m.Type = dtype
+		orm.DbUpdates(m, []string{"version", "type", "last_time", "online"})
+	} else {
+		orm.DbUpdates(m, []string{"last_time", "online", "last_status"})
+	}
+	return nil
 }

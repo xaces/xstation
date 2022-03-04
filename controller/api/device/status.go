@@ -21,7 +21,7 @@ func (o *Status) ListHandler(c *gin.Context) {
 		ctx.JSONWriteError(err, c)
 		return
 	}
-	_, m := mnger.Devs.Model(param.DeviceNo)
+	m := mnger.Device.StatusModel(param.DeviceNo)
 	var data []model.DevStatus
 	total, _ := orm.DbPage(m, param.Where()).Find(param.PageNum, param.PageSize, &data)
 	ctx.JSONOk().Write(gin.H{"total": total, "data": data}, c)
@@ -34,7 +34,7 @@ func (o *Status) GetHandler(c *gin.Context) {
 		ctx.JSONWriteError(err, c)
 		return
 	}
-	_, data := mnger.Devs.Model(param.DeviceNo)
+	data := mnger.Device.StatusModel(param.DeviceNo)
 	if err := orm.DbFirstById(data, param.StatusId); err != nil {
 		ctx.JSONWriteError(err, c)
 		return

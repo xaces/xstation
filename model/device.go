@@ -13,11 +13,12 @@ type DeviceOpt struct {
 
 type Device struct {
 	DeviceOpt
-	Type       string     `json:"type" gorm:"type:varchar(20);"`
-	Guid       string     `json:"guid" gorm:"type:varchar(64);"`
-	Version    string     `json:"version" gorm:"type:varchar(20);"`
-	Online     bool       `json:"online"`
-	LastStatus JDevStatus `json:"lastStatus" gorm:"comment:离线时状态;"`
+	Type      string     `json:"type" gorm:"type:varchar(20);"`
+	Guid      string     `json:"guid" gorm:"type:varchar(64);"`
+	Version   string     `json:"version" gorm:"type:varchar(20);"`
+	Online    bool       `json:"online"`
+	OnStatus  JDevStatus `json:"onStatus"`
+	OffStatus JDevStatus `json:"offStatus"`
 	ModelTime
 }
 

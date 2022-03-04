@@ -8,8 +8,7 @@ import (
 	"github.com/wlgd/xutils/orm"
 )
 
-// ServeMapper 服务
-type Serve struct {
+type ServeInfo struct {
 	ServeId     string    `json:"serveId"` // 服务id
 	Token       string    `json:"token"`   //
 	UpdatedTime time.Time `json:"updatedTime"`
@@ -18,30 +17,31 @@ type Serve struct {
 	model.SysServeOpt
 }
 
-func (s *Serve) Update(address string) error {
+func (s *ServeInfo) Update(address string) error {
 	s.Address = address
 	s.UpdatedTime = time.Now()
 	return nil
 }
 
-type ServeMapper struct {
+// serveMapper 服务
+type serveMapper struct {
 	lock      sync.RWMutex
-	lServeMap map[string]*Serve
+	lServeMap map[string]*ServeInfo
 }
 
 var (
-	Serves = &ServeMapper{lServeMap: make(map[string]*Serve)}
+	Serve = &serveMapper{lServeMap: make(map[string]*ServeInfo)}
 )
 
 // 初始化
-func (s *ServeMapper) Set(serves []model.SysServe) {
+func (s *serveMapper) Set(serves []model.SysServe) {
 	for _, v := range serves {
 		s.Add(&v)
 	}
 }
 
 // GetByType 根据类型
-func (s *ServeMapper) GetByType(ctype int) *Serve {
+func (s *serveMapper) GetByType(ctype int) *ServeInfo {
 	s.lock.RLock()
 	defer s.lock.RUnlock()
 	for _, v := range s.lServeMap {
@@ -53,7 +53,7 @@ func (s *ServeMapper) GetByType(ctype int) *Serve {
 }
 
 // LoadAllLServe 获取实时状态
-func (s *ServeMapper) GetAll() (lse []Serve) {
+func (s *serveMapper) GetAll() (lse []ServeInfo) {
 	s.lock.RLock()
 	defer s.lock.RUnlock()
 	for _, v := range s.lServeMap {
@@ -63,7 +63,7 @@ func (s *ServeMapper) GetAll() (lse []Serve) {
 }
 
 // Get 获取
-func (s *ServeMapper) Get(serveId string) *Serve {
+func (s *serveMapper) Get(serveId string) *ServeInfo {
 	s.lock.RLock()
 	defer s.lock.RUnlock()
 	v, ok := s.lServeMap[serveId]
@@ -74,10 +74,10 @@ func (s *ServeMapper) Get(serveId string) *Serve {
 }
 
 // Add 添加
-func (s *ServeMapper) Add(srv *model.SysServe) {
+func (s *serveMapper) Add(srv *model.SysServe) {
 	s.lock.Lock()
 	defer s.lock.Unlock()
-	s.lServeMap[srv.Guid] = &Serve{
+	s.lServeMap[srv.Guid] = &ServeInfo{
 		ServeId:     srv.Guid,
 		SysServeOpt: srv.SysServeOpt,
 		IsWorking:   false,
@@ -85,7 +85,7 @@ func (s *ServeMapper) Add(srv *model.SysServe) {
 }
 
 // UpdateStatus 更新状态
-func (s *ServeMapper) UpdateStatus(serveIds []string, status int) error {
+func (s *serveMapper) UpdateStatus(serveIds []string, status int) error {
 	s.lock.Lock()
 	defer s.lock.Unlock()
 	for _, id := range serveIds {
@@ -100,7 +100,7 @@ func (s *ServeMapper) UpdateStatus(serveIds []string, status int) error {
 }
 
 // UpdateStatus 更新状态
-func (s *ServeMapper) Delete(devices []model.Device) {
+func (s *serveMapper) Delete(devices []model.Device) {
 	s.lock.Lock()
 	defer s.lock.Unlock()
 	for _, d := range devices {

@@ -1,7 +1,7 @@
 package access
 
 import (
-	"xstation/controller"
+	"xstation/controller/device"
 
 	"github.com/wlgd/xproto"
 	"github.com/wlgd/xproto/ho"
@@ -30,19 +30,19 @@ var (
 )
 
 // Start 启动
-func Start(host string, port uint16) error {
-	xnotify := controller.NewXNotify()
+func Start(msgproc, host string, port uint16) error {
+	handle := device.NewHandler(msgproc)
 	s, err := xproto.NewServe(&xproto.Options{
 		RequestTimeout: 50,
 		RecvTimeout:    30,
 		Port:           uint16(port),
 		Host:           host,
 		Adapter:        protocolAdapter,
-		AccessNotify:   xnotify.AccessHandler,
-		DroppedNotify:  xnotify.DroppedHandler,
-		StatusNotify:   xnotify.StatusHandler,
-		AlarmNotify:    xnotify.AlarmHandler,
-		EventNotify:    xnotify.EventHandler,
+		AccessNotify:   handle.AccessHandler,
+		DroppedNotify:  handle.DroppedHandler,
+		StatusNotify:   handle.StatusHandler,
+		AlarmNotify:    handle.AlarmHandler,
+		EventNotify:    handle.EventHandler,
 		AVFrameNotify:  xproto.LogAVFrame,
 		RawNotify:      xproto.LogRawFrame,
 	})

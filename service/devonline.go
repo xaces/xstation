@@ -25,8 +25,8 @@ func (s *OnlinePage) Where() *orm.DbWhere {
 	return &where
 }
 
-// OnlineUpdate 更新链路信息
-func OnlineUpdate(m *model.DevOnline) error {
+// DevOnlineUpdate 更新链路信息
+func DevOnlineUpdate(m *model.DevOnline) error {
 	if m.OffTime == "" {
 		return orm.DbCreate(m)
 	}

@@ -28,7 +28,7 @@ func Run() error {
 		log.Printf("Xftp ListenAndServe at %s\n", configs.FtpAddr)
 	}
 	log.Printf("Xproto ListenAndServe at %s:%d\n", configs.Default.Host, configs.Default.Port.Access)
-	if err := access.Start(configs.Default.Host, configs.Default.Port.Access); err != nil {
+	if err := access.Start(configs.Default.MsgProc, configs.Default.Host, configs.Default.Port.Access); err != nil {
 		return err
 	}
 	log.Printf("Http ListenAndServe at %s:%d\n", configs.Default.Host, configs.Default.Port.Http)

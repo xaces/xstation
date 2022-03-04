@@ -302,8 +302,8 @@ func FtpTransferHandler(c *gin.Context) {
 	ctx.JSONOk().WriteData(resp, c)
 }
 
-// Jt808Handler
-func Jt808Handler(c *gin.Context) {
+// UserDefineHandler
+func UserDefineHandler(c *gin.Context) {
 	var param xproto.UserDefine
 	i, err := checkParam(c, &param)
 	if err != nil {
@@ -311,7 +311,7 @@ func Jt808Handler(c *gin.Context) {
 		return
 	}
 	var resp interface{}
-	if err := xproto.SyncSend(xproto.REQ_Jt808, param, &resp, i.deviceId); err != nil {
+	if err := xproto.SyncSend(xproto.REQ_UserDefine, param, &resp, i.deviceId); err != nil {
 		ctx.JSONWriteError(err, c)
 		return
 	}
@@ -342,7 +342,7 @@ func RequestRouter(r *gin.RouterGroup) {
 	p.POST("/parameters", ParametersHandler)
 	p.POST("/fileTransfer", FileTransferHandler)
 	p.POST("/ftpTransfer", FtpTransferHandler)
-	p.POST("/jt808", Jt808Handler)
+	p.POST("/user", UserDefineHandler)
 	p.POST("/close", CloseLinkHandler)
 
 }

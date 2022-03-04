@@ -80,7 +80,7 @@ func sqlInit(o *Options) error {
 func initDevices() error {
 	var data []model.Device
 	orm.DbFind(&data)
-	mnger.Devs.Set(data)
+	mnger.Device.Set(data)
 	return nil
 }
 

@@ -1,57 +1,52 @@
 package middleware
 
 import (
-	"encoding/json"
-	"log"
-
-	"github.com/wlgd/xproto"
 	"github.com/wlgd/xutils/mq"
 )
 
-var (
-	_nclient *mq.NatsClient
-)
+type Nats struct {
+	nclient *mq.NatsClient
+}
 
-func PublishAlarm(data interface{}) {
-	if _nclient == nil {
+func NewNatsClient() *Nats {
+	return new(Nats)
+}
+
+func (n *Nats) Notify(topic string, data interface{}) {
+	if n.nclient == nil {
 		return
 	}
-	_nclient.Publish("xstation.device.alarm", data)
+	n.nclient.Publish(topic, data)
 }
 
-func PublishStatus(data interface{}) {
-	if _nclient == nil {
+func (n *Nats) Subscribe(topic string, handle func([]byte)) {
+	if n.nclient == nil {
 		return
 	}
-	_nclient.Publish("xstation.device.status", data)
+	n.nclient.Subscribe(topic, handle)
 }
 
-func realtimeAlarmHandler(data []byte) {
-	var alr xproto.Alarm
-	json.Unmarshal(data, &alr)
-	log.Printf("%v\n", alr)
-}
-
-func realtimeStatusHandler(data []byte) {
-	var alr xproto.Status
-	json.Unmarshal(data, &alr)
-	log.Printf("%v\n", alr)
-}
-
-func MqttStart() error {
+func (n *Nats) Start() error {
 	client, err := mq.NewNatsClient(mq.DefaultURL, false)
 	if err != nil {
 		return err
 	}
-	_nclient = client
-	_nclient.Subscribe("xstation.device.alarm", realtimeAlarmHandler)
-	_nclient.Subscribe("xstation.device.status", realtimeStatusHandler)
+	n.nclient = client
 	return nil
 }
 
-func MqttStop() {
-	if _nclient == nil {
+func (n *Nats) Connect(addr string) error {
+	client, err := mq.NewNatsClient(addr, false)
+	if err != nil {
+		return err
+	}
+	n.nclient = client
+	return nil
+}
+
+func (n *Nats) Stop() {
+	if n.nclient == nil {
 		return
 	}
-	_nclient.Release()
+	n.nclient.Release()
 }

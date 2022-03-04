@@ -1,9 +1,6 @@
 package service
 
 import (
-	"unsafe"
-	"xstation/model"
-
 	"github.com/wlgd/xutils/orm"
 )
 
@@ -33,31 +30,4 @@ func (s *StatusPage) Where() *orm.DbWhere {
 type StatusGet struct {
 	DeviceNo string `form:"deviceNo"` //
 	StatusId uint64 `form:"statusId"` //
-}
-
-type StatusTask struct {
-	TableIdx int
-	Data     []model.DevStatus
-	Size     int
-}
-
-// StatusCreates 批量添加
-func StatusCreates(obj interface{}) {
-	task := obj.(*StatusTask)
-	// 映射
-	var data interface{}
-	ptr := unsafe.Pointer(&task.Data)
-	switch task.TableIdx {
-	case 1:
-		data = (*[]model.DevStatus1)(ptr)
-	case 2:
-		data = (*[]model.DevStatus2)(ptr)
-	case 3:
-		data = (*[]model.DevStatus3)(ptr)
-	case 4:
-		data = (*[]model.DevStatus4)(ptr)
-	default:
-		data = &task.Data
-	}
-	orm.DbCreate(data)
 }

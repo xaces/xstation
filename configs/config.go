@@ -21,6 +21,7 @@ type configure struct {
 	Host    string
 	License string
 	Public  string
+	MsgProc string
 	Port    struct {
 		Http   uint16
 		Access uint16
@@ -31,9 +32,19 @@ type configure struct {
 		ftp.Options
 	}
 	Map struct {
-		Name string `yaml:"name"`
-		Key  string `yaml:"key"`
-	} `yaml:"map"`
+		Name string
+		Key  string
+	}
+	RdMQ struct {
+		Name    string
+		Address string
+		Topic   struct {
+			Online string
+			Alarm  string
+			Status string
+			Event  string
+		}
+	}
 }
 
 // Default 所有配置参数

@@ -51,7 +51,7 @@ func (o *Serve) AddHandler(c *gin.Context) {
 		ctx.JSONWriteError(err, c)
 		return
 	}
-	mnger.Serves.Add(&param)
+	mnger.Serve.Add(&param)
 	// 同步信息到服务管理
 	ctx.JSONOk().WriteTo(c)
 }
@@ -77,7 +77,7 @@ func (o *Serve) UpdateStatusHandler(c *gin.Context) {
 		ctx.JSONWriteError(err, c)
 		return
 	}
-	if err := mnger.Serves.UpdateStatus(param.Guids, param.Status); err != nil {
+	if err := mnger.Serve.UpdateStatus(param.Guids, param.Status); err != nil {
 		ctx.JSONWriteError(err, c)
 		return
 	}
@@ -86,7 +86,7 @@ func (o *Serve) UpdateStatusHandler(c *gin.Context) {
 
 // StatusListHandler
 func (o *Serve) StatusListHandler(c *gin.Context) {
-	data := mnger.Serves.GetAll()
+	data := mnger.Serve.GetAll()
 	ctx.JSONOk().WriteData(data, c)
 }
 
