@@ -1,131 +1,116 @@
 package device
 
 import (
-	"fmt"
-	"log"
-	"xstation/configs"
+	"time"
 	"xstation/entity/mnger"
 	"xstation/model"
 	"xstation/service"
 
-	"github.com/wlgd/xproto"
+	"github.com/panjf2000/ants/v2"
+	"github.com/wlgd/xutils/orm"
 )
 
+type handler struct {
+	Status chan model.DevStatus
+	Alarm  chan model.DevAlarm
+}
+
 var (
+	Handler *handler = &handler{
+		Status: make(chan model.DevStatus, 1),
+		Alarm:  make(chan model.DevAlarm, 1),
+	}
 	msgProc string = ""
 )
 
-type Handler struct {
-}
-
-func NewHandler(msgproc string) *Handler {
+func (h *handler) Run(msgproc string) {
+	msgProc = msgproc
 	if msgproc == "nats" {
 		natsRun()
 	}
-	msgProc = msgproc
-	devTaskRun()
-	return &Handler{}
+	go h.StatusDispatch()
+	go h.AlarmDispatch()
 }
 
-func onlineHandler(a *xproto.Access, online bool) error {
-	if a.LinkType != xproto.LINK_Signal {
-		return xproto.ErrUnSupport
-	}
-	m := mnger.Device.Get(a.DeviceNo)
-	if m == nil {
-		return fmt.Errorf("[%s] invalid", a.DeviceNo)
-	}
-	o := toDevOnlineModel(a, online)
-	switch msgProc {
-	case "nats":
-		nats.Notify(topicDevOnline, o)
-	case "default":
-		service.DeviceUpdate(m, online, o.Version, o.DevType)
-		service.DevOnlineUpdate(o)
-	}
-	// 第三方hook
-	return nil
+func (h *handler) AddStatus(v model.DevStatus) {
+	h.Status <- v
 }
 
-func (h *Handler) AccessHandler(b []byte, a *xproto.Access) (interface{}, error) {
-	log.Printf("%s\n", b)
-	if a.LinkType == xproto.LINK_FileTransfer {
-		filename, act := xproto.FileOfSess(a.Session)
-		if act == xproto.ACTION_Upload {
-			return nil, xproto.UploadFile(a, filename, true)
+func (h *handler) AddAlarm(v model.DevAlarm) {
+	h.Alarm <- v
+}
+
+type statusObj struct {
+	TableIdx int
+	Data     []model.DevStatus
+}
+
+// DbStatusHandler 批量处理数据
+func (h *handler) StatusDispatch() {
+	stArray := make([][]model.DevStatus, model.DevStatusNum)
+	statusFunc := func(v interface{}) {
+		obj := v.(*statusObj)
+		data := mnger.Device.StatusValue(obj.TableIdx, obj.Data)
+		orm.DbCreate(data)
+	}
+	p, _ := ants.NewPoolWithFunc(5, statusFunc) // 协程池
+	ticker := time.NewTicker(time.Second * 2)
+	defer p.Release()
+	defer close(h.Status)
+	for {
+		select {
+		case v := <-h.Status:
+			tabIdx := v.DeviceId % model.DevStatusNum
+			stArray[tabIdx] = append(stArray[tabIdx], v)
+		case <-ticker.C:
+			for i := 0; i < model.DevStatusNum; i++ {
+				size := len(stArray[i])
+				if size < 1 {
+					continue
+				}
+				o := &statusObj{}
+				o.TableIdx = i
+				o.Data = make([]model.DevStatus, size)
+				copy(o.Data, stArray[i])
+				if err := p.Invoke(o); err != nil {
+					continue
+				}
+				stArray[i] = stArray[i][:0]
+			}
 		}
-		return xproto.DownloadFile(configs.Default.Public+"/"+filename, nil)
 	}
-	return nil, onlineHandler(a, true)
-
 }
 
-func (h *Handler) DroppedHandler(v interface{}, a *xproto.Access, err error) {
-	log.Println(err)
-	if a.LinkType == xproto.LINK_FileTransfer {
-		_, act := xproto.FileOfSess(a.Session)
-		if act == xproto.ACTION_Upload {
-			xproto.DownloadFile("", v)
+// AlarmDispatch 批量处理数据
+func (h *handler) AlarmDispatch() {
+	var stArray []model.DevAlarm
+	alarmFunc := func(v interface{}) {
+		data := v.([]model.DevAlarm)
+		for k := range data {
+			service.DevAlarmDbAdd(&data[k])
+			mnger.Alarm.Add(&data[k])
 		}
-		return
 	}
-	onlineHandler(a, false)
-}
-func (h *Handler) StatusHandler(tag string, s *xproto.Status) {
-	// 转换
-	xproto.LogStatus(tag, s)
-	o := toDevStatusModel(s)
-	if o == nil {
-		return
-	}
-	switch msgProc {
-	case "nats":
-		nats.Notify(topicDevStatus, o)
-	case "default":
-		devtask.AddStatus(*o)
-	}
-	// 第三方hook
-}
-func (h *Handler) AlarmHandler(b []byte, a *xproto.Alarm) {
-	xproto.LogAlarm(b, a)
-	// 转换
-	status := toDevStatusModel(a.Status)
-	if status == nil {
-		return
-	}
-	o := toDevAlarmModel(a)
-	o.DevStatus = model.JDevStatus(*status)
-	switch msgProc {
-	case "nats":
-		nats.Notify(topicDevAlarm, o)
-	case "default":
-		devtask.AddStatus(*status)
-		devtask.AddAlarm(*o)
-	}
-	// 第三方hook
-}
-func (h *Handler) EventHandler(data []byte, e *xproto.Event) {
-	xproto.LogEvent(data, e)
-	//
-	switch msgProc {
-	case "nats":
-		nats.Notify(topicDevEvent, e)
-	case "default":
-		devEventHandler(e)
-	}
-	// 第三方hook
-}
-
-func devEventHandler(e *xproto.Event) {
-	m := mnger.Device.Get(e.DeviceNo)
-	if m == nil || !m.AutoFtp {
-		return
-	}
-	switch e.Type {
-	case xproto.EVENT_FtpTransfer:
-	case xproto.EVENT_FileLittle:
-		ftpLittleFile(e)
-	case xproto.EVENT_FileTimedCapture:
-		ftpTimedCapture(e)
+	ticker := time.NewTicker(time.Second * 2)
+	p, _ := ants.NewPoolWithFunc(2, alarmFunc) // 协程池
+	defer p.Release()
+	defer close(h.Alarm)
+	for {
+		select {
+		case v := <-h.Alarm:
+			// 推送给第三放
+			stArray = append(stArray, v)
+		case <-ticker.C:
+			size := len(stArray)
+			if size < 1 {
+				continue
+			}
+			data := make([]model.DevAlarm, size)
+			copy(data, stArray)
+			if err := p.Invoke(data); err != nil {
+				continue
+			}
+			stArray = stArray[:0]
+		}
 	}
 }

@@ -54,7 +54,7 @@ func natsSubDevStatusHandler(b []byte) {
 	}
 	p.Id = util.PrimaryKey()
 	p.DeviceId = m.Id
-	devtask.AddStatus(p)
+	Handler.AddStatus(p)
 }
 
 func natsSubDevAlarmHandler(b []byte) {
@@ -64,7 +64,7 @@ func natsSubDevAlarmHandler(b []byte) {
 	if m == nil {
 		return
 	}
-	devtask.AddAlarm(p)
+	Handler.AddAlarm(p)
 }
 
 func natsSubDevEventHandler(b []byte) {

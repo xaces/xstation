@@ -1,79 +1,177 @@
 package device
 
 import (
+	"fmt"
+	"log"
+	"xstation/configs"
 	"xstation/entity/mnger"
 	"xstation/model"
+	"xstation/service"
 	"xstation/util"
 
 	"github.com/wlgd/xproto"
+	"github.com/wlgd/xutils/orm"
 )
 
-// 转换
-func toDevOnlineModel(a *xproto.Access, online bool) *model.DevOnline {
-	v := &model.DevOnline{
-		Guid:          a.Session,
-		DeviceNo:      a.DeviceNo,
-		RemoteAddress: a.RemoteAddress,
-		NetType:       int(a.NetType),
-		Type:          int(a.LinkType),
-		UpTraffic:     a.UpTraffic,
-		DownTraffic:   a.DownTraffic,
-		Version:       a.Version,
-		DevType:       a.Type,
+func onlineHandler(a *xproto.Access, online bool) error {
+	if a.LinkType != xproto.LINK_Signal {
+		return xproto.ErrUnSupport
 	}
-	if online {
-		v.OnTime = a.DeviceTime
-	} else {
-		v.OffTime = a.DeviceTime
-	}
-	return v
-}
-
-func toDevStatusModel(s *xproto.Status) *model.DevStatus {
-	m := mnger.Device.Get(s.DeviceNo)
+	m := mnger.Device.Get(a.DeviceNo)
 	if m == nil {
-		return nil
+		return fmt.Errorf("[%s] invalid", a.DeviceNo)
 	}
-	o := &model.DevStatus{}
-	o.Id = util.PrimaryKey()
-	o.DeviceId = m.Id
-	o.DeviceNo = s.DeviceNo
-	o.DTU = s.DTU
-	o.Flag = s.Flag
-	if s.Location.Speed < 1 {
-		s.Location.Speed = 0
+	o := toDevOnlineModel(a, online)
+	switch msgProc {
+	case "nats":
+		nats.Notify(topicDevOnline, o)
+	case "default":
+		service.DeviceUpdate(m, online, o.Version, o.DevType)
+		service.DevOnlineUpdate(o)
 	}
-	o.Acc = s.Acc
-	o.Location = model.JLocation(s.Location)
-	o.Tempers = model.JFloats(s.Tempers)
-	o.Humiditys = model.JFloats(s.Humiditys)
-	o.Mileage = model.JMileage(s.Mileage)
-	o.Oils = model.JOil(s.Oils)
-	o.Module = model.JModule(s.Module)
-	o.Gsensor = model.JGsensor(s.Gsensor)
-	o.Mobile = model.JMobile(s.Mobile)
-	o.Disks = model.JDisks(s.Disks)
-	o.People = model.JPeople(s.People)
-	o.Obds = model.JObds(s.Obds)
-	o.Vols = model.JFloats(s.Vol)
-	return o
+	// 第三方hook
+	return nil
 }
 
-func toDevAlarmModel(a *xproto.Alarm) *model.DevAlarm {
-	flag := a.Status.Flag
-	a.Status.Flag = 2
-	if a.EndTime != "" {
-		a.Status.Flag = 3
+func AccessHandler(b []byte, a *xproto.Access) (interface{}, error) {
+	log.Printf("%s\n", b)
+	if a.LinkType == xproto.LINK_FileTransfer {
+		filename, act := xproto.FileOfSess(a.Session)
+		if act == xproto.ACTION_Upload {
+			return nil, xproto.UploadFile(a, filename, true)
+		}
+		return xproto.DownloadFile(configs.Default.Public+"/"+filename, nil)
 	}
-	o := &model.DevAlarm{
-		Guid:      a.UUID,
-		Flag:      flag,
-		StartTime: a.StartTime,
-		EndTime:   a.EndTime,
+	return nil, onlineHandler(a, true)
+
+}
+
+func DroppedHandler(v interface{}, a *xproto.Access, err error) {
+	log.Println(err)
+	if a.LinkType == xproto.LINK_FileTransfer {
+		_, act := xproto.FileOfSess(a.Session)
+		if act == xproto.ACTION_Upload {
+			xproto.DownloadFile("", v)
+		}
+		return
 	}
-	o.DTU = a.DTU
-	o.DeviceNo = a.DeviceNo
-	o.AlarmType = a.Type
-	o.Data = util.ToJString(a.Data)
-	return o
+	onlineHandler(a, false)
+}
+func StatusHandler(tag string, s *xproto.Status) {
+	// 转换
+	xproto.LogStatus(tag, s)
+	o := toDevStatusModel(s)
+	if o == nil {
+		return
+	}
+	switch msgProc {
+	case "nats":
+		nats.Notify(topicDevStatus, o)
+	case "default":
+		Handler.AddStatus(*o)
+	}
+	// 第三方hook
+}
+func AlarmHandler(b []byte, a *xproto.Alarm) {
+	xproto.LogAlarm(b, a)
+	// 转换
+	status := toDevStatusModel(a.Status)
+	if status == nil {
+		return
+	}
+	o := toDevAlarmModel(a)
+	o.DevStatus = model.JDevStatus(*status)
+	switch msgProc {
+	case "nats":
+		nats.Notify(topicDevAlarm, o)
+	case "default":
+		Handler.AddStatus(*status)
+		Handler.AddAlarm(*o)
+	}
+	// 第三方hook
+}
+func EventHandler(data []byte, e *xproto.Event) {
+	xproto.LogEvent(data, e)
+	//
+	switch msgProc {
+	case "nats":
+		nats.Notify(topicDevEvent, e)
+	case "default":
+		devEventHandler(e)
+	}
+	// 第三方hook
+}
+
+func devEventHandler(e *xproto.Event) {
+	m := mnger.Device.Get(e.DeviceNo)
+	if m == nil || !m.AutoFtp {
+		return
+	}
+	switch e.Type {
+	case xproto.EVENT_FtpTransfer:
+	case xproto.EVENT_FileLittle:
+		ftpLittleFile(e)
+	case xproto.EVENT_FileTimedCapture:
+		ftpTimedCapture(e)
+	}
+}
+
+// ftpLittleFile 新文件通知
+func ftpLittleFile(e *xproto.Event) {
+	v := e.Data.(xproto.EventFileLittle)
+	fpName := util.FilePath(v.FileName, e.DeviceNo)
+	ftp := xproto.FtpTransfer{
+		FtpURL:   configs.FtpAddr,
+		FileSrc:  v.FileName,
+		FileDst:  configs.Default.Public + "/" + fpName,
+		Action:   xproto.ACTION_Download,
+		FileType: v.FileType,
+		Session:  e.Session,
+	}
+	if xproto.SyncSend(xproto.REQ_FtpTransfer, ftp, nil, e.DeviceNo) != nil {
+		return
+	}
+	alr := mnger.Alarm.Get(e.Session) // 从缓存中获取数据
+	if alr == nil {
+		return
+	}
+	data := &model.DevAlarmFile{}
+	data.Guid = e.Session
+	data.LinkType = model.AlarmLinkFtpFile
+	data.DeviceNo = e.DeviceNo
+	data.AlarmType = alr.AlarmType
+	data.DTU = e.DTU
+	data.Channel = v.Channel
+	data.Size = v.Size
+	data.Duration = v.Duration
+	data.FileType = v.FileType
+	data.Name = ftp.FileDst
+	orm.DbCreate(data)
+}
+
+//
+func ftpTimedCapture(e *xproto.Event) {
+	v := e.Data.(xproto.EventFileTimedCapture)
+	fpName := util.FilePath(v.FileName, e.DeviceNo)
+	ftp := xproto.FtpTransfer{
+		FtpURL:   configs.FtpAddr,
+		FileSrc:  v.FileName,
+		FileDst:  configs.Default.Public + "/" + fpName,
+		Action:   xproto.ACTION_Download,
+		FileType: xproto.FILE_NormalPic,
+		Session:  e.Session,
+	}
+	if xproto.SyncSend(xproto.REQ_FtpTransfer, ftp, nil, e.DeviceNo) != nil {
+		return
+	}
+	data := &model.DevCapture{
+		DeviceNo:  e.DeviceNo,
+		DTU:       e.DTU,
+		Channel:   v.Channel,
+		Latitude:  v.Latitude,
+		Longitude: v.Longitude,
+		Speed:     v.Speed,
+		Name:      ftp.FileDst,
+	}
+	orm.DbCreate(data)
 }

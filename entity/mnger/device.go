@@ -2,6 +2,7 @@ package mnger
 
 import (
 	"sync"
+	"unsafe"
 	"xstation/model"
 
 	"github.com/wlgd/xproto"
@@ -52,8 +53,8 @@ func (o *deviceMapper) StatusModel(deviceNo string) interface{} {
 	if dev == nil {
 		return nil
 	}
-	i := int(dev.Id) % model.DevStatusNum
-	switch i {
+	tabidx := int(dev.Id) % model.DevStatusNum
+	switch tabidx {
 	case 1:
 		return &model.DevStatus1{}
 	case 2:
@@ -62,7 +63,21 @@ func (o *deviceMapper) StatusModel(deviceNo string) interface{} {
 		return model.DevStatus3{}
 	case 4:
 		return &model.DevStatus4{}
-	default:
 	}
 	return &model.DevStatus{}
+}
+
+func (o *deviceMapper) StatusValue(tabidx int, v []model.DevStatus) interface{} {
+	ptr := unsafe.Pointer(&v)
+	switch tabidx {
+	case 1:
+		return (*[]model.DevStatus1)(ptr)
+	case 2:
+		return (*[]model.DevStatus2)(ptr)
+	case 3:
+		return (*[]model.DevStatus3)(ptr)
+	case 4:
+		return (*[]model.DevStatus4)(ptr)
+	}
+	return v
 }

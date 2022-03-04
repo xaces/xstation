@@ -31,18 +31,18 @@ var (
 
 // Start 启动
 func Start(msgproc, host string, port uint16) error {
-	handle := device.NewHandler(msgproc)
+	device.Handler.Run(msgproc)
 	s, err := xproto.NewServe(&xproto.Options{
 		RequestTimeout: 50,
 		RecvTimeout:    30,
 		Port:           uint16(port),
 		Host:           host,
 		Adapter:        protocolAdapter,
-		AccessNotify:   handle.AccessHandler,
-		DroppedNotify:  handle.DroppedHandler,
-		StatusNotify:   handle.StatusHandler,
-		AlarmNotify:    handle.AlarmHandler,
-		EventNotify:    handle.EventHandler,
+		AccessNotify:   device.AccessHandler,
+		DroppedNotify:  device.DroppedHandler,
+		StatusNotify:   device.StatusHandler,
+		AlarmNotify:    device.AlarmHandler,
+		EventNotify:    device.EventHandler,
 		AVFrameNotify:  xproto.LogAVFrame,
 		RawNotify:      xproto.LogRawFrame,
 	})
