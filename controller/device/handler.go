@@ -20,13 +20,15 @@ var (
 		Status: make(chan model.DevStatus, 1),
 		Alarm:  make(chan model.DevAlarm, 1),
 	}
+	nats    *natsHandler
 	msgProc string = ""
 )
 
 func (h *handler) Run(msgproc string) {
 	msgProc = msgproc
 	if msgproc == "nats" {
-		natsRun()
+		nats = &natsHandler{}
+		nats.Run()
 	}
 	go h.StatusDispatch()
 	go h.AlarmDispatch()

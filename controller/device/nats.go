@@ -18,19 +18,26 @@ const (
 	topicDevEvent  = "station.device.event"
 )
 
-var (
-	nats *middleware.Nats
-)
-
-func natsRun() {
-	nats = middleware.NewNatsClient()
-	nats.Subscribe(topicDevOnline, natsSubDevOnlineHandler)
-	nats.Subscribe(topicDevStatus, natsSubDevStatusHandler)
-	nats.Subscribe(topicDevAlarm, natsSubDevAlarmHandler)
-	nats.Subscribe(topicDevEvent, natsSubDevEventHandler)
+type natsHandler struct {
+	client *middleware.Nats
 }
 
-func natsSubDevOnlineHandler(b []byte) {
+func (n *natsHandler) Run() {
+	n.client = middleware.NewNatsClient()
+	n.client.Subscribe(topicDevOnline, n.SubDevOnlineHandler)
+	n.client.Subscribe(topicDevStatus, n.SubDevStatusHandler)
+	n.client.Subscribe(topicDevAlarm, n.SubDevAlarmHandler)
+	n.client.Subscribe(topicDevEvent, n.SubDevEventHandler)
+}
+
+func (n *natsHandler) Notify(topic string, v interface{}) {
+	if n.client == nil {
+		return
+	}
+	n.client.Notify(topic, v)
+}
+
+func (n *natsHandler) SubDevOnlineHandler(b []byte) {
 	var p model.DevOnline
 	jsoniter.Unmarshal(b, &p)
 	m := mnger.Device.Get(p.DeviceNo)
@@ -45,7 +52,7 @@ func natsSubDevOnlineHandler(b []byte) {
 	service.DevOnlineUpdate(&p)
 }
 
-func natsSubDevStatusHandler(b []byte) {
+func (n *natsHandler) SubDevStatusHandler(b []byte) {
 	var p model.DevStatus
 	jsoniter.Unmarshal(b, &p)
 	m := mnger.Device.Get(p.DeviceNo)
@@ -57,7 +64,7 @@ func natsSubDevStatusHandler(b []byte) {
 	Handler.AddStatus(p)
 }
 
-func natsSubDevAlarmHandler(b []byte) {
+func (n *natsHandler) SubDevAlarmHandler(b []byte) {
 	var p model.DevAlarm
 	jsoniter.Unmarshal(b, &p)
 	m := mnger.Device.Get(p.DeviceNo)
@@ -67,7 +74,7 @@ func natsSubDevAlarmHandler(b []byte) {
 	Handler.AddAlarm(p)
 }
 
-func natsSubDevEventHandler(b []byte) {
+func (n *natsHandler) SubDevEventHandler(b []byte) {
 	var e xproto.Event
 	jsoniter.Unmarshal(b, &e)
 	devEventHandler(&e)
