@@ -47,6 +47,12 @@ func FilePath(s, deviceNo string) string {
 	return fmt.Sprintf("%s/%s/%s/%s", sarr[i-2], deviceNo, sarr[i-1], sarr[i])
 }
 
+func FilePicPath(s, deviceNo string) string {
+	sarr := strings.Split(s, "/")
+	i := len(sarr) - 1
+	return fmt.Sprintf("%s/%s/%s/%s", sarr[i-1], deviceNo, sarr[i-2], sarr[i])
+}
+
 // ftp://admin:123456@127.0.0.1:2211
 func StringParseFtpUri(s string) (port int, user, pswd string) {
 	arrs := strings.Split(s, "@")

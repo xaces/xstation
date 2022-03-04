@@ -152,7 +152,7 @@ func ftpLittleFile(e *xproto.Event) {
 //
 func ftpTimedCapture(e *xproto.Event) {
 	v := e.Data.(xproto.EventFileTimedCapture)
-	fpName := util.FilePath(v.FileName, e.DeviceNo)
+	fpName := util.FilePicPath(v.FileName, e.DeviceNo)
 	ftp := xproto.FtpTransfer{
 		FtpURL:   configs.FtpAddr,
 		FileSrc:  v.FileName,
