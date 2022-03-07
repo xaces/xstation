@@ -7,39 +7,68 @@ import (
 	"xstation/service"
 
 	"github.com/panjf2000/ants/v2"
+	"github.com/wlgd/xproto"
 	"github.com/wlgd/xutils/orm"
 )
 
+type broker interface {
+	Online(*xproto.Access)
+	Status(*xproto.Status)
+	Alarm(*xproto.Alarm)
+	Event(*xproto.Event)
+	Stop()
+}
+
 type handler struct {
-	Status chan model.DevStatus
-	Alarm  chan model.DevAlarm
+	status chan model.DevStatus
+	alarm  chan model.DevAlarm
 }
 
 var (
 	Handler *handler = &handler{
-		Status: make(chan model.DevStatus, 1),
-		Alarm:  make(chan model.DevAlarm, 1),
+		status: make(chan model.DevStatus, 1),
+		alarm:  make(chan model.DevAlarm, 1),
 	}
-	nats    *natsHandler
-	msgProc string = ""
+	brokers []broker
 )
 
-func (h *handler) Run(msgproc string) {
-	msgProc = msgproc
-	if msgproc == "nats" {
-		nats = &natsHandler{}
-		nats.Run()
+func (h *handler) Run(msgproc string) error {
+	switch msgproc {
+	case "nats":
+		if err := natsRun(); err != nil {
+			return err
+		}
+	case "default":
+		h.Handle(&defaultBroker{})
 	}
-	go h.StatusDispatch()
-	go h.AlarmDispatch()
+	go h.dispatchStatus()
+	go h.dispatchAlarm()
+	return nil
 }
 
-func (h *handler) AddStatus(v model.DevStatus) {
-	h.Status <- v
+func (h *handler) Stop() {
+	for _, v := range brokers {
+		v.Stop()
+	}
 }
 
-func (h *handler) AddAlarm(v model.DevAlarm) {
-	h.Alarm <- v
+func (h *handler) Handle(v broker) {
+	brokers = append(brokers, v)
+}
+
+func (h *handler) addStatus(s *xproto.Status) {
+	o := devStatusModel(s)
+	h.status <- *o
+}
+
+func (h *handler) addAlarm(a *xproto.Alarm) {
+	o := devAlarmModel(a)
+	status := devStatusModel(a.Status)
+	if status != nil {
+		o.DevStatus = model.JDevStatus(*status)
+		h.status <- *status
+	}
+	h.alarm <- *o
 }
 
 type statusObj struct {
@@ -47,8 +76,8 @@ type statusObj struct {
 	Data     []model.DevStatus
 }
 
-// DbStatusHandler 批量处理数据
-func (h *handler) StatusDispatch() {
+// dispatchStatus 批量处理数据
+func (h *handler) dispatchStatus() {
 	stArray := make([][]model.DevStatus, model.DevStatusNum)
 	statusFunc := func(v interface{}) {
 		obj := v.(*statusObj)
@@ -58,10 +87,10 @@ func (h *handler) StatusDispatch() {
 	p, _ := ants.NewPoolWithFunc(5, statusFunc) // 协程池
 	ticker := time.NewTicker(time.Second * 2)
 	defer p.Release()
-	defer close(h.Status)
+	defer close(h.status)
 	for {
 		select {
-		case v := <-h.Status:
+		case v := <-h.status:
 			tabIdx := v.DeviceId % model.DevStatusNum
 			stArray[tabIdx] = append(stArray[tabIdx], v)
 		case <-ticker.C:
@@ -83,8 +112,8 @@ func (h *handler) StatusDispatch() {
 	}
 }
 
-// AlarmDispatch 批量处理数据
-func (h *handler) AlarmDispatch() {
+// dispatchAlarm 批量处理数据
+func (h *handler) dispatchAlarm() {
 	var stArray []model.DevAlarm
 	alarmFunc := func(v interface{}) {
 		data := v.([]model.DevAlarm)
@@ -96,10 +125,10 @@ func (h *handler) AlarmDispatch() {
 	ticker := time.NewTicker(time.Second * 2)
 	p, _ := ants.NewPoolWithFunc(2, alarmFunc) // 协程池
 	defer p.Release()
-	defer close(h.Alarm)
+	defer close(h.alarm)
 	for {
 		select {
-		case v := <-h.Alarm:
+		case v := <-h.alarm:
 			// 推送给第三放
 			stArray = append(stArray, v)
 		case <-ticker.C:

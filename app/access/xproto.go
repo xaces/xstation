@@ -26,31 +26,35 @@ func protocolAdapter(b []byte) xproto.InterfaceProtocol {
 }
 
 var (
-	_xproto *xproto.Serve = nil
+	s *xproto.Server = nil
 )
 
 // Start 启动
-func Start(msgproc, host string, port uint16) error {
-	device.Handler.Run(msgproc)
-	s, err := xproto.NewServe(&xproto.Options{
+func Start(host string, port uint16) (err error) {
+	opt := &xproto.Options{
 		RequestTimeout: 50,
 		RecvTimeout:    30,
 		Port:           uint16(port),
 		Host:           host,
 		Adapter:        protocolAdapter,
-		AccessNotify:   device.AccessHandler,
-		DroppedNotify:  device.DroppedHandler,
-		StatusNotify:   device.StatusHandler,
-		AlarmNotify:    device.AlarmHandler,
-		EventNotify:    device.EventHandler,
-		AVFrameNotify:  xproto.LogAVFrame,
-		RawNotify:      xproto.LogRawFrame,
-	})
-	_xproto = s
-	return err
+	}
+	if s, err = xproto.NewServer(opt); err != nil {
+		return
+	}
+	s.Handle.Access = device.AccessHandler
+	s.Handle.Dropped = device.DroppedHandler
+	s.Handle.Status = device.StatusHandler
+	s.Handle.Alarm = device.AlarmHandler
+	s.Handle.Event = device.EventHandler
+	s.Handle.AVFrame = xproto.LogAVFrame
+	s.Handle.RawFrame = xproto.LogRawFrame
+	go s.ListenTCPAndServe()
+	return
 }
 
 // Stop 停止
 func Stop() {
-	_xproto.Release()
+	if s != nil {
+		s.Release()
+	}
 }

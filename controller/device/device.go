@@ -6,35 +6,29 @@ import (
 	"xstation/configs"
 	"xstation/entity/mnger"
 	"xstation/model"
-	"xstation/service"
 	"xstation/util"
 
 	"github.com/wlgd/xproto"
 	"github.com/wlgd/xutils/orm"
 )
 
-func onlineHandler(a *xproto.Access, online bool) error {
+
+func onlineHandler(a *xproto.Access) error {
 	if a.LinkType != xproto.LINK_Signal {
 		return xproto.ErrUnSupport
 	}
-	m := mnger.Device.Get(a.DeviceNo)
-	if m == nil {
-		return fmt.Errorf("[%s] invalid", a.DeviceNo)
+	for _, v := range brokers {
+		v.Online(a)
 	}
-	o := toDevOnlineModel(a, online)
-	switch msgProc {
-	case "nats":
-		nats.Notify(topicDevOnline, o)
-	case "default":
-		service.DeviceUpdate(m, online, o.Version, o.DevType)
-		service.DevOnlineUpdate(o)
-	}
-	// 第三方hook
 	return nil
 }
 
 func AccessHandler(b []byte, a *xproto.Access) (interface{}, error) {
 	log.Printf("%s\n", b)
+	m := mnger.Device.Get(a.DeviceNo)
+	if m == nil {
+		return nil, fmt.Errorf("[%s] invalid", a.DeviceNo)
+	}
 	if a.LinkType == xproto.LINK_FileTransfer {
 		filename, act := xproto.FileOfSess(a.Session)
 		if act == xproto.ACTION_Upload {
@@ -42,7 +36,7 @@ func AccessHandler(b []byte, a *xproto.Access) (interface{}, error) {
 		}
 		return xproto.DownloadFile(configs.Default.Public+"/"+filename, nil)
 	}
-	return nil, onlineHandler(a, true)
+	return nil, onlineHandler(a)
 
 }
 
@@ -55,51 +49,25 @@ func DroppedHandler(v interface{}, a *xproto.Access, err error) {
 		}
 		return
 	}
-	onlineHandler(a, false)
+	onlineHandler(a)
 }
 func StatusHandler(tag string, s *xproto.Status) {
-	// 转换
 	xproto.LogStatus(tag, s)
-	o := toDevStatusModel(s)
-	if o == nil {
-		return
+	for _, v := range brokers {
+		v.Status(s)
 	}
-	switch msgProc {
-	case "nats":
-		nats.Notify(topicDevStatus, o)
-	case "default":
-		Handler.AddStatus(*o)
-	}
-	// 第三方hook
 }
 func AlarmHandler(b []byte, a *xproto.Alarm) {
 	xproto.LogAlarm(b, a)
-	// 转换
-	status := toDevStatusModel(a.Status)
-	if status == nil {
-		return
+	for _, v := range brokers {
+		v.Alarm(a)
 	}
-	o := toDevAlarmModel(a)
-	o.DevStatus = model.JDevStatus(*status)
-	switch msgProc {
-	case "nats":
-		nats.Notify(topicDevAlarm, o)
-	case "default":
-		Handler.AddStatus(*status)
-		Handler.AddAlarm(*o)
-	}
-	// 第三方hook
 }
 func EventHandler(data []byte, e *xproto.Event) {
 	xproto.LogEvent(data, e)
-	//
-	switch msgProc {
-	case "nats":
-		nats.Notify(topicDevEvent, e)
-	case "default":
-		devEventHandler(e)
+	for _, v := range brokers {
+		v.Event(e)
 	}
-	// 第三方hook
 }
 
 func devEventHandler(e *xproto.Event) {

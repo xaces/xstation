@@ -3,13 +3,14 @@ package device
 import (
 	"xstation/entity/mnger"
 	"xstation/model"
+	"xstation/service"
 	"xstation/util"
 
 	"github.com/wlgd/xproto"
 )
 
 // 转换
-func toDevOnlineModel(a *xproto.Access, online bool) *model.DevOnline {
+func devOnlineModel(a *xproto.Access) *model.DevOnline {
 	v := &model.DevOnline{
 		Guid:          a.Session,
 		DeviceNo:      a.DeviceNo,
@@ -19,9 +20,9 @@ func toDevOnlineModel(a *xproto.Access, online bool) *model.DevOnline {
 		UpTraffic:     a.UpTraffic,
 		DownTraffic:   a.DownTraffic,
 		Version:       a.Version,
-		DevType:       a.Type,
+		DevType:       a.DevType,
 	}
-	if online {
+	if a.Online {
 		v.OnTime = a.DeviceTime
 	} else {
 		v.OffTime = a.DeviceTime
@@ -29,7 +30,7 @@ func toDevOnlineModel(a *xproto.Access, online bool) *model.DevOnline {
 	return v
 }
 
-func toDevStatusModel(s *xproto.Status) *model.DevStatus {
+func devStatusModel(s *xproto.Status) *model.DevStatus {
 	m := mnger.Device.Get(s.DeviceNo)
 	if m == nil {
 		return nil
@@ -59,7 +60,7 @@ func toDevStatusModel(s *xproto.Status) *model.DevStatus {
 	return o
 }
 
-func toDevAlarmModel(a *xproto.Alarm) *model.DevAlarm {
+func devAlarmModel(a *xproto.Alarm) *model.DevAlarm {
 	flag := a.Status.Flag
 	a.Status.Flag = 2
 	if a.EndTime != "" {
@@ -76,4 +77,12 @@ func toDevAlarmModel(a *xproto.Alarm) *model.DevAlarm {
 	o.AlarmType = a.Type
 	o.Data = util.ToJString(a.Data)
 	return o
+}
+
+func updateDevOnline(a *xproto.Access) error {
+	m := mnger.Device.Get(a.DeviceNo)
+	o := devOnlineModel(a)
+	service.DeviceUpdate(m, a.Online, o.Version, o.DevType)
+	service.DevOnlineUpdate(o)
+	return nil
 }

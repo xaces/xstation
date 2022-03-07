@@ -4,7 +4,6 @@ import (
 	"fmt"
 	"io/ioutil"
 	"net/http"
-	"xstation/configs"
 
 	jsoniter "github.com/json-iterator/go"
 )
@@ -15,6 +14,13 @@ type baiduLocation struct {
 		Address string `json:"formatted_address"`
 	} `json:"result"`
 }
+
+type MapOption struct {
+	Name string
+	Key  string
+}
+
+var opt MapOption
 
 // HttpGet http get 请求
 func httpGet(url string, result interface{}) error {
@@ -31,8 +37,9 @@ func httpGet(url string, result interface{}) error {
 }
 
 func GetLocation(longtitude, latitude float32) string {
-	if configs.Default.Map.Name == "Baidu" {
-		urlstr := fmt.Sprintf("http://api.map.baidu.com/reverse_geocoding/v3/?ak=%s&output=json&coordtype=wgs84ll&location=%f,%f", configs.Default.Map.Key, latitude, longtitude)
+	switch opt.Name {
+	case "Baidu":
+		urlstr := fmt.Sprintf("http://api.map.baidu.com/reverse_geocoding/v3/?ak=%s&output=json&coordtype=wgs84ll&location=%f,%f", opt.Key, latitude, longtitude)
 		var lo baiduLocation
 		if err := httpGet(urlstr, &lo); err == nil && lo.Status == 0 {
 			return lo.Result.Address

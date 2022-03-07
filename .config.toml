@@ -28,11 +28,10 @@ MsgProc= "default"
 
 ### 第三方消息推送
 [RdMQ]
+    Enable= false
     Name= "nats"
     Address= "nats://127.0.0.1:4222"
-
-[RdMQ.Topic]
-    Alarm= "device.alarm"
-    Status= "device.status"
-    Online= "device.online"
-    Event= "device.event"
+    TopicStatus= "device.status"
+    TopicOnline= "device.online"
+    TopicAlarm= "device.alarm"
+    TopicEvent= "device.event"

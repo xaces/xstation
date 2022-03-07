@@ -1,11 +1,7 @@
 package device
 
 import (
-	"xstation/entity/mnger"
 	"xstation/middleware"
-	"xstation/model"
-	"xstation/service"
-	"xstation/util"
 
 	jsoniter "github.com/json-iterator/go"
 	"github.com/wlgd/xproto"
@@ -18,63 +14,43 @@ const (
 	topicDevEvent  = "station.device.event"
 )
 
-type natsHandler struct {
-	client *middleware.Nats
+func natsRun() error {
+	nats := &middleware.Nats{}
+	if err := nats.Start(middleware.NatsOption{
+		TopicOnline: topicDevOnline,
+		TopicStatus: topicDevStatus,
+		TopicAlarm:  topicDevAlarm,
+		TopicEvent:  topicDevEvent,
+	}); err != nil {
+		return err
+	} // 推送中间件
+	Handler.Handle(nats)
+	nats.Conn.Subscribe(topicDevOnline, natsOnlineHandler)
+	nats.Conn.Subscribe(topicDevStatus, natsStatusHandler)
+	nats.Conn.Subscribe(topicDevAlarm, natsAlarmHandler)
+	nats.Conn.Subscribe(topicDevEvent, natsEventHandler)
+	return nil
 }
 
-func (n *natsHandler) Run() {
-	n.client = middleware.NewNatsClient()
-	n.client.Subscribe(topicDevOnline, n.SubDevOnlineHandler)
-	n.client.Subscribe(topicDevStatus, n.SubDevStatusHandler)
-	n.client.Subscribe(topicDevAlarm, n.SubDevAlarmHandler)
-	n.client.Subscribe(topicDevEvent, n.SubDevEventHandler)
-}
-
-func (n *natsHandler) Notify(topic string, v interface{}) {
-	if n.client == nil {
-		return
-	}
-	n.client.Notify(topic, v)
-}
-
-func (n *natsHandler) SubDevOnlineHandler(b []byte) {
-	var p model.DevOnline
+func natsOnlineHandler(b []byte) {
+	var p xproto.Access
 	jsoniter.Unmarshal(b, &p)
-	m := mnger.Device.Get(p.DeviceNo)
-	if m == nil {
-		return
-	}
-	online := true
-	if p.OffTime != "" {
-		online = false
-	}
-	service.DeviceUpdate(m, online, p.Version, p.DevType)
-	service.DevOnlineUpdate(&p)
+	updateDevOnline(&p)
 }
 
-func (n *natsHandler) SubDevStatusHandler(b []byte) {
-	var p model.DevStatus
+func natsStatusHandler(b []byte) {
+	var p xproto.Status
 	jsoniter.Unmarshal(b, &p)
-	m := mnger.Device.Get(p.DeviceNo)
-	if m == nil {
-		return
-	}
-	p.Id = util.PrimaryKey()
-	p.DeviceId = m.Id
-	Handler.AddStatus(p)
+	Handler.addStatus(&p)
 }
 
-func (n *natsHandler) SubDevAlarmHandler(b []byte) {
-	var p model.DevAlarm
+func natsAlarmHandler(b []byte) {
+	var p xproto.Alarm
 	jsoniter.Unmarshal(b, &p)
-	m := mnger.Device.Get(p.DeviceNo)
-	if m == nil {
-		return
-	}
-	Handler.AddAlarm(p)
+	Handler.addAlarm(&p)
 }
 
-func (n *natsHandler) SubDevEventHandler(b []byte) {
+func natsEventHandler(b []byte) {
 	var e xproto.Event
 	jsoniter.Unmarshal(b, &e)
 	devEventHandler(&e)

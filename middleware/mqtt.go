@@ -1,52 +1,63 @@
 package middleware
 
 import (
+	"github.com/wlgd/xproto"
 	"github.com/wlgd/xutils/mq"
 )
 
+type NatsOption struct {
+	Address     string
+	TopicOnline string
+	TopicStatus string
+	TopicAlarm  string
+	TopicEvent  string
+}
+
 type Nats struct {
-	nclient *mq.NatsClient
+	Conn *mq.NatsClient
+	opt  NatsOption
 }
 
-func NewNatsClient() *Nats {
-	return new(Nats)
-}
-
-func (n *Nats) Notify(topic string, data interface{}) {
-	if n.nclient == nil {
+func (n *Nats) Online(a *xproto.Access) {
+	if n.Conn == nil {
 		return
 	}
-	n.nclient.Publish(topic, data)
+	n.Conn.Publish(n.opt.TopicOnline, a)
 }
 
-func (n *Nats) Subscribe(topic string, handle func([]byte)) {
-	if n.nclient == nil {
+func (n *Nats) Status(s *xproto.Status) {
+	if n.Conn == nil {
 		return
 	}
-	n.nclient.Subscribe(topic, handle)
+	n.Conn.Publish(n.opt.TopicStatus, s)
 }
 
-func (n *Nats) Start() error {
-	client, err := mq.NewNatsClient(mq.DefaultURL, false)
-	if err != nil {
-		return err
+func (n *Nats) Alarm(a *xproto.Alarm) {
+	if n.Conn == nil {
+		return
 	}
-	n.nclient = client
-	return nil
+	n.Conn.Publish(n.opt.TopicAlarm, a)
 }
 
-func (n *Nats) Connect(addr string) error {
-	client, err := mq.NewNatsClient(addr, false)
-	if err != nil {
-		return err
+func (n *Nats) Event(e *xproto.Event) {
+	if n.Conn == nil {
+		return
 	}
-	n.nclient = client
-	return nil
+	n.Conn.Publish(n.opt.TopicEvent, e)
+}
+
+func (n *Nats) Start(o NatsOption) (err error) {
+	n.opt = o
+	if o.Address == "" {
+		o.Address = mq.DefaultURL
+	}
+	n.Conn, err = mq.NewNatsClient(o.Address, false)
+	return
 }
 
 func (n *Nats) Stop() {
-	if n.nclient == nil {
+	if n.Conn == nil {
 		return
 	}
-	n.nclient.Release()
+	n.Conn.Release()
 }

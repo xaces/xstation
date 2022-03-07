@@ -6,6 +6,8 @@ import (
 
 	"xstation/app/db"
 
+	"xstation/middleware"
+
 	"github.com/BurntSushi/toml"
 	"github.com/wlgd/xutils"
 )
@@ -36,14 +38,16 @@ type configure struct {
 		Key  string
 	}
 	RdMQ struct {
-		Name    string
-		Address string
-		Topic   struct {
-			Online string
-			Alarm  string
-			Status string
-			Event  string
-		}
+		Enable      bool
+		Name        string
+		middleware.NatsOption
+	}
+	RdHttp struct {
+		Enable bool
+		Online string
+		Alarm  string
+		Status string
+		Event  string
 	}
 }
 
