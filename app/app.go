@@ -62,6 +62,6 @@ func Run() error {
 func Shutdown() error {
 	access.Stop()
 	router.Stop()
-	router.Stop()
+	device.Handler.Stop()
 	return nil
 }
