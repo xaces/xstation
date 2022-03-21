@@ -104,8 +104,8 @@ func (o *Serve) DeleteHandler(c *gin.Context) {
 	ctx.JSONOk().WriteTo(c)
 }
 
-// ServerRouter 服务路由
-func ServerRouter(r *gin.RouterGroup) {
+// SysServerRouter 服务路由
+func SysServerRouter(r *gin.RouterGroup) {
 	s := Serve{}
 	r.GET("/serve/list", s.ListHandler)
 	r.GET("/serve/get/:guid", s.GetHandler)

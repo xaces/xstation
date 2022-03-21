@@ -27,9 +27,15 @@ func (o *Status) ListHandler(c *gin.Context) {
 	ctx.JSONOk().Write(gin.H{"total": total, "data": data}, c)
 }
 
+// statusGet 获取
+type statusGet struct {
+	DeviceNo string `form:"deviceNo"` //
+	StatusId uint64 `form:"statusId"` //
+}
+
 // GetHandler 获取指定id
 func (o *Status) GetHandler(c *gin.Context) {
-	param := service.StatusGet{}
+	param := statusGet{}
 	if err := c.ShouldBind(&param); err != nil {
 		ctx.JSONWriteError(err, c)
 		return

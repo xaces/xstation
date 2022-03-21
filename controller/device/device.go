@@ -12,11 +12,7 @@ import (
 	"github.com/wlgd/xutils/orm"
 )
 
-
 func onlineHandler(a *xproto.Access) error {
-	if a.LinkType != xproto.LINK_Signal {
-		return xproto.ErrUnSupport
-	}
 	for _, v := range brokers {
 		v.Online(a)
 	}
@@ -25,31 +21,35 @@ func onlineHandler(a *xproto.Access) error {
 
 func AccessHandler(b []byte, a *xproto.Access) (interface{}, error) {
 	log.Printf("%s\n", b)
-	m := mnger.Device.Get(a.DeviceNo)
+	m := mnger.Device.Model(a.DeviceNo)
 	if m == nil {
 		return nil, fmt.Errorf("[%s] invalid", a.DeviceNo)
 	}
-	if a.LinkType == xproto.LINK_FileTransfer {
+	switch a.LinkType {
+	case xproto.LINK_FileTransfer:
 		filename, act := xproto.FileOfSess(a.Session)
 		if act == xproto.ACTION_Upload {
 			return nil, xproto.UploadFile(a, filename, true)
 		}
 		return xproto.DownloadFile(configs.Default.Public+"/"+filename, nil)
+	case xproto.LINK_Signal:
+		return nil, onlineHandler(a)
 	}
-	return nil, onlineHandler(a)
+	return nil, xproto.ErrUnSupport
 
 }
 
 func DroppedHandler(v interface{}, a *xproto.Access, err error) {
 	log.Println(err)
-	if a.LinkType == xproto.LINK_FileTransfer {
+	switch a.LinkType {
+	case xproto.LINK_FileTransfer:
 		_, act := xproto.FileOfSess(a.Session)
 		if act == xproto.ACTION_Upload {
 			xproto.DownloadFile("", v)
 		}
-		return
+	case xproto.LINK_Signal:
+		onlineHandler(a)
 	}
-	onlineHandler(a)
 }
 func StatusHandler(tag string, s *xproto.Status) {
 	xproto.LogStatus(tag, s)
@@ -71,7 +71,7 @@ func EventHandler(data []byte, e *xproto.Event) {
 }
 
 func devEventHandler(e *xproto.Event) {
-	m := mnger.Device.Get(e.DeviceNo)
+	m := mnger.Device.Model(e.DeviceNo)
 	if m == nil || !m.AutoFtp {
 		return
 	}

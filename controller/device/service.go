@@ -7,6 +7,7 @@ import (
 	"xstation/util"
 
 	"github.com/wlgd/xproto"
+	"github.com/wlgd/xutils/orm"
 )
 
 // 转换
@@ -22,11 +23,6 @@ func devOnlineModel(a *xproto.Access) *model.DevOnline {
 		Version:       a.Version,
 		DevType:       a.DevType,
 	}
-	if a.Online {
-		v.OnTime = a.DeviceTime
-	} else {
-		v.OffTime = a.DeviceTime
-	}
 	return v
 }
 
@@ -37,7 +33,7 @@ func devStatusModel(s *xproto.Status) *model.DevStatus {
 	}
 	o := &model.DevStatus{}
 	o.Id = util.PrimaryKey()
-	o.DeviceId = m.Id
+	o.DeviceId = m.Model.Id
 	o.DeviceNo = s.DeviceNo
 	o.DTU = s.DTU
 	o.Flag = s.Flag
@@ -57,6 +53,9 @@ func devStatusModel(s *xproto.Status) *model.DevStatus {
 	o.People = model.JPeople(s.People)
 	o.Obds = model.JObds(s.Obds)
 	o.Vols = model.JFloats(s.Vol)
+	if s.Flag == 0 {
+		m.Status = model.JDevStatus(*o)
+	}
 	return o
 }
 
@@ -82,7 +81,17 @@ func devAlarmModel(a *xproto.Alarm) *model.DevAlarm {
 func updateDevOnline(a *xproto.Access) error {
 	m := mnger.Device.Get(a.DeviceNo)
 	o := devOnlineModel(a)
-	service.DeviceUpdate(m, a.Online, o.Version, o.DevType)
+	if a.Online {
+		o.OnlineTime = a.DeviceTime
+		o.OnlineStatus = &m.Status
+	} else {
+		o.OfflineTime = a.DeviceTime
+		o.OfflineStatus = &m.Status
+	}
+	m.Model.Online = a.Online
+	m.Model.Version = a.Version
+	m.Model.Type = a.DevType
+	orm.DbUpdates(m.Model, []string{"version", "type", "online"})
 	service.DevOnlineUpdate(o)
 	return nil
 }

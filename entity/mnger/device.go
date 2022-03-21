@@ -8,23 +8,38 @@ import (
 	"github.com/wlgd/xproto"
 )
 
+type mdevice struct {
+	Model  *model.Device
+	Status model.JDevStatus
+}
+
 type deviceMapper struct {
-	lDevMap map[string]*model.Device
+	lDevMap map[string]*mdevice
 	lock    sync.RWMutex
 }
 
 var (
-	Device = &deviceMapper{lDevMap: make(map[string]*model.Device)}
+	Device = &deviceMapper{lDevMap: make(map[string]*mdevice)}
 )
 
 func (o *deviceMapper) Set(devs []model.Device) {
 	for i := 0; i < len(devs); i++ {
-		o.lDevMap[devs[i].DeviceNo] = &devs[i]
+		o.lDevMap[devs[i].DeviceNo] = &mdevice{Model: &devs[i]}
 	}
 }
 
 // Get 获取
-func (o *deviceMapper) Get(deviceNo string) *model.Device {
+func (o *deviceMapper) Model(deviceNo string) *model.Device {
+	o.lock.RLock()
+	defer o.lock.RUnlock()
+	if v, ok := o.lDevMap[deviceNo]; ok {
+		return v.Model
+	}
+	return nil
+}
+
+// Get 获取
+func (o *deviceMapper) Get(deviceNo string) *mdevice {
 	o.lock.RLock()
 	defer o.lock.RUnlock()
 	if v, ok := o.lDevMap[deviceNo]; ok {
@@ -33,11 +48,12 @@ func (o *deviceMapper) Get(deviceNo string) *model.Device {
 	return nil
 }
 
+
 // Add 添加
 func (o *deviceMapper) Add(dev *model.Device) {
 	o.lock.Lock()
 	defer o.lock.Unlock()
-	o.lDevMap[dev.DeviceNo] = dev
+	o.lDevMap[dev.DeviceNo] = &mdevice{Model: dev}
 }
 
 // Delete 删除
@@ -49,7 +65,7 @@ func (o *deviceMapper) Delete(deviceNo string) {
 }
 
 func (o *deviceMapper) StatusModel(deviceNo string) interface{} {
-	dev := o.Get(deviceNo)
+	dev := o.Model(deviceNo)
 	if dev == nil {
 		return nil
 	}

@@ -27,7 +27,7 @@ func (s *OnlinePage) Where() *orm.DbWhere {
 
 // DevOnlineUpdate 更新链路信息
 func DevOnlineUpdate(m *model.DevOnline) error {
-	if m.OffTime == "" {
+	if m.OfflineTime == "" {
 		return orm.DbCreate(m)
 	}
 	return orm.DbUpdateModelBy(m, "guid = ?", m.Guid)

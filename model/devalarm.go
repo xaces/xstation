@@ -34,7 +34,7 @@ const (
 )
 
 // 报警关联信息
-type DevAlarmLink struct {
+type DevAlarmDetails struct {
 	Id       uint64 `json:"id" gorm:"primary_key"`
 	Guid     string `json:"guid"`     // guid和DevAlarm.guid用来关联
 	LinkType lnType `json:"linkType"` // 数据类型
@@ -43,8 +43,8 @@ type DevAlarmLink struct {
 }
 
 // TableName 表名
-func (s *DevAlarmLink) TableName() string {
-	return "t_devalarmlink"
+func (s *DevAlarmDetails) TableName() string {
+	return "t_devalarmdetails"
 }
 
 // 报警关联信息

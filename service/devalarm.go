@@ -33,7 +33,7 @@ func (s *AlarmPage) Where() *orm.DbWhere {
 	return &where
 }
 
-type AlarmLinkPage struct {
+type AlarmDetailsPage struct {
 	PageNum   int    `form:"pageNum"`  // 当前页码
 	PageSize  int    `form:"pageSize"` // 每页数
 	DeviceNo  string `form:"deviceNo"` //
@@ -44,7 +44,7 @@ type AlarmLinkPage struct {
 	AlarmType int    `form:"alarmType"`
 }
 
-func (s *AlarmLinkPage) Where() *orm.DbWhere {
+func (s *AlarmDetailsPage) Where() *orm.DbWhere {
 	var where orm.DbWhere
 	where.String("dtu >= ?", s.StartTime)
 	where.String("dtu <= ?", s.EndTime)
@@ -62,7 +62,7 @@ func (s *AlarmLinkPage) Where() *orm.DbWhere {
 // }
 
 func alarmLinkCreate(alr *model.DevAlarm) error {
-	l := &model.DevAlarmLink{}
+	l := &model.DevAlarmDetails{}
 	l.Guid = alr.Guid
 	l.DevAlarmOpt = alr.DevAlarmOpt
 	l.LinkType = model.AlarmLinkDev

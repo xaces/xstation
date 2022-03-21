@@ -23,22 +23,7 @@ func (o *Online) ListHandler(c *gin.Context) {
 	ctx.JSONOk().WriteData(gin.H{"total": total, "data": data}, c)
 }
 
-func (o *Online) AddHandler(c *gin.Context) {
-	var data model.DevOnline
-	//获取参数
-	if err := c.ShouldBind(&data); err != nil {
-		ctx.JSONWriteError(err, c)
-		return
-	}
-	if err := orm.DbCreate(&data); err != nil {
-		ctx.JSONWriteError(err, c)
-		return
-	}
-	ctx.JSONOk().WriteTo(c)
-}
-
 func OnlineRouter(r *gin.RouterGroup) {
 	on := Online{}
-	r.POST("/online", on.AddHandler)
 	r.GET("/online/list", on.ListHandler)
 }

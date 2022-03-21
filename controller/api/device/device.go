@@ -28,18 +28,7 @@ func (o *Device) ListHandler(c *gin.Context) {
 
 // GetHandler 获取指定id
 func (o *Device) GetHandler(c *gin.Context) {
-	id, err := ctx.ParamInt(c, "id")
-	if err != nil {
-		ctx.JSONWriteError(err, c)
-		return
-	}
-	var data model.Device
-	err = orm.DbFirstById(&data, id)
-	if err != nil {
-		ctx.JSONWriteError(err, c)
-		return
-	}
-	ctx.JSONOk().WriteData(data, c)
+	service.BasicGet(&model.Device{}, c)
 }
 
 // AddHandler 新增
@@ -83,6 +72,27 @@ func (o *Device) UpdateHandler(c *gin.Context) {
 	ctx.JSONOk().WriteTo(c)
 }
 
+// deviceOrganizationReset 更新
+type deviceOrganizationReset struct {
+	DeviceIds  string `json:"deviceIds"`
+	OrganizeId int    `json:"organizeId"`
+}
+
+func (o *Device) UpdateOrganizationHandler(c *gin.Context) {
+	var param deviceOrganizationReset
+	//获取参数
+	if err := c.ShouldBind(&param); err != nil {
+		ctx.JSONWriteError(err, c)
+		return
+	}
+	ids := util.StringToIntSlice(param.DeviceIds, ",")
+	if err := orm.DbUpdateByIds(&model.Device{}, ids, map[string]interface{}{"organize_id": param.OrganizeId}); err != nil {
+		ctx.JSONWriteError(err, c)
+		return
+	}
+	ctx.JSONOk().WriteTo(c)
+}
+
 // DeleteHandler 删除
 func (o *Device) DeleteHandler(c *gin.Context) {
 	idstr := ctx.ParamString(c, "id")
@@ -106,11 +116,12 @@ func (o *Device) DeleteHandler(c *gin.Context) {
 	ctx.JSONOk().WriteTo(c)
 }
 
-func Router(r *gin.RouterGroup) {
+func DeviceRouter(r *gin.RouterGroup) {
 	d := Device{}
 	r.GET("/list", d.ListHandler)
 	r.GET("/:id", d.GetHandler)
 	r.POST("", d.AddHandler)
 	r.PUT("", d.UpdateHandler)
+	r.PUT("/organization/reset", d.UpdateOrganizationHandler)
 	r.DELETE("/:id", d.DeleteHandler)
 }

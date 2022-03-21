@@ -25,9 +25,3 @@ func (s *StatusPage) Where() *orm.DbWhere {
 	where.Orders = append(where.Orders, "dtu desc")
 	return &where
 }
-
-// StatusGet 获取
-type StatusGet struct {
-	DeviceNo string `form:"deviceNo"` //
-	StatusId uint64 `form:"statusId"` //
-}
