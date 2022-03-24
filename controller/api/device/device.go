@@ -48,24 +48,15 @@ func (o *Device) AddHandler(c *gin.Context) {
 	ctx.JSONOk().WriteTo(c)
 }
 
-// deviceUpdate 更新
-type deviceUpdate struct {
-	model.DeviceOpt
-	Id uint64 `json:"id"`
-}
-
 // UpdateHandler 修改
 func (o *Device) UpdateHandler(c *gin.Context) {
-	var param deviceUpdate
+	var data model.Device
 	//获取参数
-	if err := c.ShouldBind(&param); err != nil {
+	if err := c.ShouldBind(&data.DeviceOpt); err != nil {
 		ctx.JSONWriteError(err, c)
 		return
 	}
-	data := &model.Device{
-		DeviceOpt: param.DeviceOpt,
-	}
-	if err := orm.DbUpdateById(&data, param.Id); err != nil {
+	if err := orm.DbUpdateModel(&data); err != nil {
 		ctx.JSONWriteError(err, c)
 		return
 	}

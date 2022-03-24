@@ -72,7 +72,7 @@ func EventHandler(data []byte, e *xproto.Event) {
 
 func devEventHandler(e *xproto.Event) {
 	m := mnger.Device.Model(e.DeviceNo)
-	if m == nil || !m.AutoFtp {
+	if m == nil {
 		return
 	}
 	switch e.Type {

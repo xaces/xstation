@@ -27,7 +27,7 @@ func (s *DevicePage) Where() *orm.DbWhere {
 	where.String("device_name like ?", s.DeviceName)
 	where.String("organize_guid = ?", s.OrganizeGuid)
 	if s.OrganizeId != nil {
-		where.Int("organize_id = ?", *s.OrganizeId)
+		where.Append("organize_id = ?", *s.OrganizeId)
 	}
 	return &where
 }
