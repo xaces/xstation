@@ -1,10 +1,10 @@
 package model
 
 type DeviceBasic struct {
-	ChlsCount int    `json:"chlsCount"`
-	ChlsName  string `json:"chlsName" gorm:"comment:通道别名,隔开;"`
-	IosCount  int    `json:"iosCount"`
-	IosName   string `json:"iosName" gorm:"comment:io别名,隔开;"`
+	ChlCount int    `json:"chlCount"`
+	ChlNames string `json:"chlNames" gorm:"comment:通道别名,隔开;"`
+	IoCount  int    `json:"ioCount"`
+	IoNames  string `json:"ioNames" gorm:"comment:io别名,隔开;"`
 }
 
 type DeviceOpt struct {
@@ -13,8 +13,8 @@ type DeviceOpt struct {
 	DeviceName string `json:"deviceName"`
 	Icon       string `json:"icon"`
 	DeviceBasic
-	OrganizeGuid string `json:"organizeGuid"` // 组织GUid
-	OrganizeId   uint64 `json:"organizeId"`   // 分组Id
+	OrganizeId   uint64 `json:"organizeId"` // 分组Id
+	OrganizeGuid string `json:"organizeGuid"`
 	Details      string `json:"details"`
 }
 
@@ -25,7 +25,7 @@ type Device struct {
 	Version        string `json:"version" gorm:"type:varchar(20);"`
 	Online         bool   `json:"online"`
 	LastOnlineTime string `json:"lastOnlineTime"`
-	ValidTime      jtime  `json:"validTime"`
+	EffectiveTime  jtime  `json:"effectiveTime"`
 	ModelTime
 }
 

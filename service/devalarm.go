@@ -8,8 +8,7 @@ import (
 
 // AlarmPage 分页
 type AlarmPage struct {
-	PageNum   int    `form:"pageNum"`  // 当前页码
-	PageSize  int    `form:"pageSize"` // 每页数
+	orm.DbPage
 	StartTime string `form:"startTime"`
 	EndTime   string `form:"endTime"`
 	DeviceNo  string `form:"deviceNo"` //
@@ -25,17 +24,16 @@ type AlarmPage struct {
 // }
 
 func (s *AlarmPage) Where() *orm.DbWhere {
-	var where orm.DbWhere
+	where := s.DbWhere()
 	where.String("start_time >= ?", s.StartTime)
 	where.String("start_time <= ?", s.EndTime)
 	where.String("device_no like ?", s.DeviceNo)
 	where.Orders = append(where.Orders, "dtu desc")
-	return &where
+	return where
 }
 
 type AlarmDetailsPage struct {
-	PageNum   int    `form:"pageNum"`  // 当前页码
-	PageSize  int    `form:"pageSize"` // 每页数
+	orm.DbPage
 	DeviceNo  string `form:"deviceNo"` //
 	Guid      string `form:"guid"`     //
 	LinkType  int    `form:"linkType"` //
@@ -45,7 +43,7 @@ type AlarmDetailsPage struct {
 }
 
 func (s *AlarmDetailsPage) Where() *orm.DbWhere {
-	var where orm.DbWhere
+	where := s.DbWhere()
 	where.String("dtu >= ?", s.StartTime)
 	where.String("dtu <= ?", s.EndTime)
 	where.String("guid = ?", s.Guid)
@@ -53,7 +51,7 @@ func (s *AlarmDetailsPage) Where() *orm.DbWhere {
 	where.Int("type = ?", s.AlarmType)
 	where.Int("link_type", s.LinkType)
 	where.Orders = append(where.Orders, "dtu desc")
-	return &where
+	return where
 }
 
 // type AlarmData struct {

@@ -22,7 +22,7 @@ func (o *Device) ListHandler(c *gin.Context) {
 		return
 	}
 	var data []model.Device
-	total, _ := orm.DbPage(&model.Device{}, param.Where()).Find(param.PageNum, param.PageSize, &data)
+	total, _ := orm.DbByWhere(&data, param.Where()).Find(&data)
 	ctx.JSONOk().Write(gin.H{"total": total, "data": data}, c)
 }
 
@@ -63,20 +63,20 @@ func (o *Device) UpdateHandler(c *gin.Context) {
 	ctx.JSONOk().WriteTo(c)
 }
 
-// deviceOrganizationReset 更新
-type deviceOrganizationReset struct {
-	DeviceIds  string `json:"deviceIds"`
+// resetOrganize 更新
+type resetOrganize struct {
+	Devices    string `json:"devices"`
 	OrganizeId int    `json:"organizeId"`
 }
 
-func (o *Device) UpdateOrganizationHandler(c *gin.Context) {
-	var param deviceOrganizationReset
+func (o *Device) ResetOrganizeHandler(c *gin.Context) {
+	var param resetOrganize
 	//获取参数
 	if err := c.ShouldBind(&param); err != nil {
 		ctx.JSONWriteError(err, c)
 		return
 	}
-	ids := util.StringToIntSlice(param.DeviceIds, ",")
+	ids := util.StringToIntSlice(param.Devices, ",")
 	if err := orm.DbUpdateByIds(&model.Device{}, ids, map[string]interface{}{"organize_id": param.OrganizeId}); err != nil {
 		ctx.JSONWriteError(err, c)
 		return
@@ -113,6 +113,6 @@ func DeviceRouter(r *gin.RouterGroup) {
 	r.GET("/:id", d.GetHandler)
 	r.POST("", d.AddHandler)
 	r.PUT("", d.UpdateHandler)
-	r.PUT("/organization/reset", d.UpdateOrganizationHandler)
+	r.PUT("/resetOrganize", d.ResetOrganizeHandler)
 	r.DELETE("/:id", d.DeleteHandler)
 }

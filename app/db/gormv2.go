@@ -16,7 +16,6 @@ import (
 
 func initTables(db *gorm.DB) {
 	db.AutoMigrate(
-		&model.SysServe{},
 		&model.Device{},
 		&model.DevOnline{},
 		&model.DevAlarm{},

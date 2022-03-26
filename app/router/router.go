@@ -10,7 +10,6 @@ import (
 	"xstation/controller/api"
 
 	"xstation/controller/api/device"
-	"xstation/controller/api/system"
 
 	"github.com/gin-gonic/gin"
 )
@@ -24,7 +23,6 @@ func newApp() *gin.Engine {
 	v1 := root.Group("/api")
 	v1.POST("/upload", api.UploadHandler)
 	v1.StaticFS("/public", http.Dir(configs.Default.Public))
-	system.InitRouters(v1)
 	device.InitRouters(v1)
 	return r
 }

@@ -13,24 +13,24 @@ type Alarm struct {
 }
 
 func (o *Alarm) ListHandler(c *gin.Context) {
-	var param service.AlarmPage
-	if err := c.ShouldBind(&param); err != nil {
+	var p service.AlarmPage
+	if err := c.ShouldBind(&p); err != nil {
 		ctx.JSONWriteError(err, c)
 		return
 	}
 	var data []model.DevAlarm
-	total, _ := orm.DbPage(&model.DevAlarm{}, param.Where()).Find(param.PageNum, param.PageSize, &data)
+	total, _ := orm.DbByWhere(&model.DevAlarm{}, p.Where()).Find(&data)
 	ctx.JSONOk().Write(gin.H{"total": total, "data": data}, c)
 }
 
 func (o *Alarm) ListDetailsHandler(c *gin.Context) {
-	var param service.AlarmDetailsPage
-	if err := c.ShouldBind(&param); err != nil {
+	var p service.AlarmDetailsPage
+	if err := c.ShouldBind(&p); err != nil {
 		ctx.JSONWriteError(err, c)
 		return
 	}
 	var data []model.DevAlarmDetails
-	total, _ := orm.DbPage(&model.DevAlarmDetails{}, param.Where()).Find(param.PageNum, param.PageSize, &data)
+	total, _ := orm.DbByWhere(&model.DevAlarmDetails{}, p.Where()).Find(&data)
 	ctx.JSONOk().Write(gin.H{"total": total, "data": data}, c)
 }
 
