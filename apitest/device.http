@@ -45,6 +45,15 @@ Content-Type: application/json
 }
 
 
+### 设备信息
+PUT http://127.0.0.1:12100/station/api/device/resetOrganize
+Content-Type: application/json
+
+{
+    "deviceIds": "1,2,4,90",
+    "organizeId": 1
+}
+
 ### 更新设备信息
 PUT http://127.0.0.1:12100/station/api/device
 Content-Type: application/json

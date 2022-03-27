@@ -97,19 +97,19 @@ func (o *Device) UpdateHandler(c *gin.Context) {
 
 // resetOrganize 更新
 type resetOrganize struct {
-	Devices    string `json:"devices"`
+	DeviceIds  string `json:"deviceIds"`
 	OrganizeId int    `json:"organizeId"`
 }
 
 func (o *Device) ResetOrganizeHandler(c *gin.Context) {
-	var param resetOrganize
+	var p resetOrganize
 	//获取参数
-	if err := c.ShouldBind(&param); err != nil {
+	if err := c.ShouldBind(&p); err != nil {
 		ctx.JSONWriteError(err, c)
 		return
 	}
-	ids := util.StringToIntSlice(param.Devices, ",")
-	if err := orm.DbUpdateByIds(&model.Device{}, ids, map[string]interface{}{"organize_id": param.OrganizeId}); err != nil {
+	ids := util.StringToIntSlice(p.DeviceIds, ",")
+	if err := orm.DbUpdateByIds(&model.Device{}, ids, orm.H{"organize_id": p.OrganizeId}); err != nil {
 		ctx.JSONWriteError(err, c)
 		return
 	}
