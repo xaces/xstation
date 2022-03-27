@@ -22,9 +22,11 @@ var (
 	Device = &deviceMapper{lDevMap: make(map[string]*mdevice)}
 )
 
-func (o *deviceMapper) Set(devs []model.Device) {
-	for i := 0; i < len(devs); i++ {
-		o.lDevMap[devs[i].DeviceNo] = &mdevice{Model: &devs[i]}
+func (o *deviceMapper) Set(d []model.Device) {
+	o.lock.Lock()
+	defer o.lock.Unlock()
+	for i := 0; i < len(d); i++ {
+		o.lDevMap[d[i].DeviceNo] = &mdevice{Model: &d[i]}
 	}
 }
 
@@ -47,7 +49,6 @@ func (o *deviceMapper) Get(deviceNo string) *mdevice {
 	}
 	return nil
 }
-
 
 // Add 添加
 func (o *deviceMapper) Add(dev *model.Device) {

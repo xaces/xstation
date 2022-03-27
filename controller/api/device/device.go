@@ -1,6 +1,7 @@
 package device
 
 import (
+	"fmt"
 	"xstation/entity/mnger"
 	"xstation/model"
 	"xstation/service"
@@ -45,6 +46,37 @@ func (o *Device) AddHandler(c *gin.Context) {
 		return
 	}
 	mnger.Device.Add(&data)
+	ctx.JSONOk().WriteTo(c)
+}
+
+type batchAdd struct {
+	Prefix      string `json:"prefix"`
+	StartNumber int    `json:"startNumber"`
+	Count       int    `json:"count"`
+	model.DeviceOpt
+}
+
+// BatchAddHandler 新增
+func (o *Device) BatchAddHandler(c *gin.Context) {
+	var p batchAdd
+	//获取参数
+	if err := c.ShouldBind(&p); err != nil {
+		ctx.JSONWriteError(err, c)
+		return
+	}
+	var data []model.Device
+	for i := 0; i < p.Count; i++ {
+		v := model.Device{}
+		v.DeviceOpt = p.DeviceOpt
+		v.DeviceNo = fmt.Sprintf("%s%04d", p.Prefix, p.StartNumber+i)
+		v.DeviceName = v.DeviceNo
+		data = append(data, v)
+	}
+	if err := orm.DbCreate(&data); err != nil {
+		ctx.JSONWriteError(err, c)
+		return
+	}
+	mnger.Device.Set(data)
 	ctx.JSONOk().WriteTo(c)
 }
 
@@ -112,6 +144,7 @@ func DeviceRouter(r *gin.RouterGroup) {
 	r.GET("/list", d.ListHandler)
 	r.GET("/:id", d.GetHandler)
 	r.POST("", d.AddHandler)
+	r.POST("/batchAdd", d.BatchAddHandler)
 	r.PUT("", d.UpdateHandler)
 	r.PUT("/resetOrganize", d.ResetOrganizeHandler)
 	r.DELETE("/:id", d.DeleteHandler)
