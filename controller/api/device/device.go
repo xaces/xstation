@@ -2,6 +2,7 @@ package device
 
 import (
 	"fmt"
+	"strconv"
 	"xstation/entity/mnger"
 	"xstation/model"
 	"xstation/service"
@@ -64,12 +65,14 @@ func (o *Device) BatchAddHandler(c *gin.Context) {
 		ctx.JSONWriteError(err, c)
 		return
 	}
+	lzero := len(strconv.Itoa(p.StartNumber + p.Count-1))
 	var data []model.Device
 	for i := 0; i < p.Count; i++ {
 		v := model.Device{}
 		v.DeviceOpt = p.DeviceOpt
-		v.DeviceNo = fmt.Sprintf("%s%04d", p.Prefix, p.StartNumber+i)
+		v.DeviceNo = fmt.Sprintf("%s%0*d", p.Prefix, lzero, p.StartNumber+i)
 		v.DeviceName = v.DeviceNo
+		v.Guid = util.UUID()
 		data = append(data, v)
 	}
 	if err := orm.DbCreate(&data); err != nil {
