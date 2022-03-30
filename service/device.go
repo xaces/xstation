@@ -8,6 +8,7 @@ import (
 
 // DevicePage 分页
 type DevicePage struct {
+	orm.DbPage
 	DeviceNo     string `form:"deviceNo"`
 	DeviceName   string `form:"deviceName"`
 	OrganizeGuid string `form:"organizeGuid"`
@@ -16,14 +17,14 @@ type DevicePage struct {
 
 // Where 初始化
 func (s *DevicePage) Where() *orm.DbWhere {
-	var where orm.DbWhere
+	where := s.DbWhere()
 	where.String("device_no like ?", s.DeviceNo)
 	where.String("device_name like ?", s.DeviceName)
 	where.String("organize_guid = ?", s.OrganizeGuid)
 	if s.OrganizeId != nil {
 		where.Append("organize_id = ?", *s.OrganizeId)
 	}
-	return &where
+	return where
 }
 
 func DeviceUpdate(m *model.Device, online bool, version, dtype string) error {

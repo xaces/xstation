@@ -25,7 +25,7 @@ type Device struct {
 	Version        string `json:"version" gorm:"type:varchar(20);"`
 	Online         bool   `json:"online"`
 	LastOnlineTime string `json:"lastOnlineTime"`
-	EffectiveTime  jtime  `json:"effectiveTime"`
+	EffectiveTime  string `json:"effectiveTime"`
 	ModelTime
 }
 
