@@ -1,22 +1,22 @@
 
-### jt808
-POST http://127.0.0.1:12100/station/api/device/request/jt808?deviceId=20198002
+### user
+POST http://127.0.0.1:12100/station/api/device/request/user?deviceNo=20198002
 Content-Type: application/json
 
 {
     "codeId": "0x8107"
 }
 
-### jt808
-POST http://127.0.0.1:12100/station/api/device/request/jt808?deviceId=20198002
+### user
+POST http://127.0.0.1:12100/station/api/device/request/user?deviceNo=20198002
 Content-Type: application/json
 
 {
     "codeId": "0x8201"
 }
 
-### jt808
-POST http://127.0.0.1:12100/station/api/device/request/jt808?deviceId=20198002
+### user
+POST http://127.0.0.1:12100/station/api/device/request/user?deviceNo=20198002
 Content-Type: application/json
 
 {
@@ -27,8 +27,8 @@ Content-Type: application/json
     }
 }
 
-### jt808
-POST http://127.0.0.1:12100/station/api/device/request/jt808?deviceId=20198002
+### user
+POST http://127.0.0.1:12100/station/api/device/request/user?deviceNo=20198002
 Content-Type: application/json
 
 {
@@ -39,8 +39,8 @@ Content-Type: application/json
     }
 }
 
-### jt808
-POST http://127.0.0.1:12100/station/api/device/request/jt808?deviceId=20198002
+### user
+POST http://127.0.0.1:12100/station/api/device/request/user?deviceNo=20198002
 Content-Type: application/json
 
 {
@@ -51,8 +51,8 @@ Content-Type: application/json
     }
 }
 
-### jt808
-POST http://127.0.0.1:12100/station/api/device/request/jt808?deviceId=20198002
+### user
+POST http://127.0.0.1:12100/station/api/device/request/user?deviceNo=20198002
 Content-Type: application/json
 
 {
@@ -72,8 +72,8 @@ Content-Type: application/json
     }
 }
 
-### jt808
-POST http://127.0.0.1:12100/station/api/device/request/jt808?deviceId=20198002
+### user
+POST http://127.0.0.1:12100/station/api/device/request/user?deviceNo=20198002
 Content-Type: application/json
 
 {
@@ -93,8 +93,8 @@ Content-Type: application/json
     }
 }
 
-### jt808
-POST http://127.0.0.1:12100/station/api/device/request/jt808?deviceId=20198002
+### user
+POST http://127.0.0.1:12100/station/api/device/request/user?deviceNo=20198002
 Content-Type: application/json
 
 {
@@ -105,8 +105,8 @@ Content-Type: application/json
     }
 }
 
-### jt808
-POST http://127.0.0.1:12100/station/api/device/request/jt808?deviceId=20198002
+### user
+POST http://127.0.0.1:12100/station/api/device/request/user?deviceNo=20198002
 Content-Type: application/json
 
 {
@@ -117,8 +117,8 @@ Content-Type: application/json
     }
 }
 
-### jt808
-POST http://127.0.0.1:12100/station/api/device/request/jt808?deviceId=20198002
+### user
+POST http://127.0.0.1:12100/station/api/device/request/user?deviceNo=20198002
 Content-Type: application/json
 
 {

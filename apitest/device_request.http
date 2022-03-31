@@ -1,17 +1,17 @@
 ### 录像查询
-POST http://127.0.0.1:12100/station/api/device/request/query?deviceId=20198002
+POST http://127.0.0.1:12100/station/api/device/request/query?deviceNo=20198002
 Content-Type: application/json
 
 {
-    "startTime": "2021-09-06 00:00:00",
-    "endTime": "2021-09-06 23:59:59",
-    "channelList": "1;2;3;4;5;6;7;8",
+    "startTime": "2021-12-15 00:00:00",
+    "endTime": "2021-12-15 23:59:59",
+    "channelList": "1",
     "fileType": 1
 }
 
 ### 实时流请求
 // streamType 0 子码流 1 主码流
-POST http://127.0.0.1:12100/station/api/device/request/liveStream?deviceId=20198002
+POST http://127.0.0.1:12100/station/api/device/request/liveStream?deviceNo=20198002
 Content-Type: application/json
 
 {
@@ -25,7 +25,7 @@ Content-Type: application/json
 
 ### 远程回放
 // fileName 设备文件名
-POST http://127.0.0.1:12100/station/api/device/request/playback?deviceId=20198002
+POST http://127.0.0.1:12100/station/api/device/request/playback?deviceNo=20198002
 Content-Type: application/json
 
 {
@@ -36,20 +36,20 @@ Content-Type: application/json
 
 ### 远程回放
 // 按时间段回放
-POST http://127.0.0.1:12100/station/api/device/request/playback?deviceId=20198002
+POST http://127.0.0.1:12100/station/api/device/request/playback?deviceNo=20198002
 Content-Type: application/json
 
 {
-    "server": "172.16.50.252:12320",
-    "startTime": "2021-09-06 09:00:00",
-    "endTime": "2021-09-06 09:00:10",
-    "channels": "1;2"
+    "server": "172.16.50.219:22000",
+    "startTime": "2022-03-07 09:00:00",
+    "endTime": "2022-03-07 09:02:00",
+    "channels": "2"
 }
 
 
 ### 设备控制
 
-POST http://127.0.0.1:12100/station/api/device/request/control?deviceId=20198002
+POST http://127.0.0.1:12100/station/api/device/request/control?deviceNo=20198002
 Content-Type: application/json
 
 {
@@ -58,7 +58,7 @@ Content-Type: application/json
 
 ### ftp文件传输
 
-POST http://127.0.0.1:12100/station/api/device/request/ftpTransfer?deviceId=20198002
+POST http://127.0.0.1:12100/station/api/device/request/ftpTransfer?deviceNo=20198002
 Content-Type: application/json
 
 {
@@ -71,7 +71,7 @@ Content-Type: application/json
 
 ### file文件传输
 
-POST http://127.0.0.1:12100/station/api/device/request/fileTransfer?deviceId=20198002
+POST http://127.0.0.1:12100/station/api/device/request/fileTransfer?deviceNo=20198002
 Content-Type: application/json
 
 {
@@ -85,20 +85,20 @@ Content-Type: application/json
 
 ### file文件传输
 
-POST http://127.0.0.1:12100/station/api/device/request/fileTransfer?deviceId=20198002
+POST http://127.0.0.1:12100/station/api/device/request/fileTransfer?deviceNo=20198002
 Content-Type: application/json
 
 {
-    "fileName": "HW3521V2-V18092801-V210608T0.144.sw",
+    "fileName": "Z:\\mdvr_protocol\\LINUX\\tag\\howen_20190916\\app_hw3520\\release\\HW3520D-V16072701-V220304T0.491.sw",
     "fileType": 5,
     "action": 1,
-    "server": "172.16.50.219:33000",
+    "server": "172.16.50.219:22000",
     "offset": 0
 }
 
 ### 串口透传设置, 应答的session用于透传数据, 设置为"", 系统会自动生成并返回。
 
-POST http://127.0.0.1:12100/station/api/device/request/transparent?deviceId=20198002
+POST http://127.0.0.1:12100/station/api/device/request/transparent?deviceNo=20198002
 Content-Type: application/json
 
 {
@@ -114,7 +114,7 @@ Content-Type: application/json
 # type:1 字符串 如 abcdefg
 # type:2 Hex   031F269D
 
-POST http://127.0.0.1:12100/station/api/device/request/transfer?deviceId=20198002&session=ca03fffb-0310-4cc1-8191-e4aae455b7f8
+POST http://127.0.0.1:12100/station/api/device/request/transfer?deviceNo=20198002&session=ca03fffb-0310-4cc1-8191-e4aae455b7f8
 Content-Type: application/json
 
 {
@@ -125,7 +125,7 @@ Content-Type: application/json
 
 ### 关闭链接, session存在关闭媒体链路。不存在关闭信令链路
 
-POST http://127.0.0.1:12100/station/api/device/request/close?deviceId=20198002&session=ca03fffb-0310-4cc1-8191-e4aae455b7f8
+POST http://127.0.0.1:12100/station/api/device/request/close?deviceNo=20198002&session=ca03fffb-0310-4cc1-8191-e4aae455b7f8
 Content-Type: application/json
 
 {

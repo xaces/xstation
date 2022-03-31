@@ -1,16 +1,16 @@
 
 ### 参数设置
 
-POST http://127.0.0.1:12100/station/api/device/request/parameters?deviceId=20198002
+POST http://127.0.0.1:12100/station/api/device/request/parameters?deviceNo=20198002
 Content-Type: application/json
 
 {
-   "jtparameter": {}
+   "jtparameter": []
 }
 
 ### 参数获取
 
-POST http://127.0.0.1:12100/station/api/device/request/parameters?deviceId=20198002
+POST http://127.0.0.1:12100/station/api/device/request/parameters?deviceNo=20198002
 Content-Type: application/json
 
 {
@@ -32,7 +32,7 @@ Content-Type: application/json
 
 ### 参数获取
 
-POST http://127.0.0.1:12100/station/api/device/request/parameters?deviceId=20198002
+POST http://127.0.0.1:12100/station/api/device/request/parameters?deviceNo=20198002
 Content-Type: application/json
 
 {
@@ -49,7 +49,7 @@ Content-Type: application/json
 
 ### 参数设置
 
-POST http://127.0.0.1:12100/station/api/device/request/parameters?deviceId=20198002
+POST http://127.0.0.1:12100/station/api/device/request/parameters?deviceNo=20198002
 Content-Type: application/json
 
 {
@@ -66,7 +66,7 @@ Content-Type: application/json
 
 ### AIBox参数设置
 
-POST http://127.0.0.1:12100/station/api/device/request/parameters?deviceId=20198002
+POST http://127.0.0.1:12100/station/api/device/request/parameters?deviceNo=20198002
 Content-Type: application/json
 
 {
@@ -76,7 +76,7 @@ Content-Type: application/json
 
 ### Gps角度优化
 
-POST http://127.0.0.1:12100/station/api/device/request/parameters?deviceId=20198002
+POST http://127.0.0.1:12100/station/api/device/request/parameters?deviceNo=20198002
 Content-Type: application/json
 
 {
@@ -85,4 +85,13 @@ Content-Type: application/json
         "dg": "1000",
         "on": "1"
     }
+}
+
+### 司机信息
+
+POST http://127.0.0.1:12100/station/api/device/request/parameters?deviceNo=800888
+Content-Type: application/json
+
+{
+    "DRIVERS": ""
 }
