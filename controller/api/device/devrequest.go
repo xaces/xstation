@@ -35,8 +35,8 @@ func QueryHandler(c *gin.Context) {
 		ctx.JSONWriteError(err, c)
 		return
 	}
-	var resp []xproto.QueryResult
-	if err := xproto.SyncSend(xproto.REQ_Query, param, &resp, i.deviceId); err != nil {
+	var resp []xproto.File
+	if err := xproto.SyncSend(xproto.Req_Query, param, &resp, i.deviceId); err != nil {
 		ctx.JSONWriteError(err, c)
 		return
 	}
@@ -52,7 +52,7 @@ func ParametersHandler(c *gin.Context) {
 		return
 	}
 	var resp interface{}
-	if err := xproto.SyncSend(xproto.REQ_Parameters, param, &resp, i.deviceId); err != nil {
+	if err := xproto.SyncSend(xproto.Req_Parameters, param, &resp, i.deviceId); err != nil {
 		ctx.JSONWriteError(err, c)
 		return
 	}
@@ -67,9 +67,9 @@ func ControlPTZHandler(c *gin.Context) {
 		ctx.JSONWriteError(err, c)
 		return
 	}
-	param.Type = xproto.CTRL_PTZ
+	param.Type = xproto.Ctrl_PTZ
 	var resp interface{}
-	if err := xproto.SyncSend(xproto.REQ_Control, param, &resp, i.deviceId); err != nil {
+	if err := xproto.SyncSend(xproto.Req_Control, param, &resp, i.deviceId); err != nil {
 		ctx.JSONWriteError(err, c)
 		return
 	}
@@ -83,9 +83,9 @@ func ControlRebootHandler(c *gin.Context) {
 		ctx.JSONWriteError(err, c)
 		return
 	}
-	param := xproto.Control{Type: xproto.CTRL_Reboot}
+	param := xproto.Control{Type: xproto.Ctrl_Reboot}
 	var resp interface{}
-	if err := xproto.SyncSend(xproto.REQ_Control, param, &resp, i.deviceId); err != nil {
+	if err := xproto.SyncSend(xproto.Req_Control, param, &resp, i.deviceId); err != nil {
 		ctx.JSONWriteError(err, c)
 		return
 	}
@@ -100,9 +100,9 @@ func ControlCaptureHandler(c *gin.Context) {
 		ctx.JSONWriteError(err, c)
 		return
 	}
-	param.Type = xproto.CTRL_Capture
+	param.Type = xproto.Ctrl_Capture
 	var resp interface{}
-	if err := xproto.SyncSend(xproto.REQ_Control, param, &resp, i.deviceId); err != nil {
+	if err := xproto.SyncSend(xproto.Req_Control, param, &resp, i.deviceId); err != nil {
 		ctx.JSONWriteError(err, c)
 		return
 	}
@@ -117,9 +117,9 @@ func ControlOsdHandler(c *gin.Context) {
 		ctx.JSONWriteError(err, c)
 		return
 	}
-	param.Type = xproto.CTRL_OsdSpeed
+	param.Type = xproto.Ctrl_OsdSpeed
 	var resp interface{}
-	if err := xproto.SyncSend(xproto.REQ_Control, param, &resp, i.deviceId); err != nil {
+	if err := xproto.SyncSend(xproto.Req_Control, param, &resp, i.deviceId); err != nil {
 		ctx.JSONWriteError(err, c)
 		return
 	}
@@ -134,9 +134,9 @@ func ControlGsensorHandler(c *gin.Context) {
 		ctx.JSONWriteError(err, c)
 		return
 	}
-	param.Type = xproto.CTRL_Vehi
+	param.Type = xproto.Ctrl_Vehi
 	var resp interface{}
-	if err := xproto.SyncSend(xproto.REQ_Control, param, &resp, i.deviceId); err != nil {
+	if err := xproto.SyncSend(xproto.Req_Control, param, &resp, i.deviceId); err != nil {
 		ctx.JSONWriteError(err, c)
 		return
 	}
@@ -150,9 +150,9 @@ func ControlVehicleHandler(c *gin.Context) {
 		ctx.JSONWriteError(err, c)
 		return
 	}
-	param := &xproto.Control{Type: xproto.CTRL_Vehi}
+	param := &xproto.Control{Type: xproto.Ctrl_Vehi}
 	var resp interface{}
-	if err := xproto.SyncSend(xproto.REQ_Control, param, &resp, i.deviceId); err != nil {
+	if err := xproto.SyncSend(xproto.Req_Control, param, &resp, i.deviceId); err != nil {
 		ctx.JSONWriteError(err, c)
 		return
 	}
@@ -166,9 +166,9 @@ func ControlResetHandler(c *gin.Context) {
 		ctx.JSONWriteError(err, c)
 		return
 	}
-	param := &xproto.Control{Type: xproto.CTRL_Reset}
+	param := &xproto.Control{Type: xproto.Ctrl_Reset}
 	var resp interface{}
-	if err := xproto.SyncSend(xproto.REQ_Control, param, &resp, i.deviceId); err != nil {
+	if err := xproto.SyncSend(xproto.Req_Control, param, &resp, i.deviceId); err != nil {
 		ctx.JSONWriteError(err, c)
 		return
 	}
@@ -185,7 +185,7 @@ func LiveStreamHandler(c *gin.Context) {
 		return
 	}
 	var resp interface{}
-	if err := xproto.SyncSend(xproto.REQ_LiveStream, param, &resp, i.deviceId); err != nil {
+	if err := xproto.SyncSend(xproto.Req_LiveStream, param, &resp, i.deviceId); err != nil {
 		ctx.JSONWriteError(err, c)
 		return
 	}
@@ -202,7 +202,7 @@ func VoiceHandler(c *gin.Context) {
 		return
 	}
 	var resp interface{}
-	if err := xproto.SyncSend(xproto.REQ_Voice, param, &resp, i.deviceId); err != nil {
+	if err := xproto.SyncSend(xproto.Req_Voice, param, &resp, i.deviceId); err != nil {
 		ctx.JSONWriteError(err, c)
 		return
 	}
@@ -218,7 +218,7 @@ func PlaybackHandler(c *gin.Context) {
 		return
 	}
 	var resp interface{}
-	if err := xproto.SyncSend(xproto.REQ_Playback, param, &resp, i.deviceId); err != nil {
+	if err := xproto.SyncSend(xproto.Req_Playback, param, &resp, i.deviceId); err != nil {
 		ctx.JSONWriteError(err, c)
 		return
 	}
@@ -234,7 +234,7 @@ func SerialTransparentHandler(c *gin.Context) {
 		return
 	}
 	var resp interface{}
-	if err := xproto.SyncSend(xproto.REQ_SerialTransparent, param, &resp, i.deviceId); err != nil {
+	if err := xproto.SyncSend(xproto.Req_SerialTransparent, param, &resp, i.deviceId); err != nil {
 		ctx.JSONWriteError(err, c)
 		return
 	}
@@ -248,14 +248,14 @@ func SerialTransferHandler(c *gin.Context) {
 		ctx.JSONWriteError(xproto.ErrParam, c)
 		return
 	}
-	var param xproto.RawData
+	var param xproto.RawFrame
 	i, err := checkParam(c, &param)
 	if err != nil {
 		ctx.JSONWriteError(err, c)
 		return
 	}
 	var resp interface{}
-	if err := xproto.SyncSend(xproto.REQ_SerialTransfer, param, &resp, i.deviceId, session); err != nil {
+	if err := xproto.SyncSend(xproto.Req_SerialTransfer, param, &resp, i.deviceId, session); err != nil {
 		ctx.JSONWriteError(err, c)
 		return
 	}
@@ -270,7 +270,7 @@ func FileTransferHandler(c *gin.Context) {
 		ctx.JSONWriteError(err, c)
 		return
 	}
-	if param.Action == xproto.ACTION_Upload {
+	if param.Action == xproto.Act_Upload {
 		f, err := os.Stat(param.FileName)
 		if err != nil {
 			ctx.JSONWriteError(err, c)
@@ -279,7 +279,7 @@ func FileTransferHandler(c *gin.Context) {
 		param.FileSize = int(f.Size())
 	}
 	var resp interface{}
-	if err := xproto.SyncSend(xproto.REQ_FileTransfer, param, &resp, i.deviceId); err != nil {
+	if err := xproto.SyncSend(xproto.Req_FileTransfer, param, &resp, i.deviceId); err != nil {
 		ctx.JSONWriteError(err, c)
 		return
 	}
@@ -295,7 +295,7 @@ func FtpTransferHandler(c *gin.Context) {
 		return
 	}
 	var resp interface{}
-	if err := xproto.SyncSend(xproto.REQ_FtpTransfer, param, &resp, i.deviceId); err != nil {
+	if err := xproto.SyncSend(xproto.Req_FtpTransfer, param, &resp, i.deviceId); err != nil {
 		ctx.JSONWriteError(err, c)
 		return
 	}
@@ -311,7 +311,7 @@ func UserDefineHandler(c *gin.Context) {
 		return
 	}
 	var resp interface{}
-	if err := xproto.SyncSend(xproto.REQ_UserDefine, param, &resp, i.deviceId); err != nil {
+	if err := xproto.SyncSend(xproto.Req_UserDefine, param, &resp, i.deviceId); err != nil {
 		ctx.JSONWriteError(err, c)
 		return
 	}
@@ -326,7 +326,7 @@ func CloseLinkHandler(c *gin.Context) {
 		return
 	}
 	sessionID := c.Query("session")
-	if err := xproto.SyncSend(xproto.REQ_Close, nil, nil, i.deviceId, sessionID); err != nil {
+	if err := xproto.SyncSend(xproto.Req_Close, nil, nil, i.deviceId, sessionID); err != nil {
 		ctx.JSONWriteError(err, c)
 		return
 	}

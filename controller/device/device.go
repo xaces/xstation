@@ -26,13 +26,13 @@ func AccessHandler(b []byte, a *xproto.Access) (interface{}, error) {
 		return nil, fmt.Errorf("[%s] invalid", a.DeviceNo)
 	}
 	switch a.LinkType {
-	case xproto.LINK_FileTransfer:
+	case xproto.Link_FileTransfer:
 		filename, act := xproto.FileOfSess(a.Session)
-		if act == xproto.ACTION_Upload {
+		if act == xproto.Act_Upload {
 			return nil, xproto.UploadFile(a, filename, true)
 		}
 		return xproto.DownloadFile(configs.Default.Public+"/"+filename, nil)
-	case xproto.LINK_Signal:
+	case xproto.Link_Signal:
 		return nil, onlineHandler(a)
 	}
 	return nil, xproto.ErrUnSupport
@@ -42,12 +42,12 @@ func AccessHandler(b []byte, a *xproto.Access) (interface{}, error) {
 func DroppedHandler(v interface{}, a *xproto.Access, err error) {
 	log.Println(err)
 	switch a.LinkType {
-	case xproto.LINK_FileTransfer:
+	case xproto.Link_FileTransfer:
 		_, act := xproto.FileOfSess(a.Session)
-		if act == xproto.ACTION_Upload {
+		if act == xproto.Act_Upload {
 			xproto.DownloadFile("", v)
 		}
-	case xproto.LINK_Signal:
+	case xproto.Link_Signal:
 		onlineHandler(a)
 	}
 }
@@ -76,10 +76,10 @@ func devEventHandler(e *xproto.Event) {
 		return
 	}
 	switch e.Type {
-	case xproto.EVENT_FtpTransfer:
-	case xproto.EVENT_FileLittle:
+	case xproto.Event_FtpTransfer:
+	case xproto.Event_FileLittle:
 		ftpLittleFile(e)
-	case xproto.EVENT_FileTimedCapture:
+	case xproto.Event_FileTimedCapture:
 		ftpTimedCapture(e)
 	}
 }
@@ -92,11 +92,11 @@ func ftpLittleFile(e *xproto.Event) {
 		FtpURL:   configs.FtpAddr,
 		FileSrc:  v.FileName,
 		FileDst:  configs.Default.Public + "/" + fpName,
-		Action:   xproto.ACTION_Download,
+		Action:   xproto.Act_Download,
 		FileType: v.FileType,
 		Session:  e.Session,
 	}
-	if xproto.SyncSend(xproto.REQ_FtpTransfer, ftp, nil, e.DeviceNo) != nil {
+	if xproto.SyncSend(xproto.Req_FtpTransfer, ftp, nil, e.DeviceNo) != nil {
 		return
 	}
 	alr := mnger.Alarm.Get(e.Session) // 从缓存中获取数据
@@ -125,11 +125,11 @@ func ftpTimedCapture(e *xproto.Event) {
 		FtpURL:   configs.FtpAddr,
 		FileSrc:  v.FileName,
 		FileDst:  configs.Default.Public + "/" + fpName,
-		Action:   xproto.ACTION_Download,
-		FileType: xproto.FILE_NormalPic,
+		Action:   xproto.Act_Download,
+		FileType: xproto.File_NormalPic,
 		Session:  e.Session,
 	}
-	if xproto.SyncSend(xproto.REQ_FtpTransfer, ftp, nil, e.DeviceNo) != nil {
+	if xproto.SyncSend(xproto.Req_FtpTransfer, ftp, nil, e.DeviceNo) != nil {
 		return
 	}
 	data := &model.DevCapture{
