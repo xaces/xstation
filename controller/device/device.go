@@ -80,13 +80,7 @@ func AlarmHandler(b []byte, a *xproto.Alarm) {
 	for _, v := range hooks {
 		v.Alarm(m.Id, a)
 	}
-	o := devAlarmModel(a)
-	status := devStatusModel(a.Status)
-	if status != nil {
-		o.DevStatus = model.JDevStatus(*status)
-		Handler.status <- status
-	}
-	Handler.alarm <- o
+	Handler.alarm <- a
 }
 
 func EventHandler(data []byte, e *xproto.Event) {

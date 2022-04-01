@@ -22,14 +22,14 @@ type Hook interface {
 
 type handler struct {
 	status  chan *model.DevStatus
-	alarm   chan *model.DevAlarm
+	alarm   chan *xproto.Alarm
 	dsCache [][]model.DevStatus
 }
 
 var (
 	Handler *handler = &handler{
 		status: make(chan *model.DevStatus, 1),
-		alarm:  make(chan *model.DevAlarm, 1),
+		alarm:  make(chan *xproto.Alarm, 1),
 	}
 	hooks []Hook
 )
@@ -109,12 +109,18 @@ func (h *handler) dispatchStatus() {
 
 // dispatchAlarm 批量处理数据
 func (h *handler) dispatchAlarm() {
-	var stArray []model.DevAlarm
+	var stArray []xproto.Alarm
 	alarmFunc := func(v interface{}) {
-		data := v.([]model.DevAlarm)
-		for k := range data {
-			service.DevAlarmDbAdd(&data[k])
-			mnger.Alarm.Add(&data[k])
+		data := v.([]xproto.Alarm)
+		for _, alr := range data {
+			s := devStatusModel(alr.Status)
+			if s != nil {
+				h.status <- s
+			}
+			orm.DbCreate(devAlarmDetailsModel(&alr, s))
+			o := devAlarmModel(&alr, s)
+			service.DevAlarmAdd(o)
+			mnger.Alarm.Add(o)
 		}
 	}
 	ticker := time.NewTicker(time.Second * 2)
@@ -135,7 +141,7 @@ func (h *handler) dispatchAlarm() {
 			if size < 1 {
 				continue
 			}
-			data := make([]model.DevAlarm, size)
+			data := make([]xproto.Alarm, size)
 			copy(data, stArray)
 			if err := p.Invoke(data); err != nil {
 				continue

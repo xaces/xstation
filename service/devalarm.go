@@ -54,39 +54,9 @@ func (s *AlarmDetailsPage) Where() *orm.DbWhere {
 	return where
 }
 
-// type AlarmData struct {
-// 	model.DevAlarm
-// 	Gps model.JGps `json:"gps"`
-// }
-
-func alarmLinkCreate(alr *model.DevAlarm) error {
-	l := &model.DevAlarmDetails{}
-	l.Guid = alr.Guid
-	l.DevAlarmOpt = alr.DevAlarmOpt
-	l.LinkType = model.AlarmLinkDev
-	l.DevStatus = alr.DevStatus
-	l.Status = alr.Status
-	return orm.DbCreate(&l)
-}
-
-func DevAlarmDbAdd(alr *model.DevAlarm) error {
-	upfields := []string{"status", "dtu"}
-	isupdate := true
-	if alr.EndTime != "" {
-		alr.Status = 1
-		upfields = append(upfields, "end_time")
-		if alr.EndTime == alr.StartTime {
-			isupdate = false
-		}
-	} else if alr.DTU != alr.StartTime {
-		upfields = append(upfields, "data")
-		alr.Status = 2
-	} else {
-		isupdate = false
+func DevAlarmAdd(alr *model.DevAlarm) error {
+	if alr.Status == 0 {
+		return orm.DbCreate(alr)
 	}
-	alarmLinkCreate(alr)
-	if isupdate && orm.DbUpdateSelectWhere(alr, upfields, "guid = ?", alr.Guid) == nil {
-		return nil
-	}
-	return orm.DbCreate(alr)
+	return orm.DbUpdateSelectWhere(alr, []string{"dtu, end_data, end_time, end_status"}, "guid = ?", alr.Guid)
 }
