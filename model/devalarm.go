@@ -8,7 +8,6 @@ type DevAlarm struct {
 	AlarmType   int        `json:"alarmType"`                          // 类型
 	StartData   string     `json:"startData"`                          // gps信息 json 字符串
 	EndData     string     `json:"endData"`                            // gps信息 json 字符串
-	Status      int        `json:"status"`                             // 0-开始 1--结束 2--报警中
 	StartTime   string     `json:"startTime" gorm:"type:varchar(20);"` // 开始时间
 	EndTime     string     `json:"endTime" gorm:"type:varchar(20);"`   // 结束时间
 	StartStatus JDevStatus `json:"startStatus"`
@@ -36,6 +35,7 @@ type DevAlarmDetails struct {
 	DTU       string     `json:"dtu"`
 	Guid      string     `json:"guid"`     // guid和DevAlarm.guid用来关联
 	Flag      uint8      `json:"flag"`     // 0-实时 1-补传
+	Status    int        `json:"status"`   // 0-开始 1--结束 2--报警中
 	LinkType  lnType     `json:"linkType"` // 数据类型
 	Data      string     `json:"data"`
 	DevStatus JDevStatus `json:"devStatus"`

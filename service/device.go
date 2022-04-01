@@ -3,6 +3,7 @@ package service
 import (
 	"xstation/model"
 
+	"github.com/wlgd/xproto"
 	"github.com/wlgd/xutils/orm"
 )
 
@@ -27,10 +28,13 @@ func (s *DevicePage) Where() *orm.DbWhere {
 	return where
 }
 
-func DeviceUpdate(m *model.Device, online bool, version, dtype string) error {
-	return orm.DbUpdates(m, []string{"version", "type", "online"})
-}
-
-func DevcieFindByUser() {
-
+func DeviceUpdate(m *model.Device, a *xproto.Access) error {
+	m.Online = a.Online
+	m.Version = a.Version
+	m.Type = a.DevType
+	m.LastOnlineTime = a.DeviceTime
+	if a.Online {
+		return orm.DbUpdates(m, []string{"version", "type", "online"})
+	}
+	return orm.DbUpdates(m, []string{"last_online_time"})
 }

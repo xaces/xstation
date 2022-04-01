@@ -6,6 +6,7 @@ import (
 	"xstation/configs"
 	"xstation/entity/mnger"
 	"xstation/model"
+	"xstation/service"
 	"xstation/util"
 
 	"github.com/wlgd/xproto"
@@ -14,7 +15,7 @@ import (
 
 func AccessHandler(b []byte, a *xproto.Access) (interface{}, error) {
 	log.Printf("%s\n", b)
-	m := mnger.Device.Model(a.DeviceNo)
+	m := mnger.Device.Get(a.DeviceNo)
 	if m == nil {
 		return nil, fmt.Errorf("[%s] invalid", a.DeviceNo)
 	}
@@ -27,9 +28,13 @@ func AccessHandler(b []byte, a *xproto.Access) (interface{}, error) {
 		return xproto.DownloadFile(configs.Default.Public+"/"+filename, nil)
 	case xproto.Link_Signal:
 		for _, v := range hooks {
-			v.Online(m.Id, a)
+			v.Online(m.Model.Id, a)
 		}
-		return nil, nil
+		service.DeviceUpdate(m.Model, a)
+		o := devOnlineModel(a)
+		o.OnlineTime = a.DeviceTime
+		o.OnlineStatus = &m.Status
+		return nil, orm.DbCreate(o)
 	}
 	return nil, xproto.ErrUnSupport
 
@@ -37,7 +42,7 @@ func AccessHandler(b []byte, a *xproto.Access) (interface{}, error) {
 
 func DroppedHandler(v interface{}, a *xproto.Access, err error) {
 	log.Println(err)
-	m := mnger.Device.Model(a.DeviceNo)
+	m := mnger.Device.Get(a.DeviceNo)
 	if m == nil {
 		return
 	}
@@ -49,8 +54,12 @@ func DroppedHandler(v interface{}, a *xproto.Access, err error) {
 		}
 	case xproto.Link_Signal:
 		for _, v := range hooks {
-			v.Online(m.Id, a)
+			v.Online(m.Model.Id, a)
 		}
+		o := devOnlineModel(a)
+		o.OfflineTime = a.DeviceTime
+		o.OfflineStatus = &m.Status
+		orm.DbUpdateSelectWhere(o, []string{"offline_time, offline_status"}, "guid = ?", o.Guid)
 	}
 }
 
@@ -64,10 +73,11 @@ func StatusHandler(tag string, s *xproto.Status) {
 		v.Status(m.Model.Id, s)
 	}
 	o := devStatusModel(s)
-	if s.Flag == 0 {
-		m.Status = model.JDevStatus(*o)
-	}
 	o.DeviceId = m.Model.Id
+	if s.Flag == 0 {
+		m.Status = model.JDevStatus(*o) // TODO更新设备起始位置
+	}
+	m.Model.LastOnlineTime = s.DTU
 	Handler.status <- o
 }
 

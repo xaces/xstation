@@ -1,13 +1,10 @@
 package device
 
 import (
-	"xstation/entity/mnger"
 	"xstation/model"
-	"xstation/service"
 	"xstation/util"
 
 	"github.com/wlgd/xproto"
-	"github.com/wlgd/xutils/orm"
 )
 
 // 转换
@@ -66,12 +63,7 @@ func devAlarmModel(a *xproto.Alarm, s *model.DevStatus) *model.DevAlarm {
 	if a.DTU > a.StartTime {
 		o.EndStatus = model.JDevStatus(*s)
 		o.EndData = util.JString(a.Data)
-		o.Status = 1
-		if a.EndTime != "" {
-			o.Status = 2
-		}
 	} else {
-		o.Status = 0
 		o.StartData = util.JString(a.Data)
 		o.StartStatus = model.JDevStatus(*s)
 	}
@@ -87,23 +79,12 @@ func devAlarmDetailsModel(a *xproto.Alarm, s *model.DevStatus) *model.DevAlarmDe
 	o.Data = util.JString(a.Data)
 	o.Flag = s.Flag
 	o.DevStatus = model.JDevStatus(*s)
-	return o
-}
-
-func updateDevOnline(a *xproto.Access) error {
-	m := mnger.Device.Get(a.DeviceNo)
-	o := devOnlineModel(a)
-	if a.Online {
-		o.OnlineTime = a.DeviceTime
-		o.OnlineStatus = &m.Status
-	} else {
-		o.OfflineTime = a.DeviceTime
-		o.OfflineStatus = &m.Status
+	o.Status = 0
+	if a.DTU > a.StartTime {
+		o.Status = 1
+		if a.EndTime != "" {
+			o.Status = 2
+		}
 	}
-	m.Model.Online = a.Online
-	m.Model.Version = a.Version
-	m.Model.Type = a.DevType
-	orm.DbUpdates(m.Model, []string{"version", "type", "online"})
-	service.DevOnlineUpdate(o)
-	return nil
+	return o
 }
