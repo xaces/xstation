@@ -12,13 +12,6 @@ import (
 	"github.com/wlgd/xutils/orm"
 )
 
-func onlineHandler(a *xproto.Access) error {
-	for _, v := range brokers {
-		v.Online(a)
-	}
-	return nil
-}
-
 func AccessHandler(b []byte, a *xproto.Access) (interface{}, error) {
 	log.Printf("%s\n", b)
 	m := mnger.Device.Model(a.DeviceNo)
@@ -33,7 +26,10 @@ func AccessHandler(b []byte, a *xproto.Access) (interface{}, error) {
 		}
 		return xproto.DownloadFile(configs.Default.Public+"/"+filename, nil)
 	case xproto.Link_Signal:
-		return nil, onlineHandler(a)
+		for _, v := range hooks {
+			v.Online(m.Id, a)
+		}
+		return nil, nil
 	}
 	return nil, xproto.ErrUnSupport
 
@@ -41,6 +37,10 @@ func AccessHandler(b []byte, a *xproto.Access) (interface{}, error) {
 
 func DroppedHandler(v interface{}, a *xproto.Access, err error) {
 	log.Println(err)
+	m := mnger.Device.Model(a.DeviceNo)
+	if m == nil {
+		return
+	}
 	switch a.LinkType {
 	case xproto.Link_FileTransfer:
 		_, act := xproto.FileOfSess(a.Session)
@@ -48,32 +48,55 @@ func DroppedHandler(v interface{}, a *xproto.Access, err error) {
 			xproto.DownloadFile("", v)
 		}
 	case xproto.Link_Signal:
-		onlineHandler(a)
-	}
-}
-func StatusHandler(tag string, s *xproto.Status) {
-	xproto.LogStatus(tag, s)
-	for _, v := range brokers {
-		v.Status(s)
-	}
-}
-func AlarmHandler(b []byte, a *xproto.Alarm) {
-	xproto.LogAlarm(b, a)
-	for _, v := range brokers {
-		v.Alarm(a)
-	}
-}
-func EventHandler(data []byte, e *xproto.Event) {
-	xproto.LogEvent(data, e)
-	for _, v := range brokers {
-		v.Event(e)
+		for _, v := range hooks {
+			v.Online(m.Id, a)
+		}
 	}
 }
 
-func devEventHandler(e *xproto.Event) {
+func StatusHandler(tag string, s *xproto.Status) {
+	xproto.LogStatus(tag, s)
+	m := mnger.Device.Get(s.DeviceNo)
+	if m == nil {
+		return
+	}
+	for _, v := range hooks {
+		v.Status(m.Model.Id, s)
+	}
+	o := devStatusModel(s)
+	if s.Flag == 0 {
+		m.Status = model.JDevStatus(*o)
+	}
+	o.DeviceId = m.Model.Id
+	Handler.status <- o
+}
+
+func AlarmHandler(b []byte, a *xproto.Alarm) {
+	xproto.LogAlarm(b, a)
+	m := mnger.Device.Model(a.DeviceNo)
+	if m == nil {
+		return
+	}
+	for _, v := range hooks {
+		v.Alarm(m.Id, a)
+	}
+	o := devAlarmModel(a)
+	status := devStatusModel(a.Status)
+	if status != nil {
+		o.DevStatus = model.JDevStatus(*status)
+		Handler.status <- status
+	}
+	Handler.alarm <- o
+}
+
+func EventHandler(data []byte, e *xproto.Event) {
+	xproto.LogEvent(data, e)
 	m := mnger.Device.Model(e.DeviceNo)
 	if m == nil {
 		return
+	}
+	for _, v := range hooks {
+		v.Event(m.Id, e)
 	}
 	switch e.Type {
 	case xproto.Event_FtpTransfer:
@@ -91,7 +114,7 @@ func ftpLittleFile(e *xproto.Event) {
 	ftp := xproto.FtpTransfer{
 		FtpURL:   configs.FtpAddr,
 		FileSrc:  v.FileName,
-		FileDst:  configs.Default.Public + "/" + fpName,
+		FileDst:  fpName,
 		Action:   xproto.Act_Download,
 		FileType: v.FileType,
 		Session:  e.Session,
@@ -124,7 +147,7 @@ func ftpTimedCapture(e *xproto.Event) {
 	ftp := xproto.FtpTransfer{
 		FtpURL:   configs.FtpAddr,
 		FileSrc:  v.FileName,
-		FileDst:  configs.Default.Public + "/" + fpName,
+		FileDst:  fpName,
 		Action:   xproto.Act_Download,
 		FileType: xproto.File_NormalPic,
 		Session:  e.Session,

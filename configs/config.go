@@ -2,77 +2,61 @@ package configs
 
 import (
 	"fmt"
-	"xstation/app/ftp"
-
+	"os"
+	"path/filepath"
 	"xstation/app/db"
+	"xstation/app/ftp"
+	"xstation/entity/hook"
 
-	"xstation/middleware"
-
-	"github.com/BurntSushi/toml"
 	"github.com/wlgd/xutils"
 )
-
-type localConfigure struct {
-	Id            string // 服务Id
-	IpAddr        string // 服务IP
-	EffectiveTime int    // 有效时间
-	MaxDevNumber  int
-}
 
 type configure struct {
 	Host    string
 	License string
 	Public  string
-	MsgProc string
 	Port    struct {
 		Http   uint16
 		Access uint16
 	}
-	Sql db.Options
+	Sql db.Option
 	Ftp struct {
 		Enable bool
-		ftp.Options
+		Option ftp.Option
 	}
-	Map struct {
-		Name string
-		Key  string
-	}
-	RdMQ struct {
-		Enable      bool
-		Name        string
-		middleware.NatsOption
-	}
-	RdHttp struct {
-		Enable bool
-		Online string
-		Alarm  string
-		Status string
-		Event  string
+	Hook struct {
+		Enable  bool
+		Options []hook.Option
 	}
 }
 
 // Default 所有配置参数
 var (
 	Default      configure
-	Local        localConfigure
+	License      xutils.License
 	FtpAddr      string
 	SuperAddress string
+	absDir       string
 )
+
+func PublicAbs(path string) string {
+	if filepath.IsAbs(path) {
+		return path
+	}
+	return absDir + "/" + path
+}
 
 // Load 初始化配置参数
 func Load(path string) error {
-	if _, err := toml.DecodeFile(path, &Default); err != nil {
+	absDir = filepath.Dir(os.Args[0])
+	if err := xutils.YMLConf(PublicAbs(path), &Default); err != nil {
 		return err
 	}
-	FtpAddr = fmt.Sprintf("ftp://%s:%s@%s:%d", Default.Ftp.User, Default.Ftp.Pswd, Default.Host, Default.Ftp.Port)
-	lice, err := xutils.LicenseRead(Default.License)
-	if err != nil {
+	if lice, err := xutils.LicenseRead(PublicAbs(Default.License)); err != nil {
 		return err
+	} else {
+		License = *lice
 	}
-	Local.Id = lice.ServeGuid
-	Local.EffectiveTime = lice.EffectiveTime
-	Local.MaxDevNumber = lice.MaxNumber
-	//TODO address
-	SuperAddress = lice.Address
+	FtpAddr = fmt.Sprintf("ftp://%s:%s@%s:%d", Default.Ftp.Option.User, Default.Ftp.Option.Pswd, Default.Host, Default.Ftp.Option.Port)
 	return nil
 }

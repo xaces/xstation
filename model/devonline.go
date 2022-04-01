@@ -4,7 +4,7 @@ package model
 
 // OnLine 定义
 type DevOnline struct {
-	Id            uint64      `json:"id" gorm:"primary_key"`
+	Id            uint        `json:"id" gorm:"primary_key"`
 	Guid          string      `json:"guid" gorm:"primary_key"`
 	DeviceNo      string      `json:"deviceNo" gorm:"type:varchar(24);"`
 	RemoteAddress string      `json:"remoteAddress"` // 设备网络地址

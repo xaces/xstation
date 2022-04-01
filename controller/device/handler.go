@@ -2,6 +2,7 @@ package device
 
 import (
 	"time"
+	"xstation/entity/hook"
 	"xstation/entity/mnger"
 	"xstation/model"
 	"xstation/service"
@@ -11,11 +12,11 @@ import (
 	"github.com/wlgd/xutils/orm"
 )
 
-type broker interface {
-	Online(*xproto.Access)
-	Status(*xproto.Status)
-	Alarm(*xproto.Alarm)
-	Event(*xproto.Event)
+type Hook interface {
+	Online(deviceId uint, a *xproto.Access)
+	Status(deviceId uint, s *xproto.Status)
+	Alarm(deviceId uint, a *xproto.Alarm)
+	Event(deviceId uint, e *xproto.Event)
 	Stop()
 }
 
@@ -30,48 +31,31 @@ var (
 		status: make(chan *model.DevStatus, 1),
 		alarm:  make(chan *model.DevAlarm, 1),
 	}
-	brokers []broker
+	hooks []Hook
 )
 
-func (h *handler) Run(msgproc string) error {
-	switch msgproc {
-	case "nats":
-		if err := natsRun(); err != nil {
-			return err
-		}
-	case "default":
-		h.Handle(&defaultBroker{})
-	}
+func (h *handler) Disptah() {
 	go h.dispatchStatus()
 	go h.dispatchAlarm()
-	return nil
 }
 
 func (h *handler) Stop() {
-	for _, v := range brokers {
+	for _, v := range hooks {
 		v.Stop()
 	}
 	h.alarm <- nil
 	h.status <- nil
 }
 
-func (h *handler) Handle(v broker) {
-	brokers = append(brokers, v)
-}
-
-func (h *handler) addStatus(s *xproto.Status) {
-	o := devStatusModel(s)
-	h.status <- o
-}
-
-func (h *handler) addAlarm(a *xproto.Alarm) {
-	o := devAlarmModel(a)
-	status := devStatusModel(a.Status)
-	if status != nil {
-		o.DevStatus = model.JDevStatus(*status)
-		h.status <- status
+func Hooks(o []hook.Option) {
+	for _, v := range o {
+		switch v.Name {
+		case "nats":
+			hooks = append(hooks, hook.NewNats(v))
+		case "http://":
+			hooks = append(hooks, hook.NewHttp(v))
+		}
 	}
-	h.alarm <- o
 }
 
 type statusObj struct {

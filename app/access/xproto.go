@@ -41,6 +41,7 @@ func Start(host string, port uint16) (err error) {
 	if s, err = xproto.NewServer(opt); err != nil {
 		return
 	}
+	device.Handler.Disptah()
 	s.Handle.Access = device.AccessHandler
 	s.Handle.Dropped = device.DroppedHandler
 	s.Handle.Status = device.StatusHandler
@@ -57,4 +58,5 @@ func Stop() {
 	if s != nil {
 		s.Release()
 	}
+	device.Handler.Stop()
 }

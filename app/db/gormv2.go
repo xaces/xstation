@@ -34,12 +34,12 @@ var gconf = gorm.Config{
 	},
 }
 
-type Options struct {
+type Option struct {
 	Name    string
 	Address string
 }
 
-func sqlInit(o *Options) error {
+func sqlInit(o *Option) error {
 	var err error
 	var db *gorm.DB
 	switch o.Name {
@@ -84,7 +84,7 @@ func initDevices() error {
 }
 
 // Init 初始化服务
-func Init(o *Options) error {
+func Init(o *Option) error {
 	if err := sqlInit(o); err != nil {
 		return err
 	}

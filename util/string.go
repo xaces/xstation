@@ -8,12 +8,12 @@ import (
 	jsoniter "github.com/json-iterator/go"
 )
 
-func ToJString(obj interface{}) string {
-	data, err := jsoniter.Marshal(obj)
+func JString(v interface{}) string {
+	str, err := jsoniter.MarshalToString(v)
 	if err != nil {
 		return ""
 	}
-	return string(data)
+	return str
 }
 
 func StringToIntSlice(str, sep string) []int {
@@ -54,7 +54,7 @@ func FilePicPath(s, deviceNo string) string {
 }
 
 // ftp://admin:123456@127.0.0.1:2211
-func StringParseFtpUri(s string) (port int, user, pswd string) {
+func FtpUriParse(s string) (port int, user, pswd string) {
 	arrs := strings.Split(s, "@")
 	s1 := strings.Split(arrs[0], ":")
 	user = s1[1][2:]

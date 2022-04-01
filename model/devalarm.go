@@ -49,7 +49,7 @@ func (s *DevAlarmDetails) TableName() string {
 
 // 报警关联信息
 type DevAlarmFile struct {
-	Id        uint64 `json:"id" gorm:"primary_key"`
+	Id        uint   `json:"id" gorm:"primary_key"`
 	DeviceNo  string `json:"deviceNo" gorm:"type:varchar(24);"`
 	DTU       string `json:"dtu"`
 	AlarmType int    `json:"alarmType"`

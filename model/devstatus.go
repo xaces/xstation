@@ -132,8 +132,8 @@ func (t *JObds) Scan(v interface{}) error {
 
 // Status 状态数据
 type DevStatus struct {
-	Id        uint64    `json:"id" gorm:"primary_key"`
-	DeviceId  uint64    `json:"deviceId"`
+	Id        uint      `json:"id" gorm:"primary_key"`
+	DeviceId  uint      `json:"deviceId"`
 	DeviceNo  string    `json:"deviceNo" gorm:"type:varchar(24);"`  // 时间
 	Flag      uint8     `json:"flag"`                               // 0-实时 1-补传 2-AlarmLink
 	Acc       uint8     `json:"acc"`                                // acc

@@ -27,13 +27,8 @@ func devOnlineModel(a *xproto.Access) *model.DevOnline {
 }
 
 func devStatusModel(s *xproto.Status) *model.DevStatus {
-	m := mnger.Device.Get(s.DeviceNo)
-	if m == nil {
-		return nil
-	}
 	o := &model.DevStatus{}
 	o.Id = util.PrimaryKey()
-	o.DeviceId = m.Model.Id
 	o.DeviceNo = s.DeviceNo
 	o.DTU = s.DTU
 	o.Flag = s.Flag
@@ -53,9 +48,6 @@ func devStatusModel(s *xproto.Status) *model.DevStatus {
 	o.People = model.JPeople(s.People)
 	o.Obds = model.JObds(s.Obds)
 	o.Vols = model.JFloats(s.Vol)
-	if s.Flag == 0 {
-		m.Status = model.JDevStatus(*o)
-	}
 	return o
 }
 
@@ -74,7 +66,7 @@ func devAlarmModel(a *xproto.Alarm) *model.DevAlarm {
 	o.DTU = a.DTU
 	o.DeviceNo = a.DeviceNo
 	o.AlarmType = a.Type
-	o.Data = util.ToJString(a.Data)
+	o.Data = util.JString(a.Data)
 	return o
 }
 
