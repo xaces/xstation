@@ -22,19 +22,19 @@ func NewHttp(o Option) *Http {
 }
 
 func (h *Http) Online(deviceId uint, a *xproto.Access) {
-	xutils.HttpPost(h.urlOnline, &Online{DeviceId: deviceId, Access: a}, nil)
+	xutils.HttpPost(h.urlOnline, newOnline(deviceId, a), nil)
 }
 
 func (h *Http) Status(deviceId uint, s *xproto.Status) {
-	xutils.HttpPost(h.urlStatus, &Status{DeviceId: deviceId, Status: s}, nil)
+	xutils.HttpPost(h.urlStatus, newStatus(deviceId, s), nil)
 }
 
 func (h *Http) Alarm(deviceId uint, a *xproto.Alarm) {
-	xutils.HttpPost(h.urlAlarm, &Alarm{DeviceId: deviceId, Alarm: a}, nil)
+	xutils.HttpPost(h.urlAlarm, newAlarm(deviceId, a), nil)
 }
 
 func (h *Http) Event(deviceId uint, e *xproto.Event) {
-	xutils.HttpPost(h.urlEvent, &Event{DeviceId: deviceId, Event: e}, nil)
+	xutils.HttpPost(h.urlEvent, newEvent(deviceId, e), nil)
 }
 
 func (h *Http) Stop() {

@@ -23,28 +23,28 @@ func (n *Nats) Online(deviceId uint, a *xproto.Access) {
 	if n.Conn == nil {
 		return
 	}
-	n.Conn.Publish(n.Opt.Online, &Online{DeviceId: deviceId, Access: a})
+	n.Conn.Publish(n.Opt.Online, newOnline(deviceId, a))
 }
 
 func (n *Nats) Status(deviceId uint, s *xproto.Status) {
 	if n.Conn == nil {
 		return
 	}
-	n.Conn.Publish(n.Opt.Status, &Status{DeviceId: deviceId, Status: s})
+	n.Conn.Publish(n.Opt.Status, newStatus(deviceId, s))
 }
 
 func (n *Nats) Alarm(deviceId uint, a *xproto.Alarm) {
 	if n.Conn == nil {
 		return
 	}
-	n.Conn.Publish(n.Opt.Alarm, &Alarm{DeviceId: deviceId, Alarm: a})
+	n.Conn.Publish(n.Opt.Alarm, newAlarm(deviceId, a))
 }
 
 func (n *Nats) Event(deviceId uint, e *xproto.Event) {
 	if n.Conn == nil {
 		return
 	}
-	n.Conn.Publish(n.Opt.Event, &Event{DeviceId: deviceId, Event: e})
+	n.Conn.Publish(n.Opt.Event, newEvent(deviceId, e))
 }
 
 func (n *Nats) Stop() {
