@@ -56,10 +56,11 @@ func DroppedHandler(v interface{}, a *xproto.Access, err error) {
 		for _, v := range hooks {
 			v.Online(m.Model.Id, a)
 		}
+		service.DeviceUpdate(m.Model, a)
 		o := devOnlineModel(a)
 		o.OfflineTime = a.DeviceTime
 		o.OfflineStatus = &m.Status
-		orm.DbUpdateSelectWhere(o, []string{"offline_time, offline_status"}, "guid = ?", o.Guid)
+		orm.DbUpdatesBy(o, []string{"offline_time, offline_status"}, "guid = ?", o.Guid)
 	}
 }
 

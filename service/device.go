@@ -34,7 +34,7 @@ func DeviceUpdate(m *model.Device, a *xproto.Access) error {
 	m.Type = a.DevType
 	m.LastOnlineTime = a.DeviceTime
 	if a.Online {
-		return orm.DbUpdates(m, []string{"version", "type", "online"})
+		return orm.DbUpdates(m, "version", "type", "online", "last_online_time")
 	}
-	return orm.DbUpdates(m, []string{"last_online_time"})
+	return orm.DbUpdates(m, "last_online_time", "online")
 }

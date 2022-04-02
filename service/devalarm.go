@@ -58,5 +58,5 @@ func DevAlarmAdd(alr *model.DevAlarm) error {
 	if alr.EndTime == "" {
 		return orm.DbCreate(alr)
 	}
-	return orm.DbUpdateSelectWhere(alr, []string{"dtu, end_data, end_time, end_status"}, "guid = ?", alr.Guid)
+	return orm.DbUpdatesBy(alr, []string{"dtu, end_data, end_time, end_status"}, "guid = ?", alr.Guid)
 }
