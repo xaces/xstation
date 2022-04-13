@@ -42,7 +42,7 @@ func Run(path string, o *Option) error {
 	return nil
 }
 
-func Stop() {
+func Shutdown() {
 	if ftp != nil {
 		ftp.Shutdown()
 	}

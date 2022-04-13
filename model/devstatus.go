@@ -152,16 +152,14 @@ type DevStatus struct {
 	Vols      JFloats   `json:"vols"`
 }
 
-type JDevStatus DevStatus
-
 // Value insert
-func (j JDevStatus) Value() (driver.Value, error) {
+func (j DevStatus) Value() (driver.Value, error) {
 	return jsoniter.Marshal(&j)
 }
 
 // Scan valueof
-func (t *JDevStatus) Scan(v interface{}) error {
-	return jsoniter.Unmarshal(v.([]byte), t)
+func (j *DevStatus) Scan(v interface{}) error {
+	return jsoniter.Unmarshal(v.([]byte), j)
 }
 
 const (

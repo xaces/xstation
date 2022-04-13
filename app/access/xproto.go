@@ -30,7 +30,7 @@ var (
 )
 
 // Start 启动
-func Start(host string, port uint16) (err error) {
+func Run(host string, port uint16) (err error) {
 	opt := &xproto.Options{
 		RequestTimeout: 50,
 		RecvTimeout:    30,
@@ -47,14 +47,12 @@ func Start(host string, port uint16) (err error) {
 	s.Handle.Status = device.StatusHandler
 	s.Handle.Alarm = device.AlarmHandler
 	s.Handle.Event = device.EventHandler
-	s.Handle.AVFrame = xproto.LogAVFrame
-	s.Handle.RawFrame = xproto.LogRawFrame
 	go s.ListenTCPAndServe()
 	return
 }
 
 // Stop 停止
-func Stop() {
+func Shutdown() {
 	if s != nil {
 		s.Release()
 	}

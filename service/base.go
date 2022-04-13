@@ -6,14 +6,9 @@ import (
 	"github.com/wlgd/xutils/orm"
 )
 
-func BasicGet(v interface{}, c *gin.Context) {
-	id, err := ctx.ParamInt(c, "id")
-	if err != nil {
-		ctx.JSONWriteError(err, c)
-		return
-	}
-	err = orm.DbFirstById(v, id)
-	if err != nil {
+func QueryById(v interface{}, c *gin.Context) {
+	id := ctx.ParamUInt(c, "id")
+	if err := orm.DbFirstById(v, id); err != nil {
 		ctx.JSONWriteError(err, c)
 		return
 	}

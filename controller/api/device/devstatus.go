@@ -1,7 +1,7 @@
 package device
 
 import (
-	"xstation/entity/mnger"
+	"xstation/entity/cache"
 	"xstation/model"
 	"xstation/service"
 
@@ -16,32 +16,32 @@ type Status struct {
 }
 
 func (o *Status) ListHandler(c *gin.Context) {
-	var param service.StatusPage
-	if err := c.ShouldBind(&param); err != nil {
+	var p service.StatusPage
+	if err := c.ShouldBind(&p); err != nil {
 		ctx.JSONWriteError(err, c)
 		return
 	}
-	m := mnger.Device.StatusModel(param.DeviceNo)
+	m := cache.Device(p.DeviceNo).Model()
 	var data []model.DevStatus
-	total, _ := orm.DbByWhere(m, param.Where()).Find(&data)
+	total, _ := orm.DbByWhere(m, p.Where()).Find(&data)
 	ctx.JSONOk().Write(gin.H{"total": total, "data": data}, c)
 }
 
 // statusGet 获取
 type statusGet struct {
 	DeviceNo string `form:"deviceNo"` //
-	StatusId uint64 `form:"statusId"` //
+	StatusId uint   `form:"statusId"` //
 }
 
 // GetHandler 获取指定id
 func (o *Status) GetHandler(c *gin.Context) {
-	param := statusGet{}
-	if err := c.ShouldBind(&param); err != nil {
+	p := statusGet{}
+	if err := c.ShouldBind(&p); err != nil {
 		ctx.JSONWriteError(err, c)
 		return
 	}
-	data := mnger.Device.StatusModel(param.DeviceNo)
-	if err := orm.DbFirstById(data, param.StatusId); err != nil {
+	data := cache.Device(p.DeviceNo).Model()
+	if err := orm.DbFirstById(data, p.StatusId); err != nil {
 		ctx.JSONWriteError(err, c)
 		return
 	}

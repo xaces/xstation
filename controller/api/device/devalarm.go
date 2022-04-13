@@ -36,14 +36,9 @@ func (o *Alarm) ListDetailsHandler(c *gin.Context) {
 
 // GetByStatusIdHandler 获取指定id
 func (o *Alarm) GetByStatusIdHandler(c *gin.Context) {
-	statusId, err := ctx.ParamInt(c, "statusId")
-	if err != nil {
-		ctx.JSONWriteError(err, c)
-		return
-	}
+	statusId := ctx.ParamUInt(c, "statusId")
 	var data model.DevAlarm
-	err = orm.DbFirstBy(&data, "status_id = ?", statusId)
-	if err != nil {
+	if err := orm.DbFirstBy(&data, "status_id = ?", statusId); err != nil {
 		ctx.JSONWriteError(err, c)
 		return
 	}

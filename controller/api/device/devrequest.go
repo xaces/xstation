@@ -248,7 +248,7 @@ func SerialTransferHandler(c *gin.Context) {
 		ctx.JSONWriteError(xproto.ErrParam, c)
 		return
 	}
-	var param xproto.RawFrame
+	var param xproto.RawData
 	i, err := checkParam(c, &param)
 	if err != nil {
 		ctx.JSONWriteError(err, c)

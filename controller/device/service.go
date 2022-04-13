@@ -5,11 +5,12 @@ import (
 	"xstation/util"
 
 	"github.com/wlgd/xproto"
+	"github.com/wlgd/xutils/orm"
 )
 
 // 转换
-func devOnlineModel(a *xproto.Access) *model.DevOnline {
-	v := &model.DevOnline{
+func devOnlineUpdate(a *xproto.Access, s *xproto.Status) error {
+	o := &model.DevOnline{
 		Guid:          a.Session,
 		DeviceNo:      a.DeviceNo,
 		RemoteAddress: a.RemoteAddress,
@@ -20,7 +21,14 @@ func devOnlineModel(a *xproto.Access) *model.DevOnline {
 		Version:       a.Version,
 		DevType:       a.DevType,
 	}
-	return v
+	if a.Online {
+		o.OnlineTime = a.DeviceTime
+		o.OnlineStatus = devStatusModel(s)
+		return orm.DbCreate(o)
+	}
+	o.OfflineTime = a.DeviceTime
+	o.OfflineStatus = devStatusModel(s)
+	return orm.DbUpdatesBy(o, []string{"offline_time, offline_status"}, "guid = ?", o.Guid)
 }
 
 func devStatusModel(s *xproto.Status) *model.DevStatus {
@@ -61,29 +69,30 @@ func devAlarmModel(a *xproto.Alarm, s *model.DevStatus) *model.DevAlarm {
 		AlarmType: a.Type,
 	}
 	if a.DTU > a.StartTime {
-		o.EndStatus = model.JDevStatus(*s)
+		o.EndStatus = s
 		o.EndData = util.JString(a.Data)
 	} else {
 		o.StartData = util.JString(a.Data)
-		o.StartStatus = model.JDevStatus(*s)
+		o.StartStatus = s
 	}
 	return o
 }
 
-func devAlarmDetailsModel(a *xproto.Alarm, s *model.DevStatus) *model.DevAlarmDetails {
+func devAlarmDetailsModel(a *xproto.Alarm) *model.DevAlarmDetails {
 	o := &model.DevAlarmDetails{}
 	o.DeviceNo = a.DeviceNo
 	o.DTU = a.DTU
 	o.Guid = a.UUID
 	o.LinkType = model.AlarmLinkDev
 	o.Data = util.JString(a.Data)
-	o.Flag = s.Flag
-	o.DevStatus = model.JDevStatus(*s)
+	o.DevStatus = devStatusModel(a.Status)
+	o.Flag = a.Status.Flag
+	o.AlarmType = a.Type
 	o.Status = 0
 	if a.DTU > a.StartTime {
-		o.Status = 1
+		o.Status = 2
 		if a.EndTime != "" {
-			o.Status = 2
+			o.Status = 1
 		}
 	}
 	return o

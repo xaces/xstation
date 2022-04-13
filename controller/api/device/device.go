@@ -1,15 +1,9 @@
 package device
 
 import (
-	"fmt"
-	"strconv"
-	"xstation/entity/mnger"
-	"xstation/model"
-	"xstation/service"
-	"xstation/util"
+	"xstation/entity/cache"
 
 	"github.com/wlgd/xutils/ctx"
-	"github.com/wlgd/xutils/orm"
 
 	"github.com/gin-gonic/gin"
 )
@@ -18,137 +12,11 @@ type Device struct {
 }
 
 func (o *Device) ListHandler(c *gin.Context) {
-	var param service.DevicePage
-	if err := c.ShouldBind(&param); err != nil {
-		ctx.JSONWriteError(err, c)
-		return
-	}
-	var data []model.Device
-	total, _ := orm.DbByWhere(&data, param.Where()).Find(&data)
-	ctx.JSONOk().Write(gin.H{"total": total, "data": data}, c)
-}
-
-// GetHandler 获取指定id
-func (o *Device) GetHandler(c *gin.Context) {
-	service.BasicGet(&model.Device{}, c)
-}
-
-// AddHandler 新增
-func (o *Device) AddHandler(c *gin.Context) {
-	var data model.Device
-	//获取参数
-	if err := c.ShouldBind(&data.DeviceOpt); err != nil {
-		ctx.JSONWriteError(err, c)
-		return
-	}
-	data.Guid = util.UUID()
-	if err := orm.DbCreate(&data); err != nil {
-		ctx.JSONWriteError(err, c)
-		return
-	}
-	mnger.Device.Add(&data)
-	ctx.JSONOk().WriteTo(c)
-}
-
-type batchAdd struct {
-	Prefix      string `json:"prefix"`
-	StartNumber int    `json:"startNumber"`
-	Count       int    `json:"count"`
-	model.DeviceOpt
-}
-
-// BatchAddHandler 新增
-func (o *Device) BatchAddHandler(c *gin.Context) {
-	var p batchAdd
-	//获取参数
-	if err := c.ShouldBind(&p); err != nil {
-		ctx.JSONWriteError(err, c)
-		return
-	}
-	lzero := len(strconv.Itoa(p.StartNumber + p.Count-1))
-	var data []model.Device
-	for i := 0; i < p.Count; i++ {
-		v := model.Device{}
-		v.DeviceOpt = p.DeviceOpt
-		v.DeviceNo = fmt.Sprintf("%s%0*d", p.Prefix, lzero, p.StartNumber+i)
-		v.DeviceName = v.DeviceNo
-		v.Guid = util.UUID()
-		data = append(data, v)
-	}
-	if err := orm.DbCreate(&data); err != nil {
-		ctx.JSONWriteError(err, c)
-		return
-	}
-	mnger.Device.Set(data)
-	ctx.JSONOk().WriteTo(c)
-}
-
-// UpdateHandler 修改
-func (o *Device) UpdateHandler(c *gin.Context) {
-	var data model.Device
-	//获取参数
-	if err := c.ShouldBind(&data.DeviceOpt); err != nil {
-		ctx.JSONWriteError(err, c)
-		return
-	}
-	if err := orm.DbUpdateModel(&data); err != nil {
-		ctx.JSONWriteError(err, c)
-		return
-	}
-	ctx.JSONOk().WriteTo(c)
-}
-
-// resetOrganize 更新
-type resetOrganize struct {
-	DeviceIds  string `json:"deviceIds"`
-	OrganizeId int    `json:"organizeId"`
-}
-
-func (o *Device) ResetOrganizeHandler(c *gin.Context) {
-	var p resetOrganize
-	//获取参数
-	if err := c.ShouldBind(&p); err != nil {
-		ctx.JSONWriteError(err, c)
-		return
-	}
-	ids := util.StringToIntSlice(p.DeviceIds, ",")
-	if err := orm.DbUpdateByIds(&model.Device{}, ids, orm.H{"organize_id": p.OrganizeId}); err != nil {
-		ctx.JSONWriteError(err, c)
-		return
-	}
-	ctx.JSONOk().WriteTo(c)
-}
-
-// DeleteHandler 删除
-func (o *Device) DeleteHandler(c *gin.Context) {
-	idstr := ctx.ParamString(c, "id")
-	if idstr == "" {
-		ctx.JSONError().WriteTo(c)
-		return
-	}
-	ids := util.StringToIntSlice(idstr, ",")
-	var devs []model.Device
-	if _, err := orm.DbFindBy(&devs, "id in (?)", ids); err != nil {
-		ctx.JSONError().WriteTo(c)
-		return
-	}
-	if err := orm.DbDeletes(&devs); err != nil {
-		ctx.JSONError().WriteTo(c)
-		return
-	}
-	for _, v := range devs {
-		mnger.Device.Delete(v.DeviceNo)
-	}
-	ctx.JSONOk().WriteTo(c)
+	data := cache.DeviceList()
+	ctx.JSONOk().Write(gin.H{"total": len(data), "data": data}, c)
 }
 
 func DeviceRouter(r *gin.RouterGroup) {
 	d := Device{}
 	r.GET("/list", d.ListHandler)
-	r.GET("/:id", d.GetHandler)
-	r.POST("", d.AddHandler)
-	r.POST("/batchAdd", d.BatchAddHandler)
-	r.PUT("", d.UpdateHandler)
-	r.PUT("/resetOrganize", d.ResetOrganizeHandler)
-	r.DELETE("/:id", d.DeleteHandler)
 }

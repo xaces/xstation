@@ -2,8 +2,8 @@ package device
 
 import (
 	"time"
+	"xstation/entity/cache"
 	"xstation/entity/hook"
-	"xstation/entity/mnger"
 	"xstation/model"
 	"xstation/service"
 
@@ -58,18 +58,18 @@ func Hooks(o []hook.Option) {
 	}
 }
 
-type statusObj struct {
+type statusVals struct {
 	TableIdx int
 	Data     []model.DevStatus
 }
 
-func (h *handler) insertStatus(p *ants.PoolWithFunc) {
+func (h *handler) devStatusHandle(p *ants.PoolWithFunc) {
 	for i := 0; i < model.DevStatusNum; i++ {
 		size := len(h.dsCache[i])
 		if size < 1 {
 			continue
 		}
-		o := &statusObj{}
+		o := &statusVals{}
 		o.TableIdx = i
 		o.Data = make([]model.DevStatus, size)
 		copy(o.Data, h.dsCache[i])
@@ -83,12 +83,12 @@ func (h *handler) insertStatus(p *ants.PoolWithFunc) {
 // dispatchStatus 批量处理数据
 func (h *handler) dispatchStatus() {
 	h.dsCache = make([][]model.DevStatus, model.DevStatusNum)
-	statusFunc := func(v interface{}) {
-		obj := v.(*statusObj)
-		data := mnger.Device.StatusValue(obj.TableIdx, obj.Data)
+	dbHandler := func(v interface{}) {
+		obj := v.(*statusVals)
+		data := cache.DevStatus(obj.TableIdx, obj.Data)
 		orm.DbCreate(data)
 	}
-	p, _ := ants.NewPoolWithFunc(5, statusFunc) // 协程池
+	p, _ := ants.NewPoolWithFunc(5, dbHandler) // 协程池
 	ticker := time.NewTicker(time.Second * 2)
 	defer p.Release()
 	defer close(h.status)
@@ -96,13 +96,25 @@ func (h *handler) dispatchStatus() {
 		select {
 		case v := <-h.status:
 			if v == nil {
-				h.insertStatus(p)
+				h.devStatusHandle(p)
 				return
 			}
 			tabIdx := v.DeviceId % model.DevStatusNum
 			h.dsCache[tabIdx] = append(h.dsCache[tabIdx], *v)
 		case <-ticker.C:
-			h.insertStatus(p)
+			h.devStatusHandle(p)
+		}
+	}
+}
+
+func (h *handler) devAlarmInsert(v interface{}) {
+	data := v.([]xproto.Alarm)
+	for _, alr := range data {
+		o := devAlarmDetailsModel(&alr)
+		orm.DbCreate(o)
+		service.DevAlarmAdd(devAlarmModel(&alr, o.DevStatus))
+		if o.Flag == 0 {
+			cache.NewDevAlarm(o)
 		}
 	}
 }
@@ -110,21 +122,8 @@ func (h *handler) dispatchStatus() {
 // dispatchAlarm 批量处理数据
 func (h *handler) dispatchAlarm() {
 	var stArray []xproto.Alarm
-	alarmFunc := func(v interface{}) {
-		data := v.([]xproto.Alarm)
-		for _, alr := range data {
-			s := devStatusModel(alr.Status)
-			if s != nil {
-				h.status <- s
-			}
-			orm.DbCreate(devAlarmDetailsModel(&alr, s))
-			o := devAlarmModel(&alr, s)
-			service.DevAlarmAdd(o)
-			mnger.Alarm.Add(o)
-		}
-	}
 	ticker := time.NewTicker(time.Second * 2)
-	p, _ := ants.NewPoolWithFunc(2, alarmFunc) // 协程池
+	p, _ := ants.NewPoolWithFunc(2, h.devAlarmInsert) // 协程池
 	defer p.Release()
 	defer close(h.alarm)
 	for {
@@ -134,7 +133,6 @@ func (h *handler) dispatchAlarm() {
 				p.Invoke(stArray)
 				return
 			}
-			// 推送给第三放
 			stArray = append(stArray, *v)
 		case <-ticker.C:
 			size := len(stArray)

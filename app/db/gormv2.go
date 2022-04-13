@@ -2,7 +2,6 @@ package db
 
 import (
 	"errors"
-	"xstation/entity/mnger"
 	"xstation/model"
 
 	"github.com/wlgd/xutils/orm"
@@ -16,7 +15,6 @@ import (
 
 func initTables(db *gorm.DB) {
 	db.AutoMigrate(
-		&model.Device{},
 		&model.DevOnline{},
 		&model.DevAlarm{},
 		&model.DevAlarmDetails{},
@@ -39,7 +37,7 @@ type Option struct {
 	Address string
 }
 
-func sqlInit(o *Option) error {
+func Run(o *Option) error {
 	var err error
 	var db *gorm.DB
 	switch o.Name {
@@ -74,19 +72,4 @@ func sqlInit(o *Option) error {
 	sqldb.SetMaxOpenConns(100)
 	initTables(db)
 	return nil
-}
-
-func initDevices() error {
-	var data []model.Device
-	orm.DbFind(&data)
-	mnger.Device.Set(data)
-	return nil
-}
-
-// Init 初始化服务
-func Init(o *Option) error {
-	if err := sqlInit(o); err != nil {
-		return err
-	}
-	return initDevices()
 }

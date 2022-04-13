@@ -45,7 +45,7 @@ func Run(port uint16) {
 	go s.ListenAndServe()
 }
 
-func Stop() {
+func Shutdown() {
 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer cancel()
 	if err := s.Shutdown(ctx); err != nil {

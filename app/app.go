@@ -19,22 +19,26 @@ import (
 
 // Run 启动
 func Run() error {
-	if err := db.Init(&configs.Default.Sql); err != nil {
+	if err := db.Run(&configs.Default.Sql); err != nil {
 		return err
 	}
+
 	if configs.Default.Ftp.Enable {
 		if err := ftp.Run(configs.PublicAbs(configs.Default.Public), &configs.Default.Ftp.Option); err != nil {
 			return err
 		}
 		log.Printf("Xftp ListenAndServe at %s\n", configs.FtpAddr)
 	}
+
 	if configs.Default.Hook.Enable {
 		device.Hooks(configs.Default.Hook.Options)
 	}
+
 	log.Printf("Xproto ListenAndServe at %s:%d\n", configs.Default.Host, configs.Default.Port.Access)
-	if err := access.Start(configs.Default.Host, configs.Default.Port.Access); err != nil {
+	if err := access.Run(configs.Default.Host, configs.Default.Port.Access); err != nil {
 		return err
 	}
+
 	log.Printf("Http ListenAndServe at %s:%d\n", configs.Default.Host, configs.Default.Port.Http)
 	router.Run(configs.Default.Port.Http)
 	return nil
@@ -42,7 +46,7 @@ func Run() error {
 
 // Shutdown 停止
 func Shutdown() error {
-	access.Stop()
-	router.Stop()
+	access.Shutdown()
+	// router.Stop()
 	return nil
 }
