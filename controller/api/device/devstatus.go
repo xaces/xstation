@@ -3,6 +3,7 @@ package device
 import (
 	"xstation/entity/cache"
 	"xstation/model"
+	"xstation/internal/errors"
 	"xstation/service"
 
 	"github.com/wlgd/xutils/orm"
@@ -21,9 +22,14 @@ func (o *Status) ListHandler(c *gin.Context) {
 		ctx.JSONWriteError(err, c)
 		return
 	}
-	m := cache.Device(p.DeviceNo).Model()
-	var data []model.DevStatus
-	total, _ := orm.DbByWhere(m, p.Where()).Find(&data)
+	var (
+		data  []model.DevStatus
+		total int64
+	)
+	m := cache.Device(p.DeviceNo)
+	if m != nil {
+		total, _ = orm.DbByWhere(m.Model(), p.Where()).Find(&data)
+	}
 	ctx.JSONOk().Write(gin.H{"total": total, "data": data}, c)
 }
 
@@ -40,7 +46,12 @@ func (o *Status) GetHandler(c *gin.Context) {
 		ctx.JSONWriteError(err, c)
 		return
 	}
-	data := cache.Device(p.DeviceNo).Model()
+	m := cache.Device(p.DeviceNo)
+	if m != nil {
+		ctx.JSONWriteError(errors.InvalidDeviceNo, c)
+		return
+	}
+	data := m.Model()
 	if err := orm.DbFirstById(data, p.StatusId); err != nil {
 		ctx.JSONWriteError(err, c)
 		return

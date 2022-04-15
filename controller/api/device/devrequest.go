@@ -1,7 +1,7 @@
 package device
 
 import (
-	"errors"
+	"xstation/internal/errors"
 
 	"github.com/wlgd/xutils/ctx"
 
@@ -19,7 +19,7 @@ func checkParam(c *gin.Context, param interface{}) (*devInfo, error) {
 	dvr := &devInfo{}
 	dvr.deviceNo = c.Query("deviceNo")
 	if dvr.deviceNo == "" {
-		return nil, errors.New("deviceNo invalid")
+		return nil, errors.InvalidDeviceNo
 	}
 	if param == nil {
 		return dvr, nil

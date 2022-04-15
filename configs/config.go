@@ -1,7 +1,6 @@
 package configs
 
 import (
-	"fmt"
 	"os"
 	"path/filepath"
 	"xstation/app/db"
@@ -15,15 +14,16 @@ type configure struct {
 	Host    string
 	License string
 	Public  string
+	Guid    string
 	Port    struct {
 		Http   uint16
 		Access uint16
 	}
-	Sql db.Option
-	Ftp struct {
-		Enable bool
-		Option ftp.Option
+	Super struct {
+		Api string
 	}
+	Sql  db.Option
+	Ftp  ftp.Option
 	Hook struct {
 		Enable  bool
 		Options []hook.Option
@@ -32,11 +32,10 @@ type configure struct {
 
 // Default 所有配置参数
 var (
-	Default      configure
-	License      xutils.License
-	FtpAddr      string
-	SuperAddress string
-	absDir       string
+	Default configure
+	License xutils.License
+	FtpAddr string
+	absDir  string
 )
 
 func PublicAbs(path string) string {
@@ -57,6 +56,6 @@ func Load(path string) error {
 	} else {
 		License = *lice
 	}
-	FtpAddr = fmt.Sprintf("ftp://%s:%s@%s:%d", Default.Ftp.Option.User, Default.Ftp.Option.Pswd, Default.Host, Default.Ftp.Option.Port)
+	Default.Ftp.Path = PublicAbs(Default.Public)
 	return nil
 }

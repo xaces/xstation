@@ -1,6 +1,7 @@
 package access
 
 import (
+	"log"
 	"xstation/controller/device"
 
 	"github.com/wlgd/xproto"
@@ -31,14 +32,13 @@ var (
 
 // Start 启动
 func Run(host string, port uint16) (err error) {
-	opt := &xproto.Options{
+	if s, err = xproto.NewServer(&xproto.Options{
 		RequestTimeout: 50,
 		RecvTimeout:    30,
 		Port:           uint16(port),
 		Host:           host,
 		Adapter:        protocolAdapter,
-	}
-	if s, err = xproto.NewServer(opt); err != nil {
+	}); err != nil {
 		return
 	}
 	device.Handler.Disptah()
@@ -48,6 +48,7 @@ func Run(host string, port uint16) (err error) {
 	s.Handle.Alarm = device.AlarmHandler
 	s.Handle.Event = device.EventHandler
 	go s.ListenTCPAndServe()
+	log.Printf("Xproto ListenAndServe at %s:%d\n", host, port)
 	return
 }
 

@@ -47,7 +47,7 @@ func (h *handler) Stop() {
 	h.status <- nil
 }
 
-func Hooks(o []hook.Option) {
+func NewHooks(o []hook.Option) {
 	for _, v := range o {
 		switch v.Name {
 		case "nats":

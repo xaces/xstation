@@ -1,6 +1,7 @@
 package ftp
 
 import (
+	"errors"
 	"log"
 	"os"
 
@@ -13,19 +14,24 @@ var (
 )
 
 type Option struct {
-	Port int
-	User string
-	Pswd string
+	Enable bool
+	Port   int
+	User   string
+	Pswd   string
+	Path   string
 }
 
 // Run start server
-func Run(path string, o *Option) error {
-	os.MkdirAll(path, os.ModePerm)
+func Run(o *Option) error {
+	if !o.Enable {
+		return errors.New("Xftp disable")
+	}
+	os.MkdirAll(o.Path, os.ModePerm)
 	var perm = server.NewSimplePerm("test", "test")
 	fopt := &server.ServerOpts{
 		Name: "test ftpd",
 		Factory: &filedriver.FileDriverFactory{
-			RootPath: path,
+			RootPath: o.Path,
 			Perm:     perm,
 		},
 		Port: o.Port,

@@ -15,12 +15,15 @@ func AccessHandler(b []byte, a *xproto.Access) (interface{}, error) {
 	switch a.LinkType {
 	case xproto.Link_Signal:
 		m := cache.Device(a.DeviceNo)
-		m.Update(a)
+		if m == nil {
+			m = cache.NewDevice(cache.Vehicle{DeviceNo: a.DeviceNo})
+		}
 		log.Printf("%s", b)
 		if m.DeviceId == 0 {
 			return nil, nil
 			// return nil, fmt.Errorf("[%s] invalid", a.DeviceNo)
 		}
+		m.Update(a)
 		for _, v := range hooks {
 			v.Online(m.DeviceId, a)
 		}
@@ -60,6 +63,10 @@ func DroppedHandler(v interface{}, a *xproto.Access, err error) {
 func StatusHandler(tag string, s *xproto.Status) {
 	xproto.LogStatus(tag, s)
 	m := cache.Device(s.DeviceNo)
+	if s.Flag == 0 {
+		m.LastOnlineTime = s.DTU
+		m.Status = *s
+	}
 	if m.DeviceId == 0 {
 		return
 	}
@@ -68,10 +75,6 @@ func StatusHandler(tag string, s *xproto.Status) {
 	}
 	o := devStatusModel(s)
 	o.DeviceId = m.DeviceId
-	if s.Flag == 0 {
-		m.Status = *s
-	}
-	m.LastOnlineTime = s.DTU
 	Handler.status <- o
 }
 
@@ -99,14 +102,18 @@ func EventHandler(data []byte, e *xproto.Event) {
 	switch e.Type {
 	case xproto.Event_FtpTransfer:
 	case xproto.Event_FileLittle:
-		ftpLittleFile(e)
+		alr := cache.DevAlarm(e.Session) // 从缓存中获取数据
+		if alr == nil || !m.FtpAlarms.Include(alr.AlarmType) {
+			return
+		}
+		ftpLittleFile(e, alr.AlarmType)
 	case xproto.Event_FileTimedCapture:
 		ftpTimedCapture(e)
 	}
 }
 
 // ftpLittleFile 新文件通知
-func ftpLittleFile(e *xproto.Event) {
+func ftpLittleFile(e *xproto.Event, alrType int) {
 	v := e.Data.(xproto.EventFileLittle)
 	fpName := util.FilePath(v.FileName, e.DeviceNo)
 	ftp := xproto.FtpTransfer{
@@ -120,15 +127,11 @@ func ftpLittleFile(e *xproto.Event) {
 	if xproto.SyncSend(xproto.Req_FtpTransfer, ftp, nil, e.DeviceNo) != nil {
 		return
 	}
-	alr := cache.DevAlarm(e.Session) // 从缓存中获取数据
-	if alr == nil {
-		return
-	}
 	data := &model.DevAlarmFile{}
 	data.Guid = e.Session
 	data.LinkType = model.AlarmLinkFtpFile
 	data.DeviceNo = e.DeviceNo
-	data.AlarmType = alr.AlarmType
+	data.AlarmType = alrType
 	data.DTU = e.DTU
 	data.Channel = v.Channel
 	data.Size = v.Size

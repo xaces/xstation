@@ -1,6 +1,7 @@
 package app
 
 import (
+	"fmt"
 	"log"
 	"xstation/app/access"
 	"xstation/app/db"
@@ -8,39 +9,65 @@ import (
 	"xstation/app/router"
 	"xstation/configs"
 	"xstation/controller/device"
+	"xstation/entity/cache"
+	"xstation/util"
+
+	"github.com/wlgd/xutils"
 )
 
-// func loginServe() error {
-// 	url := fmt.Sprintf("http://%s/station/online", configs.SuperAddress)
-// 	address := fmt.Sprintf("%s:%d", configs.Default.Host, configs.Default.Port.Http)
-// 	req := gin.H{"serveId": configs.Local.Id, "address": address}
-// 	return xutils.HttpPost(url, req, nil)
-// }
+func getLocalVehicle() error {
+	if configs.Default.Super.Api == "" {
+		return nil // 测试
+	}
+	// 获取设备信息
+	url := fmt.Sprintf("%s/devices/%s", configs.Default.Super.Api, configs.Default.Guid)
+	var vehis []cache.Vehicle
+	if err := xutils.HttpGet(url, &vehis); err != nil {
+		return err
+	}
+	for _, v := range vehis {
+		cache.NewDevice(v)
+	}
+
+	// 获取报警ftp上传策略
+	url = fmt.Sprintf("%s/ftpAlarms/%s", configs.Default.Super.Api, configs.Default.Guid)
+	var alarms []cache.VehicleFtp
+	if err := xutils.HttpGet(url, &alarms); err != nil {
+		return err
+	}
+	for _, v := range alarms {
+		m := cache.Device(v.DeviceNo)
+		if m == nil {
+			continue
+		}
+		alrs := util.StringToIntSlice(v.Alarms, ",")
+		for _, t := range alrs {
+			m.FtpAlarms.Set(t)
+		}
+	}
+	return nil
+}
 
 // Run 启动
 func Run() error {
-	if err := db.Run(&configs.Default.Sql); err != nil {
+	conf := configs.Default
+	if err := getLocalVehicle(); err != nil {
 		return err
 	}
-
-	if configs.Default.Ftp.Enable {
-		if err := ftp.Run(configs.PublicAbs(configs.Default.Public), &configs.Default.Ftp.Option); err != nil {
-			return err
-		}
+	if err := db.Run(&conf.Sql); err != nil {
+		return err
+	}
+	if err := ftp.Run(&conf.Ftp); err == nil {
+		configs.FtpAddr = fmt.Sprintf("ftp://%s:%s@%s:%d", conf.Ftp.User, conf.Ftp.Pswd, conf.Host, conf.Ftp.Port)
 		log.Printf("Xftp ListenAndServe at %s\n", configs.FtpAddr)
 	}
-
-	if configs.Default.Hook.Enable {
-		device.Hooks(configs.Default.Hook.Options)
+	if conf.Hook.Enable {
+		device.NewHooks(conf.Hook.Options)
 	}
-
-	log.Printf("Xproto ListenAndServe at %s:%d\n", configs.Default.Host, configs.Default.Port.Access)
-	if err := access.Run(configs.Default.Host, configs.Default.Port.Access); err != nil {
+	if err := access.Run(conf.Host, conf.Port.Access); err != nil {
 		return err
 	}
-
-	log.Printf("Http ListenAndServe at %s:%d\n", configs.Default.Host, configs.Default.Port.Http)
-	router.Run(configs.Default.Port.Http)
+	router.Run(conf.Port.Http)
 	return nil
 }
 

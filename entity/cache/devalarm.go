@@ -8,10 +8,6 @@ import (
 	"github.com/wlgd/xutils/orm"
 )
 
-type alarmMapper struct {
-	Cache *cachego.Cache
-}
-
 var (
 	gAlarm = cachego.NewCache(cachego.WithAutoGC(60 * time.Minute))
 )

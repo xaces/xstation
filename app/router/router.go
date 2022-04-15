@@ -43,6 +43,7 @@ func Run(port uint16) {
 		MaxHeaderBytes: 1 << 20,
 	}
 	go s.ListenAndServe()
+	log.Printf("Http ListenAndServe at %s\n", address)
 }
 
 func Shutdown() {
