@@ -114,7 +114,7 @@ func EventHandler(data []byte, e *xproto.Event) {
 
 // ftpLittleFile 新文件通知
 func ftpLittleFile(e *xproto.Event, alrType int) {
-	v := e.Data.(xproto.EventFileLittle)
+	v := e.Data.(xproto.FileLittle)
 	fpName := util.FilePath(v.FileName, e.DeviceNo)
 	ftp := xproto.FtpTransfer{
 		FtpURL:   configs.FtpAddr,
@@ -127,23 +127,24 @@ func ftpLittleFile(e *xproto.Event, alrType int) {
 	if xproto.SyncSend(xproto.Req_FtpTransfer, ftp, nil, e.DeviceNo) != nil {
 		return
 	}
-	data := &model.DevAlarmFile{}
-	data.Guid = e.Session
-	data.LinkType = model.AlarmLinkFtpFile
-	data.DeviceNo = e.DeviceNo
-	data.AlarmType = alrType
-	data.DTU = e.DTU
-	data.Channel = v.Channel
-	data.Size = v.Size
-	data.Duration = v.Duration
-	data.FileType = v.FileType
-	data.Name = ftp.FileDst
+	data := &model.DevAlarmFile{
+		Guid:      e.Session,
+		LinkType:  model.AlarmLinkFtpFile,
+		DeviceNo:  e.DeviceNo,
+		AlarmType: alrType,
+		DTU:       e.DTU,
+		Channel:   v.Channel,
+		Size:      v.Size,
+		Duration:  v.Duration,
+		FileType:  v.FileType,
+		Name:      ftp.FileDst,
+	}
 	orm.DbCreate(data)
 }
 
 //
 func ftpTimedCapture(e *xproto.Event) {
-	v := e.Data.(xproto.EventFileTimedCapture)
+	v := e.Data.(xproto.FileCapture)
 	fpName := util.FilePicPath(v.FileName, e.DeviceNo)
 	ftp := xproto.FtpTransfer{
 		FtpURL:   configs.FtpAddr,
