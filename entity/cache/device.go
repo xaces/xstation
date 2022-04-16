@@ -2,7 +2,6 @@ package cache
 
 import (
 	"sync"
-	"unsafe"
 	"xstation/model"
 
 	"github.com/wlgd/xproto"
@@ -34,18 +33,7 @@ func (m *mdevice) Update(a *xproto.Access) {
 }
 
 func (m *mdevice) Model() interface{} {
-	tabIdex := m.DeviceId % model.DevStatusNum
-	switch tabIdex {
-	case 1:
-		return &model.DevStatus1{}
-	case 2:
-		return &model.DevStatus1{}
-	case 3:
-		return model.DevStatus3{}
-	case 4:
-		return &model.DevStatus4{}
-	}
-	return &model.DevStatus{}
+	return model.DevStatusVal(m.DeviceId)
 }
 
 var (
@@ -86,19 +74,4 @@ func DeviceList() (devs []mdevice) {
 		devs = append(devs, *v)
 	}
 	return
-}
-
-func DevStatus(tabidx int, v []model.DevStatus) interface{} {
-	ptr := unsafe.Pointer(&v)
-	switch tabidx {
-	case 1:
-		return (*[]model.DevStatus1)(ptr)
-	case 2:
-		return (*[]model.DevStatus2)(ptr)
-	case 3:
-		return (*[]model.DevStatus3)(ptr)
-	case 4:
-		return (*[]model.DevStatus4)(ptr)
-	}
-	return v
 }

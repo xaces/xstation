@@ -64,7 +64,7 @@ type statusVals struct {
 }
 
 func (h *handler) devStatusHandle(p *ants.PoolWithFunc) {
-	for i := 0; i < model.DevStatusNum; i++ {
+	for i := 0; i < model.DevStatusTabCount; i++ {
 		size := len(h.dsCache[i])
 		if size < 1 {
 			continue
@@ -82,10 +82,10 @@ func (h *handler) devStatusHandle(p *ants.PoolWithFunc) {
 
 // dispatchStatus 批量处理数据
 func (h *handler) dispatchStatus() {
-	h.dsCache = make([][]model.DevStatus, model.DevStatusNum)
+	h.dsCache = make([][]model.DevStatus, model.DevStatusTabCount)
 	dbHandler := func(v interface{}) {
 		obj := v.(*statusVals)
-		data := cache.DevStatus(obj.TableIdx, obj.Data)
+		data := model.DevStatusTabVal(obj.TableIdx, obj.Data)
 		orm.DbCreate(data)
 	}
 	p, _ := ants.NewPoolWithFunc(5, dbHandler) // 协程池
@@ -99,7 +99,7 @@ func (h *handler) dispatchStatus() {
 				h.devStatusHandle(p)
 				return
 			}
-			tabIdx := v.DeviceId % model.DevStatusNum
+			tabIdx := v.DeviceId % model.DevStatusTabCount
 			h.dsCache[tabIdx] = append(h.dsCache[tabIdx], *v)
 		case <-ticker.C:
 			h.devStatusHandle(p)

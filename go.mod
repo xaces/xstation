@@ -11,17 +11,13 @@ require (
 	github.com/jlaffaye/ftp v0.0.0-20211117213618-11820403398b // indirect
 	github.com/json-iterator/go v1.1.11
 	github.com/kardianos/service v1.2.0
-	github.com/lesismal/arpc v1.2.7 // indirect
+	github.com/lesismal/arpc v1.2.7
 	github.com/nats-io/nuid v1.0.1
 	github.com/panjf2000/ants/v2 v2.4.6
 	github.com/satori/go.uuid v1.2.0
 	github.com/unrolled/secure v1.0.9
 	github.com/wlgd/xproto v0.0.0-00010101000000-000000000000
 	github.com/wlgd/xutils v0.0.0-20210701074559-e4b0685b2ff6
-	gorm.io/driver/mysql v1.3.2
-	gorm.io/driver/postgres v1.3.1
-	gorm.io/driver/sqlite v1.1.4
-	gorm.io/gorm v1.23.3
 )
 
 replace github.com/wlgd/xproto => ../xproto

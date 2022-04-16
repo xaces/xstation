@@ -2,8 +2,8 @@ package device
 
 import (
 	"xstation/entity/cache"
-	"xstation/model"
 	"xstation/internal/errors"
+	"xstation/model"
 	"xstation/service"
 
 	"github.com/wlgd/xutils/orm"

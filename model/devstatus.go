@@ -2,6 +2,7 @@ package model
 
 import (
 	"database/sql/driver"
+	"unsafe"
 
 	jsoniter "github.com/json-iterator/go"
 	"github.com/wlgd/xproto"
@@ -163,7 +164,7 @@ func (j *DevStatus) Scan(v interface{}) error {
 }
 
 const (
-	DevStatusNum = 2
+	DevStatusTabCount = 2
 )
 
 // TableName 表名
@@ -193,4 +194,34 @@ type DevStatus4 DevStatus
 
 func (s *DevStatus4) TableName() string {
 	return "t_devstatus4"
+}
+
+func DevStatusTabVal(tabIdx int, v []DevStatus) interface{} {
+	ptr := unsafe.Pointer(&v)
+	switch tabIdx {
+	case 1:
+		return (*[]DevStatus1)(ptr)
+	case 2:
+		return (*[]DevStatus2)(ptr)
+	case 3:
+		return (*[]DevStatus3)(ptr)
+	case 4:
+		return (*[]DevStatus4)(ptr)
+	}
+	return v
+}
+
+func DevStatusVal(id uint) interface{} {
+	tabIdex := id % DevStatusTabCount
+	switch tabIdex {
+	case 1:
+		return &DevStatus1{}
+	case 2:
+		return &DevStatus1{}
+	case 3:
+		return &DevStatus3{}
+	case 4:
+		return &DevStatus4{}
+	}
+	return &DevStatus{}
 }

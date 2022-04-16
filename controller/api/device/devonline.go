@@ -20,7 +20,7 @@ func (o *Online) ListHandler(c *gin.Context) {
 	}
 	var data []model.DevOnline
 	total, _ := orm.DbByWhere(&model.DevOnline{}, param.Where()).Find(&data)
-	ctx.JSONOk().WriteData(gin.H{"total": total, "data": data}, c)
+	ctx.JSONOk().Write(gin.H{"total": total, "data": data}, c)
 }
 
 func OnlineRouter(r *gin.RouterGroup) {
