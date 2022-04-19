@@ -87,7 +87,11 @@ func AlarmHandler(b []byte, a *xproto.Alarm) {
 	for _, v := range hooks {
 		v.Alarm(m.DeviceId, a)
 	}
-	Handler.alarm <- a
+	o := devAlarmDetailsModel(a)
+	if o.Status == 0 {
+		cache.NewDevAlarm(o)
+	}
+	Handler.alarm <- o
 }
 
 func EventHandler(data []byte, e *xproto.Event) {

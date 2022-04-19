@@ -21,7 +21,8 @@ func DevAlarm(ss string) *model.DevAlarmDetails {
 	var alr model.DevAlarmDetails
 	if data, ok := gAlarm.Get(ss); ok {
 		alr = data.(model.DevAlarmDetails)
-	}
+		return &alr
+	} 
 	if err := orm.DbFirstBy(&alr, "guid = ?", ss); err == nil {
 		NewDevAlarm(&alr)
 		return &alr

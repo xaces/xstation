@@ -2,7 +2,6 @@ package device
 
 import (
 	"time"
-	"xstation/entity/cache"
 	"xstation/entity/hook"
 	"xstation/model"
 	"xstation/service"
@@ -22,14 +21,14 @@ type Hook interface {
 
 type handler struct {
 	status  chan *model.DevStatus
-	alarm   chan *xproto.Alarm
+	alarm   chan *model.DevAlarmDetails
 	dsCache [][]model.DevStatus
 }
 
 var (
 	Handler *handler = &handler{
 		status: make(chan *model.DevStatus, 1),
-		alarm:  make(chan *xproto.Alarm, 1),
+		alarm:  make(chan *model.DevAlarmDetails, 1),
 	}
 	hooks []Hook
 )
@@ -108,20 +107,17 @@ func (h *handler) dispatchStatus() {
 }
 
 func (h *handler) devAlarmInsert(v interface{}) {
-	data := v.([]xproto.Alarm)
+	data := v.([]model.DevAlarmDetails)
 	for _, alr := range data {
-		o := devAlarmDetailsModel(&alr)
-		orm.DbCreate(o)
-		service.DevAlarmAdd(devAlarmModel(&alr, o.DevStatus))
-		if o.Flag == 0 {
-			cache.NewDevAlarm(o)
-		}
+		orm.DbCreate(alr.DevStatus) // 报警
+		orm.DbCreate(&alr)
+		service.DevAlarmAdd(&alr)
 	}
 }
 
 // dispatchAlarm 批量处理数据
 func (h *handler) dispatchAlarm() {
-	var stArray []xproto.Alarm
+	var stArray []model.DevAlarmDetails
 	ticker := time.NewTicker(time.Second * 2)
 	p, _ := ants.NewPoolWithFunc(2, h.devAlarmInsert) // 协程池
 	defer p.Release()
@@ -139,7 +135,7 @@ func (h *handler) dispatchAlarm() {
 			if size < 1 {
 				continue
 			}
-			data := make([]xproto.Alarm, size)
+			data := make([]model.DevAlarmDetails, size)
 			copy(data, stArray)
 			if err := p.Invoke(data); err != nil {
 				continue

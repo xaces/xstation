@@ -54,9 +54,21 @@ func (s *AlarmDetailsPage) Where() *orm.DbWhere {
 	return where
 }
 
-func DevAlarmAdd(alr *model.DevAlarm) error {
-	if alr.EndTime == "" {
-		return orm.DbCreate(alr)
+func DevAlarmAdd(a *model.DevAlarmDetails) error {
+	o := &model.DevAlarm{
+		Guid:      a.Guid,
+		DeviceNo:  a.DeviceNo,
+		DTU:       a.DTU,
+		AlarmType: a.AlarmType,
 	}
-	return orm.DbUpdatesBy(alr, []string{"dtu, end_data, end_time, end_status"}, "guid = ?", alr.Guid)
+	if a.Status == 0 {
+		o.StartTime = a.StartTime
+		o.StartData = a.Data
+		o.StartStatus = a.DevStatus
+		return orm.DbCreate(o)
+	}
+	o.EndTime = a.EndTime
+	o.EndStatus = a.DevStatus
+	o.EndData = a.Data
+	return orm.DbUpdatesBy(o, []string{"dtu", "end_time", "end_data", "end_status"}, "guid = ?", o.Guid)
 }

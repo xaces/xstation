@@ -15,7 +15,9 @@ func NewNats(o Option) *Nats {
 		o.Address = mq.DefaultURL
 	}
 	c := &Nats{Opt: o}
-	c.Conn, _ = mq.NewNatsClient(o.Address, false)
+	if conn, err := mq.NewNatsClient(o.Address, false); err == nil {
+		c.Conn = conn
+	}
 	return c
 }
 

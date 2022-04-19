@@ -36,7 +36,6 @@ func devStatusModel(s *xproto.Status) *model.DevStatus {
 		return nil
 	}
 	o := &model.DevStatus{}
-	o.Id = util.PrimaryKey()
 	o.DeviceNo = s.DeviceNo
 	o.DTU = s.DTU
 	o.Flag = s.Flag
@@ -59,41 +58,26 @@ func devStatusModel(s *xproto.Status) *model.DevStatus {
 	return o
 }
 
-func devAlarmModel(a *xproto.Alarm, s *model.DevStatus) *model.DevAlarm {
-	o := &model.DevAlarm{
+func devAlarmDetailsModel(a *xproto.Alarm) *model.DevAlarmDetails {
+	o := &model.DevAlarmDetails{
+		DeviceNo:  a.DeviceNo,
+		DTU:       a.DTU,
+		AlarmType: a.Type,
 		Guid:      a.UUID,
 		StartTime: a.StartTime,
 		EndTime:   a.EndTime,
-		DTU:       a.DTU,
-		DeviceNo:  a.DeviceNo,
-		AlarmType: a.Type,
+		Data:      util.JString(a.Data),
+		DevStatus: devStatusModel(a.Status),
 	}
-	if a.DTU > a.StartTime {
-		o.EndStatus = s
-		o.EndData = util.JString(a.Data)
-	} else {
-		o.StartData = util.JString(a.Data)
-		o.StartStatus = s
-	}
-	return o
-}
-
-func devAlarmDetailsModel(a *xproto.Alarm) *model.DevAlarmDetails {
-	o := &model.DevAlarmDetails{}
-	o.DeviceNo = a.DeviceNo
-	o.DTU = a.DTU
-	o.Guid = a.UUID
-	o.LinkType = model.AlarmLinkDev
-	o.Data = util.JString(a.Data)
-	o.DevStatus = devStatusModel(a.Status)
 	o.Flag = a.Status.Flag
-	o.AlarmType = a.Type
+	o.DevStatus.Flag = 2
 	o.Status = 0
 	if a.DTU > a.StartTime {
 		o.Status = 2
 		if a.EndTime != "" {
 			o.Status = 1
 		}
+		o.DevStatus.Flag = 3
 	}
 	return o
 }

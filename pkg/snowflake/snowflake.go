@@ -1,4 +1,4 @@
-package util
+package snowflake
 
 import (
 	"errors"
@@ -24,8 +24,8 @@ type Snowflake struct {
 	number    int64
 }
 
-// NewSnowflake 创建实例
-func NewSnowflake(workerID int64) (*Snowflake, error) {
+// New 创建实例
+func New(workerID int64) (*Snowflake, error) {
 	if workerID < 0 || workerID > workerMax {
 		return nil, errors.New("worker id excess of quantity")
 	}
@@ -62,7 +62,7 @@ var (
 )
 
 func init() {
-	_snowflake, _ = NewSnowflake(0xFF)
+	_snowflake, _ = New(0xff)
 }
 
 func PrimaryKey() uint {
