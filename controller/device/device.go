@@ -107,7 +107,7 @@ func EventHandler(data []byte, e *xproto.Event) {
 	case xproto.Event_FtpTransfer:
 	case xproto.Event_FileLittle:
 		alr := cache.DevAlarm(e.Session) // 从缓存中获取数据
-		if alr == nil || !m.FtpAlarms.Include(alr.AlarmType) {
+		if alr == nil {
 			return
 		}
 		ftpLittleFile(e, alr.AlarmType)

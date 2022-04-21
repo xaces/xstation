@@ -5,7 +5,6 @@ import (
 	"xstation/model"
 
 	"github.com/wlgd/xproto"
-	"github.com/wlgd/xutils"
 )
 
 type Vehicle struct {
@@ -24,7 +23,6 @@ type mdevice struct {
 	Online         bool           `json:"online"`
 	LastOnlineTime string         `json:"lastOnlineTime"`
 	Status         xproto.Status  `json:"status"`
-	FtpAlarms      *xutils.BitMap `json:"-"`
 }
 
 func (m *mdevice) Update(a *xproto.Access) {
@@ -56,7 +54,6 @@ func NewDevice(vehi Vehicle) *mdevice {
 	gDevlock.Lock()
 	defer gDevlock.Unlock()
 	v := &mdevice{Vehicle: vehi}
-	v.FtpAlarms = xutils.NewBitMapWithBase(0, 1000)
 	gDevices[v.DeviceNo] = v
 	return v
 }

@@ -10,7 +10,6 @@ import (
 	"xstation/configs"
 	"xstation/controller/device"
 	"xstation/entity/cache"
-	"xstation/util"
 
 	"github.com/wlgd/xutils"
 )
@@ -27,23 +26,6 @@ func getLocalVehicle() error {
 	}
 	for _, v := range vehis {
 		cache.NewDevice(v)
-	}
-
-	// 获取报警ftp上传策略
-	url = fmt.Sprintf("%s/ftpAlarms/%s", configs.Default.Super.Api, configs.Default.Guid)
-	var alarms []cache.VehicleFtp
-	if err := xutils.HttpGet(url, &alarms); err != nil {
-		return err
-	}
-	for _, v := range alarms {
-		m := cache.Device(v.DeviceNo)
-		if m == nil {
-			continue
-		}
-		alrs := util.StringToIntSlice(v.Alarms, ",")
-		for _, t := range alrs {
-			m.FtpAlarms.Set(t)
-		}
 	}
 	return nil
 }
