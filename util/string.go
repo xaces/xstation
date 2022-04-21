@@ -44,7 +44,7 @@ func StringIndex(s, sep string, n int) string {
 func FilePath(s, deviceNo string) string {
 	sarr := strings.Split(s, "/")
 	i := len(sarr) - 1
-	return fmt.Sprintf("%s/%s/%s/%s", sarr[i-2], deviceNo, sarr[i-1], sarr[i])
+	return fmt.Sprintf("%s/%s/%s/%s/%s", sarr[i-2],deviceNo, sarr[i-3], sarr[i-1], sarr[i])
 }
 
 func FilePicPath(s, deviceNo string) string {
