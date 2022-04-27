@@ -8,9 +8,9 @@ type DevOnline struct {
 	Guid          string     `json:"guid" gorm:"primary_key"`
 	DeviceNo      string     `json:"deviceNo" gorm:"type:varchar(24);"`
 	RemoteAddress string     `json:"remoteAddress"` // 设备网络地址
-	OnlineTime    string     `json:"onlineTime"`
+	OnlineTime    string     `json:"onlineTime" gorm:"type:datetime;default:null"`
 	OnlineStatus  *DevStatus `json:"onlineStatus"`
-	OfflineTime   string     `json:"offlineTime"`
+	OfflineTime   string     `json:"offlineTime" gorm:"type:datetime;default:null"`
 	OfflineStatus *DevStatus `json:"offlineStatus"`
 	NetType       int        `json:"netType"` // 网络类型
 	Type          int        `json:"type"`    // 工作类型

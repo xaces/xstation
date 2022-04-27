@@ -138,7 +138,7 @@ type DevStatus struct {
 	DeviceNo  string    `json:"deviceNo" gorm:"type:varchar(24);"`  // 时间
 	Flag      uint8     `json:"flag"`                               // 0-实时 1-补传 2-报警开始 3-报警结束
 	Acc       uint8     `json:"acc"`                                // acc
-	DTU       string    `json:"dtu" gorm:"type:varchar(20);"`       // 时间
+	DTU       string    `json:"dtu" gorm:"type:datetime;"`       // 时间
 	Location  JLocation `json:"location" gorm:"type:varchar(128);"` // location json 字符串
 	Obds      JObds     `json:"obds"`                               // obd json 字符串
 	Tempers   JFloats   `json:"tempers"`                            // 温度 json 字符串
