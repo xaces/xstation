@@ -10,18 +10,15 @@ import (
 	"github.com/wlgd/xproto/ttx"
 )
 
-func protocolAdapter(b []byte) xproto.InterfaceProtocol {
-	if _, err := ho.IsValidProto(b); err == nil {
-		return &ho.ProtoImpl{
-			SubAlarmStatus: 0xffff,
-			SubStatus:      0xffff,
-		}
+func protocolAdapter(b []byte) xproto.IClient {
+	if c := ho.NewClient(b, &ho.Options{SubAlarmStatus: 0xffff, SubStatus: 0xffff}); c != nil {
+		return c
 	}
-	if _, err := ttx.IsValidProto(b); err == nil {
-		return &ttx.ProtoImpl{}
+	if c := ttx.NewClient(b); c != nil {
+		return c
 	}
-	if _, err := jt.IsValidProto(b); err == nil {
-		return &jt.ProtoImpl{}
+	if c := jt.NewClient(b); c != nil {
+		return c
 	}
 	return nil
 }
@@ -47,6 +44,7 @@ func Run(host string, port uint16) (err error) {
 	s.Handle.Status = device.StatusHandler
 	s.Handle.Alarm = device.AlarmHandler
 	s.Handle.Event = device.EventHandler
+	s.Handle.Frame = xproto.LogFrame
 	go s.ListenTCPAndServe()
 	log.Printf("Xproto ListenAndServe at %s:%d\n", host, port)
 	return
