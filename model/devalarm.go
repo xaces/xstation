@@ -6,7 +6,7 @@ type DevAlarm struct {
 	DeviceNo    string     `json:"deviceNo" gorm:"type:varchar(24);"`
 	DTU         string     `json:"dtu" gorm:"type:datetime;default:null"`
 	AlarmType   int        `json:"alarmType"` // 类型
-	StartTime   string     `json:"startTime" gorm:"type:datetime;default:null"` // 开始时间
+	StartTime   string     `json:"startTime" gorm:"primary_key;type:datetime;"` // 开始时间
 	StartData   string     `json:"startData"`                                   // gps信息 json 字符串
 	StartStatus *DevStatus `json:"startStatus"`
 	EndTime     string     `json:"endTime" gorm:"type:datetime;default:null"` // 结束时间
