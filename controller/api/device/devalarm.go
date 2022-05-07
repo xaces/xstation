@@ -2,7 +2,6 @@ package device
 
 import (
 	"xstation/model"
-	"xstation/service"
 
 	"github.com/gin-gonic/gin"
 	"github.com/wlgd/xutils/ctx"
@@ -13,24 +12,24 @@ type Alarm struct {
 }
 
 func (o *Alarm) ListHandler(c *gin.Context) {
-	var p service.AlarmPage
+	var p Where
 	if err := c.ShouldBind(&p); err != nil {
 		ctx.JSONWriteError(err, c)
 		return
 	}
 	var data []model.DevAlarm
-	total, _ := orm.DbByWhere(&model.DevAlarm{}, p.Where()).Find(&data)
+	total, _ := orm.DbByWhere(&model.DevAlarm{}, p.Alarm()).Find(&data)
 	ctx.JSONOk().Write(gin.H{"total": total, "data": data}, c)
 }
 
 func (o *Alarm) ListDetailsHandler(c *gin.Context) {
-	var p service.AlarmDetailsPage
+	var p Where
 	if err := c.ShouldBind(&p); err != nil {
 		ctx.JSONWriteError(err, c)
 		return
 	}
 	var data []model.DevAlarmDetails
-	total, _ := orm.DbByWhere(&model.DevAlarmDetails{}, p.Where()).Find(&data)
+	total, _ := orm.DbByWhere(&model.DevAlarmDetails{}, p.AlarmDetailsPage()).Find(&data)
 	ctx.JSONOk().Write(gin.H{"total": total, "data": data}, c)
 }
 
@@ -45,9 +44,9 @@ func (o *Alarm) GetByStatusIdHandler(c *gin.Context) {
 	ctx.JSONOk().WriteData(data, c)
 }
 
-func AlarmRouter(r *gin.RouterGroup) {
+func alarmRouter(r *gin.RouterGroup) {
 	alr := Alarm{}
-	r.GET("/alarm/list", alr.ListHandler)
-	r.GET("/alarm/details/list", alr.ListDetailsHandler)
-	r.GET("/alarm/bystatus/:statusId", alr.GetByStatusIdHandler)
+	r.GET("/list", alr.ListHandler)
+	r.GET("/details/list", alr.ListDetailsHandler)
+	r.GET("/bystatus/:statusId", alr.GetByStatusIdHandler)
 }

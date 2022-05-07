@@ -4,7 +4,6 @@ import (
 	"xstation/entity/cache"
 	"xstation/internal/errors"
 	"xstation/model"
-	"xstation/service"
 
 	"github.com/wlgd/xutils/orm"
 
@@ -17,7 +16,7 @@ type Status struct {
 }
 
 func (o *Status) ListHandler(c *gin.Context) {
-	var p service.StatusPage
+	var p Where
 	if err := c.ShouldBind(&p); err != nil {
 		ctx.JSONWriteError(err, c)
 		return
@@ -28,7 +27,7 @@ func (o *Status) ListHandler(c *gin.Context) {
 	)
 	m := cache.Device(p.DeviceNo)
 	if m != nil {
-		total, _ = orm.DbByWhere(m.Model(), p.Where()).Find(&data)
+		total, _ = orm.DbByWhere(m.Model(), p.Status()).Find(&data)
 	}
 	ctx.JSONOk().Write(gin.H{"total": total, "data": data}, c)
 }
@@ -59,8 +58,8 @@ func (o *Status) GetHandler(c *gin.Context) {
 	ctx.JSONOk().WriteData(data, c)
 }
 
-func StatusRouter(r *gin.RouterGroup) {
+func statusRouter(r *gin.RouterGroup) {
 	s := Status{}
-	r.GET("/status/list", s.ListHandler)
-	r.GET("/status", s.GetHandler)
+	r.GET("/list", s.ListHandler)
+	r.GET("", s.GetHandler)
 }

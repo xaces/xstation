@@ -333,27 +333,25 @@ func CloseLinkHandler(c *gin.Context) {
 	ctx.JSONOk().WriteTo(c)
 }
 
-func RequestRouter(r *gin.RouterGroup) {
-	p := r.Group("/request")
-	p.POST("/liveStream", LiveStreamHandler)
-	p.POST("/voice", VoiceHandler)
-	p.POST("/playback", PlaybackHandler)
-	p.POST("/query", QueryHandler)
-	p.POST("/parameters", ParametersHandler)
-	p.POST("/fileTransfer", FileTransferHandler)
-	p.POST("/ftpTransfer", FtpTransferHandler)
-	p.POST("/user", UserDefineHandler)
-	p.POST("/close", CloseLinkHandler)
+func requestRouter(r *gin.RouterGroup) {
+	r.POST("/liveStream", LiveStreamHandler)
+	r.POST("/voice", VoiceHandler)
+	r.POST("/playback", PlaybackHandler)
+	r.POST("/query", QueryHandler)
+	r.POST("/parameters", ParametersHandler)
+	r.POST("/fileTransfer", FileTransferHandler)
+	r.POST("/ftpTransfer", FtpTransferHandler)
+	r.POST("/user", UserDefineHandler)
+	r.POST("/close", CloseLinkHandler)
 
 }
 
-func ControlRouter(r *gin.RouterGroup) {
-	ctrl := r.Group("/control")
-	ctrl.POST("/ptz", ControlPTZHandler)
-	ctrl.POST("/reboot", ControlRebootHandler)
-	ctrl.POST("/capture", ControlCaptureHandler)
-	ctrl.POST("/osd", ControlOsdHandler)
-	ctrl.POST("/reset", ControlResetHandler)
-	ctrl.POST("/vehicle", ControlVehicleHandler)
-	ctrl.POST("/gsensor", ControlGsensorHandler)
+func controlRouter(r *gin.RouterGroup) {
+	r.POST("/ptz", ControlPTZHandler)
+	r.POST("/reboot", ControlRebootHandler)
+	r.POST("/capture", ControlCaptureHandler)
+	r.POST("/osd", ControlOsdHandler)
+	r.POST("/reset", ControlResetHandler)
+	r.POST("/vehicle", ControlVehicleHandler)
+	r.POST("/gsensor", ControlGsensorHandler)
 }

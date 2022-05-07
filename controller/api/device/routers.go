@@ -2,12 +2,11 @@ package device
 
 import "github.com/gin-gonic/gin"
 
-func InitRouters(r *gin.RouterGroup) {
-	api := r.Group("/device")
-	DeviceRouter(api)
-	RequestRouter(api)
-	ControlRouter(api)
-	StatusRouter(api)
-	OnlineRouter(api)
-	AlarmRouter(api)
+func Routers(r *gin.RouterGroup) {
+	deviceRouter(r)
+	requestRouter(r.Group("/request"))
+	controlRouter(r.Group("/control"))
+	statusRouter(r.Group("/status"))
+	onlineRouter(r.Group("/online"))
+	alarmRouter(r.Group("/alarm"))
 }

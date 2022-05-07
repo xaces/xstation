@@ -27,7 +27,7 @@ func (o *Device) GetHandler(c *gin.Context) {
 	ctx.JSONWriteError(errors.InvalidDeviceNo, c)
 }
 
-func DeviceRouter(r *gin.RouterGroup) {
+func deviceRouter(r *gin.RouterGroup) {
 	d := Device{}
 	r.GET("/list", d.ListHandler)
 	r.GET("/:deviceNo", d.GetHandler)
