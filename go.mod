@@ -17,9 +17,7 @@ require (
 	github.com/satori/go.uuid v1.2.0
 	github.com/unrolled/secure v1.0.9
 	github.com/wlgd/xproto v0.0.0-00010101000000-000000000000
-	github.com/wlgd/xutils v0.0.0-20210701074559-e4b0685b2ff6
+	github.com/wlgd/xutils v0.0.0-20220511104346-0bbafde87f52
 )
 
 replace github.com/wlgd/xproto => ../xproto
-
-replace github.com/wlgd/xutils => ../xutils

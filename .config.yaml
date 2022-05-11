@@ -1,31 +1,21 @@
-### 配置公网ip，此ip需要下发给设备
-host: "172.16.50.219"
+host: "172.16.50.219" ### 配置公网ip，此ip需要下发给设备
 license: "localstation.lice"
 guid: "gQSmPuboIGQahHdxQisOOk"
 public: "public"
-### 中心服务
-super:
+super: ### 中心服务
   api: ""
-  
-### 端口
-port:
+port: ### 端口
   http: 12100
   access: 22000
-
-# Ftp服务
-ftp:
+ftp: # Ftp服务
   enable: true
   port: 2211
   user: "admin"
   pswd: "123456"
-
-### SQL
-sql:
+sql: ### SQL
   name: "mysql"
   address: "root:123456@tcp(127.0.0.1:3306)/station?charset=utf8&parseTime=True&loc=Local"
-
-### 第三方Hook
-hook:
+hook: ### 第三方Hook
   enable: true
   options:
     - name: "nats"

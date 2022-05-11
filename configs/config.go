@@ -48,7 +48,7 @@ func PublicAbs(path string) string {
 // Load 初始化配置参数
 func Load(path string) error {
 	absDir = filepath.Dir(os.Args[0])
-	if err := xutils.YMLConf(PublicAbs(path), &Default); err != nil {
+	if err := xutils.YAMLFile(PublicAbs(path), &Default); err != nil {
 		return err
 	}
 	if lice, err := xutils.LicenseRead(PublicAbs(Default.License)); err != nil {
