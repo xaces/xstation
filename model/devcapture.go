@@ -13,6 +13,6 @@ type DevCapture struct {
 }
 
 // TableName 表名
-func (s *DevCapture) TableName() string {
+func (DevCapture) TableName() string {
 	return "t_devcapture"
 }

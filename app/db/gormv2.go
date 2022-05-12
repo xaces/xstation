@@ -1,6 +1,7 @@
 package db
 
 import (
+	"xstation/entity/task"
 	"xstation/model"
 
 	"github.com/wlgd/xutils/orm"
@@ -25,6 +26,11 @@ func Run(o *Option) error {
 		&model.DevStatus{},
 		&model.DevStatus1{},
 	)
-	NewPartition("t_devalarm", "start_time", 5).exec()
+	task.Timer.AddDbPartFunc(func() {
+		PartTable(model.DevAlarmDetails{}.TableName()).AlterRange("dtu", 5)
+	})
+	task.Timer.AddDbPartFunc(func() {
+		PartTable(model.DevAlarm{}.TableName()).AlterRange("start_time", 5)
+	})
 	return nil
 }

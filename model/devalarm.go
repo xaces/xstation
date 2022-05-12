@@ -15,7 +15,7 @@ type DevAlarm struct {
 }
 
 // TableName 表名
-func (s *DevAlarm) TableName() string {
+func (DevAlarm) TableName() string {
 	return "t_devalarm"
 }
 
@@ -35,7 +35,7 @@ type DevAlarmDetails struct {
 }
 
 // TableName 表名
-func (s *DevAlarmDetails) TableName() string {
+func (DevAlarmDetails) TableName() string {
 	return "t_devalarmdetails"
 }
 

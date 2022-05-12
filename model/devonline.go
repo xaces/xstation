@@ -21,6 +21,6 @@ type DevOnline struct {
 }
 
 // TableName 表名
-func (s *DevOnline) TableName() string {
+func (DevOnline) TableName() string {
 	return "t_devonline"
 }

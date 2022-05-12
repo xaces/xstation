@@ -10,6 +10,7 @@ import (
 	"xstation/configs"
 	"xstation/controller/device"
 	"xstation/entity/cache"
+	"xstation/entity/task"
 
 	"github.com/wlgd/xutils"
 )
@@ -36,6 +37,7 @@ func Run() error {
 	if err := getLocalVehicle(); err != nil {
 		return err
 	}
+	task.Timer.Run() // 启动定时任务
 	if err := db.Run(&conf.Sql); err != nil {
 		return err
 	}

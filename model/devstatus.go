@@ -168,31 +168,31 @@ const (
 )
 
 // TableName 表名
-func (s *DevStatus) TableName() string {
+func (DevStatus) TableName() string {
 	return "t_devstatus0"
 }
 
 type DevStatus1 DevStatus
 
-func (s *DevStatus1) TableName() string {
+func (DevStatus1) TableName() string {
 	return "t_devstatus1"
 }
 
 type DevStatus2 DevStatus
 
-func (s *DevStatus2) TableName() string {
+func (DevStatus2) TableName() string {
 	return "t_devstatus2"
 }
 
 type DevStatus3 DevStatus
 
-func (s *DevStatus3) TableName() string {
+func (DevStatus3) TableName() string {
 	return "t_devstatus3"
 }
 
 type DevStatus4 DevStatus
 
-func (s *DevStatus4) TableName() string {
+func (DevStatus4) TableName() string {
 	return "t_devstatus4"
 }
 
