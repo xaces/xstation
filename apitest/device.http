@@ -1,3 +1,32 @@
+
+POST http://127.0.0.1:12100/station/api/device
+Content-Type: application/json
+
+{
+    "deviceNo": "20198002",
+    "deviceName": "",
+    "icon": "",
+    "chlCount": 4,
+    "chlNames": "CH01,CH02,CH03,CH04",
+    "ioCount": 1,
+    "ioNames": "IO01"
+}
+
+### 批量添加设备
+POST http://127.0.0.1:12100/station/api/device/batchAdd
+Content-Type: application/json
+
+{
+    "prefix": "102019",
+    "count": 100,
+    "startNumber": 8003,
+    "chlCount": 4,
+    "chlNames": "CH01,CH02,CH03,CH04",
+    "ioCount": 1,
+    "ioNames": "IO01",
+    "icon": ""
+}
+
 ### 设备列表
 GET http://127.0.0.1:12100/station/api/device/list
 Content-Type: application/json
@@ -15,7 +44,7 @@ Content-Type: application/json
 }
 
 ### 获取设备状态数据
-GET http://127.0.0.1:12100/station/api/device/status/list?deviceNo=20198002&startTime=2021-12-09 00:00:00&endTime=2021-12-09 23:59:59&desc=dtu
+GET http://127.0.0.1:12100/station/api/device/status/list?deviceNo=20198003&startTime=2022-05-06 00:00:00&endTime=2022-05-06 23:59:59&desc=dtu
 Content-Type: application/json
 
 {
@@ -23,7 +52,7 @@ Content-Type: application/json
 }
 
 ### 获取设备状态数据
-GET http://127.0.0.1:12100/station/api/device/status/list?deviceNo=20198002&startTime=2021-12-09 00:00:00&endTime=2021-12-09 23:59:59&flag=2&desc=dtu
+GET http://127.0.0.1:12100/station/api/device/status/list?deviceNo=20198002&startTime=2022-05-06 00:00:00&endTime=2022-05-06 23:59:59&flag=2&desc=dtu
 Content-Type: application/json
 
 {
@@ -32,7 +61,7 @@ Content-Type: application/json
 
 
 ### 获取设备上下线数据
-GET http://127.0.0.1:12100/station/api/device/online/list?deviceNo=20198002&startTime=2021-12-09 00:00:00&endTime=2021-12-09 23:59:59
+GET http://127.0.0.1:12100/station/api/device/online/list?deviceNo=20198002&startTime=2022-05-06 00:00:00&endTime=2022-05-06 23:59:59
 Content-Type: application/json
 
 {
@@ -40,7 +69,7 @@ Content-Type: application/json
 }
 
 ### 获取设备报警数据
-GET http://127.0.0.1:12100/station/api/device/alarm/list?deviceNo=20198002&startTime=2021-12-09 00:00:00&endTime=2021-12-09 23:59:59
+GET http://127.0.0.1:12100/station/api/device/alarm/list?deviceNo=20198002&startTime=2022-05-06 00:00:00&endTime=2022-05-06 23:59:59
 Content-Type: application/json
 
 {
@@ -49,7 +78,7 @@ Content-Type: application/json
 
 
 ### 获取设备报警数据
-GET http://127.0.0.1:12100/station/api/device/alarm/link/list?deviceNo=800888&startTime=2021-12-09 00:00:00&endTime=2021-12-13 23:59:59&guid=1639159344002007000000800888
+GET http://127.0.0.1:12100/station/api/device/alarm/link/list?deviceNo=800888&startTime=2022-05-06 00:00:00&endTime=2021-12-13 23:59:59&guid=1639159344002007000000800888
 Content-Type: application/json
 
 {

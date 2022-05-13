@@ -31,11 +31,22 @@ func devOnlineUpdate(a *xproto.Access, s *xproto.Status) error {
 	return orm.DbUpdatesBy(o, []string{"offline_time, offline_status"}, "guid = ?", o.Guid)
 }
 
-func devStatusModel(s *xproto.Status) *model.DevStatus {
-	if s == nil {
-		return nil
+func deviceUpdate(deviceId uint, a *xproto.Access) error {
+	o := &model.Device{
+		Type:           a.DevType,
+		Version:        a.Version,
+		Online:         a.Online,
+		LastOnlineTime: a.DeviceTime,
 	}
+	o.ID = deviceId
+	return orm.DbUpdateModel(o)
+}
+
+func devStatusModel(s *xproto.Status) *model.DevStatus {
 	o := &model.DevStatus{}
+	if s == nil {
+		return o
+	}
 	o.DeviceNo = s.DeviceNo
 	o.DTU = s.DTU
 	o.Flag = s.Flag

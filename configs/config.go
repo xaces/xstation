@@ -36,6 +36,7 @@ var (
 	License xutils.License
 	FtpAddr string
 	absDir  string
+	MsgProc int    // 0--测试模式 1--正常模式
 )
 
 func PublicAbs(path string) string {

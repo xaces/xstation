@@ -135,21 +135,21 @@ func (t *JObds) Scan(v interface{}) error {
 type DevStatus struct {
 	Id        uint      `json:"id" gorm:"primary_key"`
 	DeviceId  uint      `json:"deviceId"`
-	DeviceNo  string    `json:"deviceNo" gorm:"type:varchar(24);"`  // 时间
-	Flag      uint8     `json:"flag"`                               // 0-实时 1-补传 2-报警开始 3-报警结束
-	Acc       uint8     `json:"acc"`                                // acc
-	DTU       string    `json:"dtu" gorm:"type:datetime;"`       // 时间
-	Location  JLocation `json:"location" gorm:"type:varchar(128);"` // location json 字符串
-	Obds      JObds     `json:"obds"`                               // obd json 字符串
-	Tempers   JFloats   `json:"tempers"`                            // 温度 json 字符串
-	Humiditys JFloats   `json:"humidity"`                           // 湿度 json 字符串
-	Mileage   JMileage  `json:"mileage"`                            // 里程 json 字符串
-	Oils      JOil      `json:"oils"`                               // 油耗 json 字符串
-	Module    JModule   `json:"module"`                             // 模块状态 json 字符串
-	Gsensor   JGsensor  `json:"gsensor"`                            // GSensor json 字符串
-	Mobile    JMobile   `json:"mobile"`                             // 移动网络 json 字符串
-	Disks     JDisks    `json:"disks"`                              // 磁盘 json 字符串
-	People    JPeople   `json:"people"`                             // 人数统计 json 字符串
+	DeviceNo  string    `json:"deviceNo" gorm:"type:varchar(24);"`    // 时间
+	Flag      uint8     `json:"flag"`                                 // 0-实时 1-补传 2-报警开始 3-报警结束
+	Acc       uint8     `json:"acc"`                                  // acc
+	DTU       string    `json:"dtu" gorm:"type:datetime;primary_key"` // 时间
+	Location  JLocation `json:"location" gorm:"type:varchar(128);"`   // location json 字符串
+	Obds      JObds     `json:"obds"`                                 // obd json 字符串
+	Tempers   JFloats   `json:"tempers"`                              // 温度 json 字符串
+	Humiditys JFloats   `json:"humidity"`                             // 湿度 json 字符串
+	Mileage   JMileage  `json:"mileage"`                              // 里程 json 字符串
+	Oils      JOil      `json:"oils"`                                 // 油耗 json 字符串
+	Module    JModule   `json:"module"`                               // 模块状态 json 字符串
+	Gsensor   JGsensor  `json:"gsensor"`                              // GSensor json 字符串
+	Mobile    JMobile   `json:"mobile"`                               // 移动网络 json 字符串
+	Disks     JDisks    `json:"disks"`                                // 磁盘 json 字符串
+	People    JPeople   `json:"people"`                               // 人数统计 json 字符串
 	Vols      JFloats   `json:"vols"`
 }
 
@@ -169,6 +169,13 @@ const (
 
 // TableName 表名
 func (DevStatus) TableName() string {
+	return "t_devstatus"
+}
+
+type DevStatus0 DevStatus
+
+// TableName 表名
+func (DevStatus0) TableName() string {
 	return "t_devstatus0"
 }
 
@@ -208,7 +215,7 @@ func DevStatusTabVal(tabIdx int, v []DevStatus) interface{} {
 	case 4:
 		return (*[]DevStatus4)(ptr)
 	}
-	return v
+	return (*[]DevStatus0)(ptr)
 }
 
 func DevStatusVal(id uint) interface{} {
@@ -223,5 +230,5 @@ func DevStatusVal(id uint) interface{} {
 	case 4:
 		return &DevStatus4{}
 	}
-	return &DevStatus{}
+	return &DevStatus0{}
 }

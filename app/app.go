@@ -11,34 +11,36 @@ import (
 	"xstation/controller/device"
 	"xstation/entity/cache"
 	"xstation/entity/task"
+	"xstation/model"
 
 	"github.com/wlgd/xutils"
+	"github.com/wlgd/xutils/orm"
 )
 
-func getLocalVehicle() error {
-	if configs.Default.Super.Api == "" {
-		return nil // 测试
-	}
-	// 获取设备信息
-	url := fmt.Sprintf("%s/devices/%s", configs.Default.Super.Api, configs.Default.Guid)
+func getLocalVehicle() (err error) {
 	var vehis []cache.Vehicle
-	if err := xutils.HttpGet(url, &vehis); err != nil {
-		return err
+	// 获取设备信息
+	if configs.Default.Super.Api == "" {
+		err = orm.DB().Model(&model.Device{}).Scan(&vehis).Error
+	} else {
+		configs.MsgProc = 1
+		url := fmt.Sprintf("%s/devices/%s", configs.Default.Super.Api, configs.Default.Guid)
+		err = xutils.HttpGet(url, &vehis)
 	}
 	for _, v := range vehis {
 		cache.NewDevice(v)
 	}
-	return nil
+	return
 }
 
 // Run 启动
 func Run() error {
 	conf := configs.Default
-	if err := getLocalVehicle(); err != nil {
-		return err
-	}
 	task.Timer.Run() // 启动定时任务
 	if err := db.Run(&conf.Sql); err != nil {
+		return err
+	}
+	if err := getLocalVehicle(); err != nil {
 		return err
 	}
 	if err := ftp.Run(&conf.Ftp); err == nil {

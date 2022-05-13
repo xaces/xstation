@@ -18,14 +18,19 @@ func Run(o *Option) error {
 		return err
 	}
 	db.AutoMigrate(
+		&model.Device{},
 		&model.DevOnline{},
 		&model.DevAlarm{},
 		&model.DevAlarmDetails{},
 		&model.DevAlarmFile{},
 		&model.DevCapture{},
-		&model.DevStatus{},
+		&model.DevStatus{}, // 本机测试
+		&model.DevStatus0{},
 		&model.DevStatus1{},
 	)
+	task.Timer.AddDbPartFunc(func() {
+		PartTable(model.DevStatus{}.TableName()).AlterRange("dtu", 5)
+	})
 	task.Timer.AddDbPartFunc(func() {
 		PartTable(model.DevAlarmDetails{}.TableName()).AlterRange("dtu", 5)
 	})

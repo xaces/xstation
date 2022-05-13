@@ -2,6 +2,7 @@ package device
 
 import (
 	"time"
+	"xstation/configs"
 	"xstation/entity/hook"
 	"xstation/model"
 	"xstation/service"
@@ -20,9 +21,8 @@ type Hook interface {
 }
 
 type handler struct {
-	status  chan *model.DevStatus
-	alarm   chan *model.DevAlarmDetails
-	dsCache [][]model.DevStatus
+	status chan *model.DevStatus
+	alarm  chan *model.DevAlarmDetails
 }
 
 var (
@@ -33,17 +33,17 @@ var (
 	hooks []Hook
 )
 
-func (h *handler) Disptah() {
-	go h.dispatchStatus()
-	go h.dispatchAlarm()
+func (o *handler) Disptah() {
+	go o.dispatchStatus()
+	go o.dispatchAlarm()
 }
 
-func (h *handler) Stop() {
+func (o *handler) Stop() {
 	for _, v := range hooks {
 		v.Stop()
 	}
-	h.alarm <- nil
-	h.status <- nil
+	o.alarm <- nil
+	o.status <- nil
 }
 
 func NewHooks(o []hook.Option) {
@@ -57,79 +57,76 @@ func NewHooks(o []hook.Option) {
 	}
 }
 
-type statusVals struct {
-	TableIdx int
-	Data     []model.DevStatus
-}
-
-func (h *handler) devStatusHandle(p *ants.PoolWithFunc) {
-	for i := 0; i < model.DevStatusTabCount; i++ {
-		size := len(h.dsCache[i])
-		if size < 1 {
-			continue
-		}
-		o := &statusVals{}
-		o.TableIdx = i
-		o.Data = make([]model.DevStatus, size)
-		copy(o.Data, h.dsCache[i])
-		if err := p.Invoke(o); err != nil {
-			continue
-		}
-		h.dsCache[i] = h.dsCache[i][:0]
-	}
-}
-
 // dispatchStatus 批量处理数据
-func (h *handler) dispatchStatus() {
-	h.dsCache = make([][]model.DevStatus, model.DevStatusTabCount)
-	dbHandler := func(v interface{}) {
-		obj := v.(*statusVals)
-		data := model.DevStatusTabVal(obj.TableIdx, obj.Data)
-		orm.DbCreate(data)
-	}
-	p, _ := ants.NewPoolWithFunc(5, dbHandler) // 协程池
+func (o *handler) dispatchStatus() {
+	dataArr := make([][]model.DevStatus, model.DevStatusTabCount)
+	p, _ := ants.NewPoolWithFunc(5, func(v interface{}) {
+		orm.DbCreate(v)
+	}) // 协程池
 	ticker := time.NewTicker(time.Second * 2)
+	var (
+		tabIdx uint = 0
+		err    error
+	)
 	defer p.Release()
-	defer close(h.status)
+	defer close(o.status)
 	for {
 		select {
-		case v := <-h.status:
+		case v := <-o.status:
 			if v == nil {
-				h.devStatusHandle(p)
 				return
 			}
-			tabIdx := v.DeviceId % model.DevStatusTabCount
-			h.dsCache[tabIdx] = append(h.dsCache[tabIdx], *v)
+			tabIdx = 0
+			if configs.MsgProc > 0 {
+				tabIdx = v.DeviceId % model.DevStatusTabCount
+			}
+			dataArr[tabIdx] = append(dataArr[tabIdx], *v)
 		case <-ticker.C:
-			h.devStatusHandle(p)
+			for i := 0; i < model.DevStatusTabCount; i++ {
+				size := len(dataArr[i])
+				if size < 1 {
+					continue
+				}
+				data := make([]model.DevStatus, size)
+				copy(data, dataArr[i])
+				if configs.MsgProc > 0 {
+					err = p.Invoke(model.DevStatusTabVal(i, data))
+				} else {
+					err = p.Invoke(data)
+				}
+				if err != nil {
+					continue
+				}
+				dataArr[i] = dataArr[i][:0]
+			}
 		}
-	}
-}
-
-func (h *handler) devAlarmInsert(v interface{}) {
-	data := v.([]model.DevAlarmDetails)
-	for _, alr := range data {
-		orm.DbCreate(alr.DevStatus) // 报警
-		orm.DbCreate(&alr)
-		service.DevAlarmAdd(&alr)
 	}
 }
 
 // dispatchAlarm 批量处理数据
-func (h *handler) dispatchAlarm() {
+func (o *handler) dispatchAlarm() {
 	var stArray []model.DevAlarmDetails
 	ticker := time.NewTicker(time.Second * 2)
-	p, _ := ants.NewPoolWithFunc(2, h.devAlarmInsert) // 协程池
+	p, _ := ants.NewPoolWithFunc(2, func(v interface{}) {
+		data := v.([]model.DevAlarmDetails)
+		for _, alr := range data {
+			orm.DbCreate(alr.DevStatus) // 报警
+			orm.DbCreate(&alr)
+			service.DevAlarmAdd(&alr)
+		}
+	}) // 协程池
 	defer p.Release()
-	defer close(h.alarm)
+	defer close(o.alarm)
 	for {
 		select {
-		case v := <-h.alarm:
+		case v := <-o.alarm:
 			if v == nil {
 				p.Invoke(stArray)
 				return
 			}
-			stArray = append(stArray, *v)
+			if configs.MsgProc > 0 {
+				stArray = append(stArray, *v)
+			}
 		case <-ticker.C:
 			size := len(stArray)
 			if size < 1 {
