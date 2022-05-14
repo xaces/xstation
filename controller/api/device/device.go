@@ -50,7 +50,7 @@ func (o *Device) AddHandler(c *gin.Context) {
 		ctx.JSONWriteError(err, c)
 		return
 	}
-	cache.NewDevice(cache.Vehicle{ID: p.ID, No: p.No, EffectiveTime: p.EffectiveTime})
+	cache.NewDevice(cache.DeviceInfo{ID: p.ID, No: p.No, EffectiveTime: p.EffectiveTime})
 	ctx.JSONOk().WriteTo(c)
 }
 
@@ -87,7 +87,7 @@ func (o *Device) BatchAddHandler(c *gin.Context) {
 		return
 	}
 	for _, v := range data {
-		cache.NewDevice(cache.Vehicle{ID: v.ID, No: v.No, EffectiveTime: v.EffectiveTime})
+		cache.NewDevice(cache.DeviceInfo{ID: v.ID, No: v.No, EffectiveTime: v.EffectiveTime})
 	}
 	ctx.JSONOk().WriteTo(c)
 }

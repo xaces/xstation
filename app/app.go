@@ -17,17 +17,17 @@ import (
 	"github.com/wlgd/xutils/orm"
 )
 
-func getLocalVehicle() (err error) {
-	var vehis []cache.Vehicle
+func getLocalDeivce() (err error) {
+	var data []cache.DeviceInfo
 	// 获取设备信息
 	if configs.Default.Super.Api == "" {
-		err = orm.DB().Model(&model.Device{}).Scan(&vehis).Error
+		err = orm.DB().Model(&model.Device{}).Scan(&data).Error
 	} else {
 		configs.MsgProc = 1
 		url := fmt.Sprintf("%s/devices/%s", configs.Default.Super.Api, configs.Default.Guid)
-		err = xutils.HttpGet(url, &vehis)
+		err = xutils.HttpGet(url, &data)
 	}
-	for _, v := range vehis {
+	for _, v := range data {
 		cache.NewDevice(v)
 	}
 	return
@@ -40,7 +40,7 @@ func Run() error {
 	if err := db.Run(&conf.Sql); err != nil {
 		return err
 	}
-	if err := getLocalVehicle(); err != nil {
+	if err := getLocalDeivce(); err != nil {
 		return err
 	}
 	if err := ftp.Run(&conf.Ftp); err == nil {

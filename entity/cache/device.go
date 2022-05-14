@@ -8,20 +8,20 @@ import (
 	"github.com/wlgd/xproto"
 )
 
-type Vehicle struct {
+type DeviceInfo struct {
 	ID             uint   `json:"deviceId"`
 	No             string `json:"deviceNo"`
 	EffectiveTime  string `json:"effectiveTime"`
 	LastOnlineTime string `json:"lastOnlineTime"`
 }
 
-type VehicleFtp struct {
-	DeviceNo string `json:"deviceNo"`
-	Alarms   string `json:"alarms"`
+type DeviceFtp struct {
+	No     string `json:"deviceNo"`
+	Alarms string `json:"alarms"`
 }
 
 type mdevice struct {
-	Vehicle
+	DeviceInfo
 	Online bool          `json:"online"`
 	Status xproto.Status `json:"status"`
 }
@@ -54,10 +54,10 @@ func Device(deviceNo string) *mdevice {
 }
 
 // 新建
-func NewDevice(vehi Vehicle) *mdevice {
+func NewDevice(info DeviceInfo) *mdevice {
 	gDevlock.Lock()
 	defer gDevlock.Unlock()
-	v := &mdevice{Vehicle: vehi}
+	v := &mdevice{DeviceInfo: info}
 	gDevices[v.No] = v
 	return v
 }
