@@ -4,8 +4,8 @@ package model
 type DevAlarm struct {
 	Guid        string     `json:"guid" gorm:"primary_key;index"`
 	DeviceNo    string     `json:"deviceNo" gorm:"type:varchar(24);"`
-	DTU         string     `json:"dtu" gorm:"type:datetime;default:null"`
-	AlarmType   int        `json:"alarmType"` // 类型
+	DTU         string     `json:"dtu" gorm:"type:datetime;"`
+	AlarmType   int        `json:"alarmType"`                                   // 类型
 	StartTime   string     `json:"startTime" gorm:"primary_key;type:datetime;"` // 开始时间
 	StartData   string     `json:"startData"`                                   // gps信息 json 字符串
 	StartStatus *DevStatus `json:"startStatus"`
@@ -23,7 +23,7 @@ func (DevAlarm) TableName() string {
 type DevAlarmDetails struct {
 	Id        uint64     `json:"id" gorm:"primary_key"`
 	DeviceNo  string     `json:"deviceNo" gorm:"type:varchar(24);"`
-	DTU       string     `json:"dtu" gorm:"type:datetime;default:null"`
+	DTU       string     `json:"dtu" gorm:"type:datetime;primary_key"`
 	AlarmType int        `json:"alarmType"`                                   // 类型
 	Guid      string     `json:"guid"`                                        // guid和DevAlarm.guid用来关联
 	Flag      uint8      `json:"flag"`                                        // 0-实时 1-补传
