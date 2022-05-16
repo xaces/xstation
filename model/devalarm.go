@@ -3,7 +3,7 @@ package model
 // DevAlarm 报警
 type DevAlarm struct {
 	Guid        string     `json:"guid" gorm:"primary_key;index"`
-	DeviceNo    string     `json:"deviceNo" gorm:"type:varchar(24);"`
+	DeviceNo    string     `json:"deviceNo"`
 	DTU         string     `json:"dtu" gorm:"type:datetime;"`
 	AlarmType   int        `json:"alarmType"`                                   // 类型
 	StartTime   string     `json:"startTime" gorm:"primary_key;type:datetime;"` // 开始时间
@@ -22,7 +22,7 @@ func (DevAlarm) TableName() string {
 // 报警关联信息
 type DevAlarmDetails struct {
 	Id        uint64     `json:"id" gorm:"primary_key"`
-	DeviceNo  string     `json:"deviceNo" gorm:"type:varchar(24);"`
+	DeviceNo  string     `json:"deviceNo"`
 	DTU       string     `json:"dtu" gorm:"type:datetime;primary_key"`
 	AlarmType int        `json:"alarmType"`                                   // 类型
 	Guid      string     `json:"guid"`                                        // guid和DevAlarm.guid用来关联
@@ -51,7 +51,7 @@ const (
 // 报警关联信息
 type DevAlarmFile struct {
 	Id        uint   `json:"id" gorm:"primary_key"`
-	DeviceNo  string `json:"deviceNo" gorm:"type:varchar(24);"`
+	DeviceNo  string `json:"deviceNo"`
 	DTU       string `json:"dtu" gorm:"type:datetime;"`
 	AlarmType int    `json:"alarmType"`
 	Guid      string `json:"guid"` // guid和DevAlarm.guid用来关联
