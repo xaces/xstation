@@ -11,6 +11,7 @@ import (
 
 	"xstation/controller/api/device"
 
+	"github.com/gin-contrib/pprof"
 	"github.com/gin-gonic/gin"
 )
 
@@ -42,6 +43,7 @@ func Run(port uint16) {
 		WriteTimeout:   60 * time.Second,
 		MaxHeaderBytes: 1 << 20,
 	}
+	pprof.Register(r)
 	go s.ListenAndServe()
 	log.Printf("Http ListenAndServe at %s\n", address)
 }

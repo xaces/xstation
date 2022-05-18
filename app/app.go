@@ -60,6 +60,6 @@ func Run() error {
 // Shutdown 停止
 func Shutdown() error {
 	access.Shutdown()
-	// router.Stop()
+	// router.Shutdown()
 	return nil
 }
