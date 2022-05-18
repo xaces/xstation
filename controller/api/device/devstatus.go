@@ -29,7 +29,7 @@ func (o *Status) ListHandler(c *gin.Context) {
 	if m != nil {
 		total, _ = orm.DbByWhere(m.Model(), p.Status()).Find(&data)
 	}
-	ctx.JSONOk().Write(gin.H{"total": total, "data": data}, c)
+	ctx.JSONWriteData(gin.H{"total": total, "data": data}, c)
 }
 
 // statusGet 获取
@@ -55,7 +55,7 @@ func (o *Status) GetHandler(c *gin.Context) {
 		ctx.JSONWriteError(err, c)
 		return
 	}
-	ctx.JSONOk().WriteData(data, c)
+	ctx.JSONWriteData(data, c)
 }
 
 func statusRouter(r *gin.RouterGroup) {

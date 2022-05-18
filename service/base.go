@@ -12,5 +12,5 @@ func QueryById(v interface{}, c *gin.Context) {
 		ctx.JSONWriteError(err, c)
 		return
 	}
-	ctx.JSONOk().WriteData(v, c)
+	ctx.JSONWriteData(v, c)
 }

@@ -14,5 +14,5 @@ func UploadHandler(c *gin.Context) {
 		return
 	}
 	c.SaveUploadedFile(f, f.Filename)
-	ctx.JSONOk().WriteData(gin.H{"fileName": f.Filename, "fileSize": f.Size}, c)
+	ctx.JSONWriteData(gin.H{"fileName": f.Filename, "fileSize": f.Size}, c)
 }

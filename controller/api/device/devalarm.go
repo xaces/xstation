@@ -19,7 +19,7 @@ func (o *Alarm) ListHandler(c *gin.Context) {
 	}
 	var data []model.DevAlarm
 	total, _ := orm.DbByWhere(&model.DevAlarm{}, p.Alarm()).Find(&data)
-	ctx.JSONOk().Write(gin.H{"total": total, "data": data}, c)
+	ctx.JSONWriteData(gin.H{"total": total, "data": data}, c)
 }
 
 func (o *Alarm) ListDetailsHandler(c *gin.Context) {
@@ -30,7 +30,7 @@ func (o *Alarm) ListDetailsHandler(c *gin.Context) {
 	}
 	var data []model.DevAlarmDetails
 	total, _ := orm.DbByWhere(&model.DevAlarmDetails{}, p.AlarmDetailsPage()).Find(&data)
-	ctx.JSONOk().Write(gin.H{"total": total, "data": data}, c)
+	ctx.JSONWriteData(gin.H{"total": total, "data": data}, c)
 }
 
 // GetByStatusIdHandler 获取指定id
@@ -41,7 +41,7 @@ func (o *Alarm) GetByStatusIdHandler(c *gin.Context) {
 		ctx.JSONWriteError(err, c)
 		return
 	}
-	ctx.JSONOk().WriteData(data, c)
+	ctx.JSONWriteData(data, c)
 }
 
 func alarmRouter(r *gin.RouterGroup) {

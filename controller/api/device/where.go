@@ -20,9 +20,8 @@ type Where struct {
 // Where 初始化
 func (s *Where) Online() *orm.DbWhere {
 	where := s.DbWhere()
-	where.String("device_no = ?", s.DeviceNo)
-	where.String("online_time >= ?", s.StartTime)
-	where.String("online_time <= ?", s.EndTime)
+	where.Equal("device_no", s.DeviceNo)
+	where.TimeRange("online_time", s.StartTime, s.EndTime)
 	where.Orders = append(where.Orders, "online_time desc")
 	return where
 }
@@ -38,21 +37,16 @@ func (s *Where) Online() *orm.DbWhere {
 
 func (s *Where) Alarm() *orm.DbWhere {
 	where := s.DbWhere()
-	where.String("start_time >= ?", s.StartTime)
-	where.String("start_time <= ?", s.EndTime)
-	where.String("device_no = ?", s.DeviceNo)
+	where.TimeRange("start_time", s.StartTime, s.EndTime)
+	where.Equal("device_no", s.DeviceNo)
 	where.Orders = append(where.Orders, "start_time desc")
 	return where
 }
 
 func (s *Where) AlarmDetailsPage() *orm.DbWhere {
 	where := s.DbWhere()
-	where.String("dtu >= ?", s.StartTime)
-	where.String("dtu <= ?", s.EndTime)
-	where.String("guid = ?", s.Guid)
-	where.String("device_no = ?", s.DeviceNo)
-	where.Int("type = ?", s.AlarmType)
-	where.Int("link_type", s.LinkType)
+	where.TimeRange("dtu", s.StartTime, s.EndTime)
+	where.Equal("device_no", s.DeviceNo)
 	where.Orders = append(where.Orders, "dtu desc")
 	return where
 }
@@ -60,10 +54,8 @@ func (s *Where) AlarmDetailsPage() *orm.DbWhere {
 // Where 初始化
 func (s *Where) Status() *orm.DbWhere {
 	where := s.DbWhere()
-	where.String("device_no = ?", s.DeviceNo)
-	where.String("dtu >= ?", s.StartTime)
-	where.String("dtu <= ?", s.EndTime)
-	where.Int("flag = ?", s.Flag)
+	where.TimeRange("dtu", s.StartTime, s.EndTime)
+	where.Equal("device_no", s.DeviceNo)
 	where.Orders = append(where.Orders, "dtu desc")
 	return where
 }

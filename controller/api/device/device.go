@@ -21,14 +21,14 @@ type Device struct {
 
 func (o *Device) ListHandler(c *gin.Context) {
 	data := cache.DeviceList()
-	ctx.JSONOk().Write(gin.H{"total": len(data), "data": data}, c)
+	ctx.JSONWriteData(gin.H{"total": len(data), "data": data}, c)
 }
 
 // GetHandler 获取指定id
 func (o *Device) GetHandler(c *gin.Context) {
-	deviceNo := ctx.ParamString(c, "deviceNo")
+	deviceNo := c.Param("deviceNo")
 	if data := cache.Device(deviceNo); data != nil {
-		ctx.JSONOk().WriteData(data, c)
+		ctx.JSONWriteData(data, c)
 		return
 	}
 	ctx.JSONWriteError(errors.InvalidDeviceNo, c)
@@ -37,7 +37,7 @@ func (o *Device) GetHandler(c *gin.Context) {
 // AddHandler 新增
 func (o *Device) AddHandler(c *gin.Context) {
 	if configs.MsgProc > 0 {
-		ctx.JSONError().WriteTo(c)
+		ctx.JSONError(c)
 		return
 	}
 	var p model.Device
@@ -51,7 +51,7 @@ func (o *Device) AddHandler(c *gin.Context) {
 		return
 	}
 	cache.NewDevice(cache.DeviceInfo{ID: p.ID, No: p.No, EffectiveTime: p.EffectiveTime})
-	ctx.JSONOk().WriteTo(c)
+	ctx.JSONOk(c)
 }
 
 type batchAdd struct {
@@ -64,7 +64,7 @@ type batchAdd struct {
 // BatchAddHandler 新增
 func (o *Device) BatchAddHandler(c *gin.Context) {
 	if configs.MsgProc > 0 {
-		ctx.JSONError().WriteTo(c)
+		ctx.JSONError(c)
 		return
 	}
 	var p batchAdd
@@ -89,14 +89,14 @@ func (o *Device) BatchAddHandler(c *gin.Context) {
 	for _, v := range data {
 		cache.NewDevice(cache.DeviceInfo{ID: v.ID, No: v.No, EffectiveTime: v.EffectiveTime})
 	}
-	ctx.JSONOk().WriteTo(c)
+	ctx.JSONOk(c)
 }
 
 // DeleteHandler 删除
 func (o *Device) DeleteHandler(c *gin.Context) {
-	idstr := ctx.ParamString(c, "id")
+	idstr := c.Param("id")
 	if idstr == "" {
-		ctx.JSONError().WriteTo(c)
+		ctx.JSONError(c)
 		return
 	}
 	var data []model.Device
@@ -116,7 +116,7 @@ func (o *Device) DeleteHandler(c *gin.Context) {
 		ctx.JSONWriteError(err, c)
 		return
 	}
-	ctx.JSONOk().WriteTo(c)
+	ctx.JSONOk(c)
 }
 
 func deviceRouter(r *gin.RouterGroup) {

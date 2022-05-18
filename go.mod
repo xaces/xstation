@@ -5,6 +5,7 @@ go 1.16
 require (
 	github.com/FishGoddess/cachego v0.2.5
 	github.com/dgrijalva/jwt-go v3.2.0+incompatible
+	github.com/gin-contrib/pprof v1.3.0
 	github.com/gin-gonic/gin v1.7.2
 	github.com/go-co-op/gocron v1.13.0
 	github.com/goftp/file-driver v0.0.0-20180502053751-5d604a0fc0c9
@@ -18,8 +19,10 @@ require (
 	github.com/satori/go.uuid v1.2.0
 	github.com/unrolled/secure v1.0.9
 	github.com/wlgd/xproto v0.0.0-00010101000000-000000000000
-	github.com/wlgd/xutils v0.0.0-20220511104346-0bbafde87f52
+	github.com/wlgd/xutils v0.0.0-00010101000000-000000000000
 	gorm.io/gorm v1.23.1
 )
 
 replace github.com/wlgd/xproto => ../xproto
+
+replace github.com/wlgd/xutils => ../xutils
