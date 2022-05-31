@@ -54,8 +54,8 @@ func (s *Where) AlarmDetailsPage() *orm.DbWhere {
 // Where 初始化
 func (s *Where) Status() *orm.DbWhere {
 	where := s.DbWhere()
-	where.TimeRange("dtu", s.StartTime, s.EndTime)
 	where.Equal("device_no", s.DeviceNo)
+	where.TimeRange("dtu", s.StartTime, s.EndTime)
 	where.Orders = append(where.Orders, "dtu desc")
 	return where
 }

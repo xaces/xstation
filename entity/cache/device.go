@@ -2,8 +2,6 @@ package cache
 
 import (
 	"sync"
-	"xstation/configs"
-	"xstation/model"
 
 	"github.com/wlgd/xproto"
 )
@@ -29,13 +27,6 @@ type mdevice struct {
 func (m *mdevice) Update(a *xproto.Access) {
 	m.Online = a.Online
 	m.LastOnlineTime = a.DeviceTime
-}
-
-func (m *mdevice) Model() interface{} {
-	if configs.MsgProc > 0 {
-		return model.DevStatusVal(m.ID)
-	}
-	return &model.DevStatus{}
 }
 
 var (

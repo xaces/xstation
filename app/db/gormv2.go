@@ -24,18 +24,18 @@ func Run(o *Option) error {
 		&model.DevAlarmDetails{},
 		&model.DevAlarmFile{},
 		&model.DevCapture{},
-		&model.DevStatus{}, // 本机测试
-		&model.DevStatus0{},
-		&model.DevStatus1{},
+		// &model.DevStatus{}, // 本机测试
 	)
+	orm.CreateTables(&model.DevStatus{})
 	task.Timer.AddDbPartFunc(func() {
-		PartTable(model.DevStatus{}.TableName()).AlterRange("dtu", 5)
+		orm.NewPartiton(model.DevStatus{}.TableName()).AlterRange("dtu", 30)
 	})
 	task.Timer.AddDbPartFunc(func() {
-		PartTable(model.DevAlarmDetails{}.TableName()).AlterRange("dtu", 5)
+		orm.NewPartiton(model.DevAlarmDetails{}.TableName()).AlterRange("dtu", 30)
 	})
 	task.Timer.AddDbPartFunc(func() {
-		PartTable(model.DevAlarm{}.TableName()).AlterRange("start_time", 5)
+		orm.NewPartiton(model.DevAlarm{}.TableName()).AlterRange("start_time", 30)
 	})
+	orm.SetDB(db.Debug())
 	return nil
 }

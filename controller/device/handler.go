@@ -59,15 +59,13 @@ func NewHooks(o []hook.Option) {
 
 // dispatchStatus 批量处理数据
 func (o *handler) dispatchStatus() {
-	dataArr := make([][]model.DevStatus, model.DevStatusTabCount)
+	tableCount := model.DevStatus{}.TableCount()
+	dataArr := make([][]model.DevStatus, tableCount)
 	p, _ := ants.NewPoolWithFunc(5, func(v interface{}) {
-		orm.DbCreate(v)
+		data := v.([]model.DevStatus)
+		orm.DB().Table(data[0].TableName()).Create(&data)
 	}) // 协程池
 	ticker := time.NewTicker(time.Second * 2)
-	var (
-		tabIdx uint = 0
-		err    error
-	)
 	defer p.Release()
 	defer close(o.status)
 	for {
@@ -76,25 +74,20 @@ func (o *handler) dispatchStatus() {
 			if v == nil {
 				return
 			}
-			tabIdx = 0
+			var tabIdx uint = 0
 			if configs.MsgProc > 0 {
-				tabIdx = v.DeviceId % model.DevStatusTabCount
+				tabIdx = v.DeviceId % tableCount
 			}
 			dataArr[tabIdx] = append(dataArr[tabIdx], *v)
 		case <-ticker.C:
-			for i := 0; i < model.DevStatusTabCount; i++ {
+			for i := 0; i < int(tableCount); i++ {
 				size := len(dataArr[i])
 				if size < 1 {
 					continue
 				}
 				data := make([]model.DevStatus, size)
 				copy(data, dataArr[i])
-				if configs.MsgProc > 0 {
-					err = p.Invoke(model.DevStatusTabVal(i, data))
-				} else {
-					err = p.Invoke(data)
-				}
-				if err != nil {
+				if err := p.Invoke(data); err != nil {
 					continue
 				}
 				dataArr[i] = dataArr[i][:0]
