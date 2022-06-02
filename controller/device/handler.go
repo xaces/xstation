@@ -2,7 +2,6 @@ package device
 
 import (
 	"time"
-	"xstation/configs"
 	"xstation/entity/hook"
 	"xstation/model"
 	"xstation/service"
@@ -27,7 +26,7 @@ type handler struct {
 
 var (
 	Handler *handler = &handler{
-		status: make(chan *model.DevStatus, 1),
+		status: make(chan *model.DevStatus, 50),
 		alarm:  make(chan *model.DevAlarmDetails, 1),
 	}
 	hooks []Hook
@@ -75,8 +74,8 @@ func (o *handler) dispatchStatus() {
 				return
 			}
 			var tabIdx uint = 0
-			if configs.MsgProc > 0 {
-				tabIdx = v.DeviceId % tableCount
+			if tableCount > 0 {
+				tabIdx = v.DeviceID % tableCount
 			}
 			dataArr[tabIdx] = append(dataArr[tabIdx], *v)
 		case <-ticker.C:
@@ -98,7 +97,7 @@ func (o *handler) dispatchStatus() {
 
 // dispatchAlarm 批量处理数据
 func (o *handler) dispatchAlarm() {
-	var stArray []model.DevAlarmDetails
+	var dataArr []model.DevAlarmDetails
 	ticker := time.NewTicker(time.Second * 2)
 	p, _ := ants.NewPoolWithFunc(2, func(v interface{}) {
 		data := v.([]model.DevAlarmDetails)
@@ -114,23 +113,21 @@ func (o *handler) dispatchAlarm() {
 		select {
 		case v := <-o.alarm:
 			if v == nil {
-				p.Invoke(stArray)
+				p.Invoke(dataArr)
 				return
 			}
-			if configs.MsgProc > 0 {
-				stArray = append(stArray, *v)
-			}
+			dataArr = append(dataArr, *v)
 		case <-ticker.C:
-			size := len(stArray)
+			size := len(dataArr)
 			if size < 1 {
 				continue
 			}
 			data := make([]model.DevAlarmDetails, size)
-			copy(data, stArray)
+			copy(data, dataArr)
 			if err := p.Invoke(data); err != nil {
 				continue
 			}
-			stArray = stArray[:0]
+			dataArr = dataArr[:0]
 		}
 	}
 }

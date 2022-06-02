@@ -11,7 +11,7 @@ import (
 // 转换
 func devOnlineUpdate(a *xproto.Access, s *xproto.Status) error {
 	o := &model.DevOnline{
-		Guid:          a.Session,
+		GUID:          a.Session,
 		DeviceNo:      a.DeviceNo,
 		RemoteAddress: a.RemoteAddress,
 		NetType:       int(a.NetType),
@@ -28,7 +28,7 @@ func devOnlineUpdate(a *xproto.Access, s *xproto.Status) error {
 	}
 	o.OfflineTime = a.DeviceTime
 	o.OfflineStatus = devStatusModel(s)
-	return orm.DbUpdatesBy(o, []string{"offline_time, offline_status"}, "guid = ?", o.Guid)
+	return orm.DbUpdatesBy(o, []string{"offline_time, offline_status"}, "guid = ?", o.GUID)
 }
 
 func deviceUpdate(deviceId uint, a *xproto.Access) error {
@@ -74,7 +74,7 @@ func devAlarmDetailsModel(a *xproto.Alarm) *model.DevAlarmDetails {
 		DeviceNo:  a.DeviceNo,
 		DTU:       a.DTU,
 		AlarmType: a.Type,
-		Guid:      a.UUID,
+		GUID:      a.UUID,
 		StartTime: a.StartTime,
 		EndTime:   a.EndTime,
 		Data:      util.JString(a.Data),

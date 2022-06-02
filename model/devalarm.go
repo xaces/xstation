@@ -2,7 +2,7 @@ package model
 
 // DevAlarm 报警
 type DevAlarm struct {
-	Guid        string     `json:"guid" gorm:"primary_key;index"`
+	GUID        string     `json:"guid" gorm:"primary_key;index"`
 	DeviceNo    string     `json:"deviceNo"`
 	DTU         string     `json:"dtu" gorm:"type:datetime;"`
 	AlarmType   int        `json:"alarmType"`                                   // 类型
@@ -21,11 +21,11 @@ func (DevAlarm) TableName() string {
 
 // 报警关联信息
 type DevAlarmDetails struct {
-	Id        uint64     `json:"id" gorm:"primary_key"`
+	ID        uint64     `json:"id" gorm:"primary_key"`
 	DeviceNo  string     `json:"deviceNo"`
 	DTU       string     `json:"dtu" gorm:"type:datetime;primary_key"`
 	AlarmType int        `json:"alarmType"`                                   // 类型
-	Guid      string     `json:"guid"`                                        // guid和DevAlarm.guid用来关联
+	GUID      string     `json:"guid"`                                        // guid和DevAlarm.guid用来关联
 	Flag      uint8      `json:"flag"`                                        // 0-实时 1-补传
 	Status    int        `json:"status"`                                      // 0-开始 1-报警中 2-结束
 	StartTime string     `json:"startTime" gorm:"type:datetime;default:null"` // 开始时间
@@ -50,11 +50,11 @@ const (
 
 // 报警关联信息
 type DevAlarmFile struct {
-	Id        uint   `json:"id" gorm:"primary_key"`
+	ID        uint   `json:"id" gorm:"primary_key"`
 	DeviceNo  string `json:"deviceNo"`
 	DTU       string `json:"dtu" gorm:"type:datetime;"`
 	AlarmType int    `json:"alarmType"`
-	Guid      string `json:"guid"` // guid和DevAlarm.guid用来关联
+	GUID      string `json:"guid"` // guid和DevAlarm.guid用来关联
 	LinkType  lnType `json:"linkType"`
 	Channel   int    `json:"channel"`
 	Size      int    `json:"size"`

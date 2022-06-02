@@ -78,7 +78,7 @@ func StatusHandler(tag string, s *xproto.Status) {
 		v.Status(m.ID, s)
 	}
 	o := devStatusModel(s)
-	o.DeviceId = m.ID
+	o.DeviceID = m.ID
 	Handler.status <- o
 }
 
@@ -139,7 +139,7 @@ func ftpLittleFile(e *xproto.Event, alrType int) {
 		return
 	}
 	data := &model.DevAlarmFile{
-		Guid:      e.Session,
+		GUID:      e.Session,
 		LinkType:  model.AlarmLinkFtpFile,
 		DeviceNo:  e.DeviceNo,
 		AlarmType: alrType,

@@ -35,7 +35,7 @@ func (o *Status) ListHandler(c *gin.Context) {
 // statusGet 获取
 type statusGet struct {
 	DeviceNo string `form:"deviceNo"` //
-	StatusId uint   `form:"statusId"` //
+	StatusID uint   `form:"statusId"` //
 }
 
 // GetHandler 获取指定id
@@ -50,8 +50,8 @@ func (o *Status) GetHandler(c *gin.Context) {
 		ctx.JSONWriteError(errors.InvalidDeviceNo, c)
 		return
 	}
-	data := &model.DevStatus{DeviceId: m.ID}
-	if err := orm.DB().Table(data.TableName()).First(&data, p.StatusId).Error; err != nil {
+	data := &model.DevStatus{DeviceID: m.ID}
+	if err := orm.DB().Table(data.TableName()).First(&data, p.StatusID).Error; err != nil {
 		ctx.JSONWriteError(err, c)
 		return
 	}

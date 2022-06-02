@@ -8,7 +8,7 @@ import (
 
 func DevAlarmAdd(a *model.DevAlarmDetails) error {
 	o := &model.DevAlarm{
-		Guid:      a.Guid,
+		GUID:      a.GUID,
 		DeviceNo:  a.DeviceNo,
 		DTU:       a.DTU,
 		AlarmType: a.AlarmType,
@@ -22,5 +22,5 @@ func DevAlarmAdd(a *model.DevAlarmDetails) error {
 	o.EndTime = a.EndTime
 	o.EndStatus = a.DevStatus
 	o.EndData = a.Data
-	return orm.DbUpdatesBy(o, []string{"dtu", "end_time", "end_data", "end_status"}, "guid = ?", o.Guid)
+	return orm.DbUpdatesBy(o, []string{"dtu", "end_time", "end_data", "end_status"}, "guid = ?", o.GUID)
 }

@@ -14,7 +14,7 @@ var (
 
 // DevAlarm 添加
 func NewDevAlarm(a *model.DevAlarmDetails) {
-	gAlarm.Set(a.Guid, *a)
+	gAlarm.Set(a.GUID, *a)
 }
 
 func DevAlarm(ss string) *model.DevAlarmDetails {
@@ -22,7 +22,7 @@ func DevAlarm(ss string) *model.DevAlarmDetails {
 	if data, ok := gAlarm.Get(ss); ok {
 		alr = data.(model.DevAlarmDetails)
 		return &alr
-	} 
+	}
 	if err := orm.DbFirstBy(&alr, "guid = ?", ss); err == nil {
 		NewDevAlarm(&alr)
 		return &alr

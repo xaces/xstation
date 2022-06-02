@@ -1,7 +1,7 @@
 package model
 
 type DevCapture struct {
-	Id        uint    `json:"id" gorm:"primary_key"`
+	ID        uint    `json:"id" gorm:"primary_key"`
 	DeviceNo  string  `json:"deviceNo"`
 	DTU       string  `json:"dtu" gorm:"type:datetime;default:null"`
 	Channel   int     `json:"channel"`
