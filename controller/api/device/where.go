@@ -1,6 +1,10 @@
 package device
 
-import "github.com/wlgd/xutils/orm"
+import (
+	"xstation/entity/cache"
+
+	"github.com/wlgd/xutils/orm"
+)
 
 // 搜索条件
 type Where struct {
@@ -13,8 +17,9 @@ type Where struct {
 	LinkType  int    `form:"linkType"` //
 	AlarmType int    `form:"alarmType"`
 
-	Flag int    `form:"flag"` // 0-实时 1-补传
-	Desc string `form:"desc"` //
+	Flag     int    `form:"flag"` // 0-实时 1-补传
+	Desc     string `form:"desc"` //
+	deviceID uint
 }
 
 // Where 初始化
@@ -37,16 +42,16 @@ func (s *Where) Online() *orm.DbWhere {
 
 func (s *Where) Alarm() *orm.DbWhere {
 	where := s.DbWhere()
+	where.Equal("device_id", s.deviceID)
 	where.TimeRange("start_time", s.StartTime, s.EndTime)
-	where.Equal("device_no", s.DeviceNo)
 	where.Orders = append(where.Orders, "start_time desc")
 	return where
 }
 
 func (s *Where) AlarmDetailsPage() *orm.DbWhere {
 	where := s.DbWhere()
+	where.Equal("device_id", s.deviceID)
 	where.TimeRange("dtu", s.StartTime, s.EndTime)
-	where.Equal("device_no", s.DeviceNo)
 	where.Orders = append(where.Orders, "dtu desc")
 	return where
 }
@@ -54,8 +59,15 @@ func (s *Where) AlarmDetailsPage() *orm.DbWhere {
 // Where 初始化
 func (s *Where) Status() *orm.DbWhere {
 	where := s.DbWhere()
-	where.Equal("device_no", s.DeviceNo)
+	where.Equal("device_id", s.deviceID)
 	where.TimeRange("dtu", s.StartTime, s.EndTime)
 	where.Orders = append(where.Orders, "dtu desc")
 	return where
+}
+
+func (s *Where) checkDeviceNo() uint {
+	if dev := cache.GetDevice(s.DeviceNo); dev != nil {
+		return dev.ID
+	}
+	return 0
 }

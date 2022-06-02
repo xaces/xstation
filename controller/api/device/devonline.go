@@ -1,6 +1,7 @@
 package device
 
 import (
+	"xstation/internal/errors"
 	"xstation/model"
 
 	"github.com/gin-gonic/gin"
@@ -15,6 +16,10 @@ func (o *Online) ListHandler(c *gin.Context) {
 	var p Where
 	if err := c.ShouldBind(&p); err != nil {
 		ctx.JSONWriteError(err, c)
+		return
+	}
+	if p.checkDeviceNo() == 0 {
+		ctx.JSONWriteError(errors.InvalidDeviceNo, c)
 		return
 	}
 	var data []model.DevOnline

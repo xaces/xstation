@@ -5,8 +5,8 @@ package model
 // OnLine 定义
 type DevOnline struct {
 	ID            uint       `json:"id" gorm:"primary_key"`
-	GUID          string     `json:"guid" gorm:"primary_key"`
-	DeviceNo      string     `json:"deviceNo"`
+	DeviceID      uint       `json:"deviceId"`
+	GUID          string     `json:"guid" gorm:"index"`
 	RemoteAddress string     `json:"remoteAddress"` // 设备网络地址
 	OnlineTime    string     `json:"onlineTime" gorm:"type:datetime;default:null"`
 	OnlineStatus  *DevStatus `json:"onlineStatus"`

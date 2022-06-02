@@ -15,7 +15,7 @@ import (
 func AccessHandler(b []byte, a *xproto.Access) (interface{}, error) {
 	switch a.LinkType {
 	case xproto.Link_Signal:
-		m := cache.Device(a.DeviceNo)
+		m := cache.GetDevice(a.DeviceNo)
 		log.Printf("%s", b)
 		if m == nil {
 			return nil, fmt.Errorf("[%s] invalid", a.DeviceNo)
@@ -25,9 +25,9 @@ func AccessHandler(b []byte, a *xproto.Access) (interface{}, error) {
 			v.Online(m.ID, a)
 		}
 		if configs.MsgProc == 0 {
-			return nil, deviceUpdate(m.ID, a)
+			return m, deviceUpdate(m.ID, a)
 		}
-		return nil, devOnlineUpdate(a, &m.Status)
+		return m, devOnlineUpdate(a, &m.Status, m.ID)
 	case xproto.Link_FileTransfer:
 		filename, act := xproto.FileOfSess(a.Session)
 		if act == xproto.Act_Upload {
@@ -48,9 +48,9 @@ func DroppedHandler(v interface{}, a *xproto.Access, err error) {
 		}
 	case xproto.Link_Signal:
 		log.Println(err)
-		m := cache.Device(a.DeviceNo)
-		if m == nil {
-			return
+		m, ok := v.(*cache.Device)
+		if !ok || m == nil {
+			break
 		}
 		m.Update(a)
 		for _, v := range hooks {
@@ -60,14 +60,14 @@ func DroppedHandler(v interface{}, a *xproto.Access, err error) {
 			deviceUpdate(m.ID, a)
 			return
 		}
-		devOnlineUpdate(a, &m.Status)
+		devOnlineUpdate(a, &m.Status, m.ID)
 	}
 }
 
-func StatusHandler(tag string, s *xproto.Status) {
+func StatusHandler(tag string, v interface{}, s *xproto.Status) {
 	xproto.LogStatus(tag, s)
-	m := cache.Device(s.DeviceNo)
-	if m == nil {
+	m, ok := v.(*cache.Device)
+	if !ok || m == nil {
 		return
 	}
 	if s.Flag == 0 {
@@ -82,29 +82,30 @@ func StatusHandler(tag string, s *xproto.Status) {
 	Handler.status <- o
 }
 
-func AlarmHandler(b []byte, a *xproto.Alarm) {
+func AlarmHandler(b []byte, v interface{}, a *xproto.Alarm) {
 	xproto.LogAlarm(b, a)
-	m := cache.Device(a.DeviceNo)
-	if m == nil {
+	m, ok := v.(*cache.Device)
+	if !ok || m == nil {
 		return
 	}
 	for _, v := range hooks {
 		v.Alarm(m.ID, a)
 	}
 	o := devAlarmDetailsModel(a)
+	o.DeviceID = m.ID
 	if o.Status == 0 {
 		cache.NewDevAlarm(o)
 	}
 	Handler.alarm <- o
 }
 
-func EventHandler(data []byte, e *xproto.Event) {
+func EventHandler(data []byte, v interface{}, e *xproto.Event) {
 	xproto.LogEvent(data, e)
 	if configs.MsgProc == 0 {
 		return
 	}
-	m := cache.Device(e.DeviceNo)
-	if m == nil {
+	m, ok := v.(*cache.Device)
+	if !ok || m == nil {
 		return
 	}
 	for _, v := range hooks {
@@ -113,18 +114,18 @@ func EventHandler(data []byte, e *xproto.Event) {
 	switch e.Type {
 	case xproto.Event_FtpTransfer:
 	case xproto.Event_FileLittle:
-		alr := cache.DevAlarm(e.Session) // 从缓存中获取数据
-		if alr == nil {
-			return
-		}
-		ftpLittleFile(e, alr.AlarmType)
+		ftpLittleFile(e, m.ID)
 	case xproto.Event_FileTimedCapture:
-		ftpTimedCapture(e)
+		ftpTimedCapture(e, m.ID)
 	}
 }
 
 // ftpLittleFile 新文件通知
-func ftpLittleFile(e *xproto.Event, alrType int) {
+func ftpLittleFile(e *xproto.Event, deviceId uint) {
+	alr := cache.DevAlarm(e.Session) // 从缓存中获取数据
+	if alr == nil {
+		return
+	}
 	v := e.Data.(xproto.FileLittle)
 	fpName := util.FilePath(v.FileName, e.DeviceNo)
 	ftp := xproto.FtpTransfer{
@@ -141,8 +142,8 @@ func ftpLittleFile(e *xproto.Event, alrType int) {
 	data := &model.DevAlarmFile{
 		GUID:      e.Session,
 		LinkType:  model.AlarmLinkFtpFile,
-		DeviceNo:  e.DeviceNo,
-		AlarmType: alrType,
+		DeviceID:  deviceId,
+		AlarmType: alr.AlarmType,
 		DTU:       e.DTU,
 		Channel:   v.Channel,
 		Size:      v.Size,
@@ -154,7 +155,7 @@ func ftpLittleFile(e *xproto.Event, alrType int) {
 }
 
 //
-func ftpTimedCapture(e *xproto.Event) {
+func ftpTimedCapture(e *xproto.Event, deviceId uint) {
 	v := e.Data.(xproto.FileCapture)
 	fpName := util.FilePicPath(v.FileName, e.DeviceNo)
 	ftp := xproto.FtpTransfer{
@@ -169,7 +170,7 @@ func ftpTimedCapture(e *xproto.Event) {
 		return
 	}
 	data := &model.DevCapture{
-		DeviceNo:  e.DeviceNo,
+		DeviceID:  deviceId,
 		DTU:       e.DTU,
 		Channel:   v.Channel,
 		Latitude:  v.Latitude,

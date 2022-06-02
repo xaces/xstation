@@ -9,7 +9,7 @@ import (
 func DevAlarmAdd(a *model.DevAlarmDetails) error {
 	o := &model.DevAlarm{
 		GUID:      a.GUID,
-		DeviceNo:  a.DeviceNo,
+		DeviceID:  a.DeviceID,
 		DTU:       a.DTU,
 		AlarmType: a.AlarmType,
 	}

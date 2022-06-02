@@ -5,9 +5,8 @@ import (
 	"xstation/internal/errors"
 	"xstation/model"
 
-	"github.com/wlgd/xutils/orm"
-
 	"github.com/wlgd/xutils/ctx"
+	"github.com/wlgd/xutils/orm"
 
 	"github.com/gin-gonic/gin"
 )
@@ -25,9 +24,9 @@ func (o *Status) ListHandler(c *gin.Context) {
 		data  []model.DevStatus
 		total int64
 	)
-	m := cache.Device(p.DeviceNo)
-	if m != nil {
-		total, _ = orm.DbTableByWhere(model.DevStatus{}.TableNameOf(m.ID), p.Status()).Find(&data)
+	devID := p.checkDeviceNo()
+	if devID > 0 {
+		total, _ = orm.DbTableByWhere(model.DevStatus{}.TableNameOf(devID), p.Status()).Find(&data)
 	}
 	ctx.JSONWriteData(gin.H{"total": total, "data": data}, c)
 }
@@ -45,7 +44,7 @@ func (o *Status) GetHandler(c *gin.Context) {
 		ctx.JSONWriteError(err, c)
 		return
 	}
-	m := cache.Device(p.DeviceNo)
+	m := cache.GetDevice(p.DeviceNo)
 	if m == nil {
 		ctx.JSONWriteError(errors.InvalidDeviceNo, c)
 		return

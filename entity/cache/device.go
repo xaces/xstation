@@ -18,24 +18,24 @@ type DeviceFtp struct {
 	Alarms string `json:"alarms"`
 }
 
-type mdevice struct {
+type Device struct {
 	DeviceInfo
 	Online bool          `json:"online"`
 	Status xproto.Status `json:"status"`
 }
 
-func (m *mdevice) Update(a *xproto.Access) {
+func (m *Device) Update(a *xproto.Access) {
 	m.Online = a.Online
 	m.LastOnlineTime = a.DeviceTime
 }
 
 var (
-	gDevices = make(map[string]*mdevice)
+	gDevices = make(map[string]*Device)
 	gDevlock sync.RWMutex
 )
 
 // 获取
-func Device(deviceNo string) *mdevice {
+func GetDevice(deviceNo string) *Device {
 	gDevlock.RLock()
 	defer gDevlock.RUnlock()
 	if v, ok := gDevices[deviceNo]; ok {
@@ -45,23 +45,23 @@ func Device(deviceNo string) *mdevice {
 }
 
 // 新建
-func NewDevice(info DeviceInfo) *mdevice {
+func NewDevice(info DeviceInfo) *Device {
 	gDevlock.Lock()
 	defer gDevlock.Unlock()
-	v := &mdevice{DeviceInfo: info}
+	v := &Device{DeviceInfo: info}
 	gDevices[v.No] = v
 	return v
 }
 
 // 删除
-func DeviceDel(deviceNo string) {
+func DelDevice(deviceNo string) {
 	xproto.SyncStop(deviceNo)
 	gDevlock.Lock()
 	defer gDevlock.Unlock()
 	delete(gDevices, deviceNo)
 }
 
-func DeviceList() (devs []mdevice) {
+func ListDevice() (devs []Device) {
 	for _, v := range gDevices {
 		devs = append(devs, *v)
 	}

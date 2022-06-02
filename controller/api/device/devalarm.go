@@ -1,6 +1,7 @@
 package device
 
 import (
+	"xstation/internal/errors"
 	"xstation/model"
 
 	"github.com/gin-gonic/gin"
@@ -17,6 +18,10 @@ func (o *Alarm) ListHandler(c *gin.Context) {
 		ctx.JSONWriteError(err, c)
 		return
 	}
+	if p.checkDeviceNo() == 0 {
+		ctx.JSONWriteError(errors.InvalidDeviceNo, c)
+		return
+	}
 	var data []model.DevAlarm
 	total, _ := orm.DbByWhere(&model.DevAlarm{}, p.Alarm()).Find(&data)
 	ctx.JSONWriteData(gin.H{"total": total, "data": data}, c)
@@ -26,6 +31,10 @@ func (o *Alarm) ListDetailsHandler(c *gin.Context) {
 	var p Where
 	if err := c.ShouldBind(&p); err != nil {
 		ctx.JSONWriteError(err, c)
+		return
+	}
+	if p.checkDeviceNo() == 0 {
+		ctx.JSONWriteError(errors.InvalidDeviceNo, c)
 		return
 	}
 	var data []model.DevAlarmDetails

@@ -9,10 +9,10 @@ import (
 )
 
 // 转换
-func devOnlineUpdate(a *xproto.Access, s *xproto.Status) error {
+func devOnlineUpdate(a *xproto.Access, s *xproto.Status, deviceId uint) error {
 	o := &model.DevOnline{
 		GUID:          a.Session,
-		DeviceNo:      a.DeviceNo,
+		DeviceID:      deviceId,
 		RemoteAddress: a.RemoteAddress,
 		NetType:       int(a.NetType),
 		Type:          int(a.LinkType),
@@ -47,7 +47,6 @@ func devStatusModel(s *xproto.Status) *model.DevStatus {
 	if s == nil {
 		return o
 	}
-	o.DeviceNo = s.DeviceNo
 	o.DTU = s.DTU
 	o.Flag = s.Flag
 	if s.Location.Speed < 1 {
@@ -71,7 +70,6 @@ func devStatusModel(s *xproto.Status) *model.DevStatus {
 
 func devAlarmDetailsModel(a *xproto.Alarm) *model.DevAlarmDetails {
 	o := &model.DevAlarmDetails{
-		DeviceNo:  a.DeviceNo,
 		DTU:       a.DTU,
 		AlarmType: a.Type,
 		GUID:      a.UUID,

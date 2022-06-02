@@ -20,14 +20,14 @@ type Device struct {
 }
 
 func (o *Device) ListHandler(c *gin.Context) {
-	data := cache.DeviceList()
+	data := cache.ListDevice()
 	ctx.JSONWriteData(gin.H{"total": len(data), "data": data}, c)
 }
 
 // GetHandler 获取指定id
 func (o *Device) GetHandler(c *gin.Context) {
 	deviceNo := c.Param("deviceNo")
-	if data := cache.Device(deviceNo); data != nil {
+	if data := cache.GetDevice(deviceNo); data != nil {
 		ctx.JSONWriteData(data, c)
 		return
 	}
@@ -109,7 +109,7 @@ func (o *Device) DeleteHandler(c *gin.Context) {
 			return err
 		}
 		for _, v := range data {
-			cache.DeviceDel(v.No)
+			cache.DelDevice(v.No)
 		}
 		return nil
 	}); err != nil {
