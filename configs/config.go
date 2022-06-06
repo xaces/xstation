@@ -22,12 +22,9 @@ type configure struct {
 	Super struct {
 		Api string
 	}
-	Sql  db.Option
-	Ftp  ftp.Option
-	Hook struct {
-		Enable  bool
-		Options []hook.Option
-	}
+	Sql   db.Option
+	Ftp   ftp.Option
+	Hooks []hook.Option
 }
 
 // Default 所有配置参数

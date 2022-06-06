@@ -6,7 +6,7 @@ super: ### 中心服务
   api: ""
 port: ### 端口
   http: 12100
-  access: 22000
+  access: 20000
 ftp: # Ftp服务
   enable: true
   port: 2211
@@ -15,18 +15,14 @@ ftp: # Ftp服务
 sql: ### SQL
   name: "mysql"
   address: "root:123456@tcp(127.0.0.1:3306)/station?charset=utf8&parseTime=True&loc=Local"
-hook: ### 第三方Hook
-  enable: true
-  options:
-    - name: "nats"
-      address: "nats://127.0.0.1:4222"
-      online: "device.online"
-      status: "device.status"
-      alarm: "device.alarm"
-      event: "device.event"
-    # - name: "http://"
-    #   address: "localhost:8080/xserver"
-    #   online: "notify/devonline"
-    #   status: "notifydevstatus"
-    #   alarm: "notifydevalarm"
-    #   event: "notify/devevent"
+# hooks: ### 第三方Hook
+#   - address: "nats://127.0.0.1:4222"
+#     online: "device.online"
+#     status: "device.status"
+#     alarm: "device.alarm"
+#     event: "device.event"
+#   - address: "http://localhost:8080/xserver/notify"
+#     online: "devonline"
+#     status: "devstatus"
+#     alarm: "devalarm"
+#     event: "devevent"

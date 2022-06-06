@@ -1,6 +1,7 @@
 package device
 
 import (
+	"strings"
 	"time"
 	"xstation/entity/hook"
 	"xstation/model"
@@ -47,10 +48,9 @@ func (o *handler) Stop() {
 
 func NewHooks(o []hook.Option) {
 	for _, v := range o {
-		switch v.Name {
-		case "nats":
+		if strings.Contains(v.Address, "nats://") {
 			hooks = append(hooks, hook.NewNats(v))
-		case "http://":
+		} else if strings.Contains(v.Address, "http://") {
 			hooks = append(hooks, hook.NewHttp(v))
 		}
 	}

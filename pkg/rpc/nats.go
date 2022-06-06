@@ -6,7 +6,7 @@ type natsclient struct {
 	Conn *mq.NatsClient
 }
 
-func NewNats(addr string) Interface {
+func NewNats(addr string) IRpc {
 	c := &natsclient{}
 	c.Conn, _ = mq.NewNatsClient(addr, false)
 	return c

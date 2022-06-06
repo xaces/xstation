@@ -6,13 +6,13 @@ import (
 	jsoniter "github.com/json-iterator/go"
 )
 
-type Interface interface {
+type IRpc interface {
 	Subscribe(string, func([]byte))
 	Publish(string, interface{}) error
 	Relase()
 }
 
-var gRpc Interface
+var gRpc IRpc
 
 func Handler(b []byte) {
 	j := jsoniter.Get(b)
@@ -24,13 +24,13 @@ func Handler(b []byte) {
 	case 5000: // 同步服务器信息
 
 	case 5010, 5011: // 设备管理
-		var vehis []cache.Vehicle
+		var vehis []cache.DeviceInfo
 		j.Get("data").ToVal(&vehis)
 		for _, v := range vehis {
 			if code == 5010 {
 				cache.NewDevice(v)
 			} else {
-				cache.DeviceDel(v.DeviceNo)
+				cache.DelDevice(v.No)
 			}
 		}
 	case 5012: // 比如指定Ftp上传
@@ -38,7 +38,7 @@ func Handler(b []byte) {
 }
 
 // 这里Topic用服务guid
-func Run(s Interface, topic string) {
+func Run(s IRpc, topic string) {
 	if s == nil {
 		return
 	}

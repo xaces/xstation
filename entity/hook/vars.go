@@ -3,14 +3,12 @@ package hook
 import "github.com/wlgd/xproto"
 
 type Option struct {
-	Name    string
 	Address string
 	Online  string
 	Status  string
 	Alarm   string
 	Event   string
 }
-
 
 type online struct {
 	MsgCode  int  `json:"msgCode"`

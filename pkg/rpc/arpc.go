@@ -11,7 +11,7 @@ type arpclient struct {
 	Conn *pubsub.Client
 }
 
-func NewArpc(addr string) Interface {
+func NewArpc(addr string) IRpc {
 	c := &arpclient{}
 	c.Conn, _ = pubsub.NewClient(func() (net.Conn, error) {
 		return net.DialTimeout("tcp", addr, time.Second*3)
