@@ -21,7 +21,7 @@ type Device struct {
 
 func (o *Device) ListHandler(c *gin.Context) {
 	data := cache.ListDevice()
-	ctx.JSONWriteData(gin.H{"total": len(data), "data": data}, c)
+	ctx.JSONWrite(gin.H{"total": len(data), "data": data}, c)
 }
 
 // GetHandler 获取指定id

@@ -65,7 +65,7 @@ func DroppedHandler(v interface{}, a *xproto.Access, err error) {
 }
 
 func StatusHandler(tag string, v interface{}, s *xproto.Status) {
-	xproto.LogStatus(tag, s)
+	// xproto.LogStatus(tag, s)
 	m, ok := v.(*cache.Device)
 	if !ok || m == nil {
 		return

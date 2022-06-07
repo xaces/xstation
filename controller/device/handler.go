@@ -62,7 +62,7 @@ func (o *handler) dispatchStatus() {
 	dataArr := make([][]model.DevStatus, tableCount)
 	p, _ := ants.NewPoolWithFunc(5, func(v interface{}) {
 		data := v.([]model.DevStatus)
-		orm.DB().Table(data[0].TableName()).Create(&data)
+		orm.Table(data[0]).Create(&data)
 	}) // 协程池
 	ticker := time.NewTicker(time.Second * 2)
 	defer p.Release()
@@ -73,10 +73,7 @@ func (o *handler) dispatchStatus() {
 			if v == nil {
 				return
 			}
-			var tabIdx uint = 0
-			if tableCount > 0 {
-				tabIdx = v.DeviceID % tableCount
-			}
+			tabIdx := v.DeviceID % tableCount
 			dataArr[tabIdx] = append(dataArr[tabIdx], *v)
 		case <-ticker.C:
 			for i := 0; i < int(tableCount); i++ {

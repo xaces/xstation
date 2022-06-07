@@ -26,7 +26,7 @@ func (o *Status) ListHandler(c *gin.Context) {
 	)
 	devID := p.checkDeviceNo()
 	if devID > 0 {
-		total, _ = orm.DbTableByWhere(model.DevStatus{}.TableNameOf(devID), p.Status()).Find(&data)
+		total, _ = orm.DbByWhere(&model.DevStatus{DeviceID: devID}, p.Status()).Find(&data)
 	}
 	ctx.JSONWriteData(gin.H{"total": total, "data": data}, c)
 }
@@ -50,7 +50,7 @@ func (o *Status) GetHandler(c *gin.Context) {
 		return
 	}
 	data := &model.DevStatus{DeviceID: m.ID}
-	if err := orm.DB().Table(data.TableName()).First(&data, p.StatusID).Error; err != nil {
+	if err := orm.Table(data).First(data, p.StatusID).Error; err != nil {
 		ctx.JSONWriteError(err, c)
 		return
 	}
