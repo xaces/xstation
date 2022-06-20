@@ -64,9 +64,9 @@ func DroppedHandler(v interface{}, a *xproto.Access, err error) {
 	}
 }
 
-func StatusHandler(tag string, v interface{}, s *xproto.Status) {
+func StatusHandler(tag string, arg interface{}, s *xproto.Status) {
 	// xproto.LogStatus(tag, s)
-	m, ok := v.(*cache.Device)
+	m, ok := arg.(*cache.Device)
 	if !ok || m == nil {
 		return
 	}
@@ -82,9 +82,9 @@ func StatusHandler(tag string, v interface{}, s *xproto.Status) {
 	Handler.status <- o
 }
 
-func AlarmHandler(b []byte, v interface{}, a *xproto.Alarm) {
-	xproto.LogAlarm(b, a)
-	m, ok := v.(*cache.Device)
+func AlarmHandler(b []byte, arg interface{}, a *xproto.Alarm) {
+	xproto.LogAlarm(b, arg, a)
+	m, ok := arg.(*cache.Device)
 	if !ok || m == nil {
 		return
 	}
@@ -96,15 +96,16 @@ func AlarmHandler(b []byte, v interface{}, a *xproto.Alarm) {
 	if o.Status == 0 {
 		cache.NewDevAlarm(o)
 	}
+	Handler.status <- o.DevStatus
 	Handler.alarm <- o
 }
 
-func EventHandler(data []byte, v interface{}, e *xproto.Event) {
-	xproto.LogEvent(data, e)
+func EventHandler(data []byte, arg interface{}, e *xproto.Event) {
+	xproto.LogEvent(data, arg, e)
 	if configs.MsgProc == 0 {
 		return
 	}
-	m, ok := v.(*cache.Device)
+	m, ok := arg.(*cache.Device)
 	if !ok || m == nil {
 		return
 	}

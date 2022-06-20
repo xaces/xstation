@@ -6,7 +6,6 @@ import (
 
 	"github.com/gin-gonic/gin"
 	"github.com/wlgd/xutils/ctx"
-	"github.com/wlgd/xutils/orm"
 )
 
 type Online struct {
@@ -23,7 +22,7 @@ func (o *Online) ListHandler(c *gin.Context) {
 		return
 	}
 	var data []model.DevOnline
-	total, _ := orm.DbByWhere(&model.DevOnline{}, p.Online()).Find(&data)
+	total, _ := p.Online().Model(&model.DevOnline{}).Find(&data)
 	ctx.JSONWriteData(gin.H{"total": total, "data": data}, c)
 }
 

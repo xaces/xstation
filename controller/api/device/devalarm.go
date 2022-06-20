@@ -23,7 +23,7 @@ func (o *Alarm) ListHandler(c *gin.Context) {
 		return
 	}
 	var data []model.DevAlarm
-	total, _ := orm.DbByWhere(&model.DevAlarm{}, p.Alarm()).Find(&data)
+	total, _ := p.Alarm().Model(&model.DevAlarm{}).Find(&data)
 	ctx.JSONWriteData(gin.H{"total": total, "data": data}, c)
 }
 
@@ -38,7 +38,7 @@ func (o *Alarm) ListDetailsHandler(c *gin.Context) {
 		return
 	}
 	var data []model.DevAlarmDetails
-	total, _ := orm.DbByWhere(&model.DevAlarmDetails{}, p.AlarmDetailsPage()).Find(&data)
+	total, _ := p.AlarmDetails().Model(&model.DevAlarmDetails{}).Find(&data)
 	ctx.JSONWriteData(gin.H{"total": total, "data": data}, c)
 }
 

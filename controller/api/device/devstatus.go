@@ -26,7 +26,7 @@ func (o *Status) ListHandler(c *gin.Context) {
 	)
 	devID := p.checkDeviceNo()
 	if devID > 0 {
-		total, _ = orm.DbByWhere(&model.DevStatus{DeviceID: devID}, p.Status()).Find(&data)
+		total, _ = p.Status().Model(&model.DevStatus{DeviceID: devID}).Find(&data)
 	}
 	ctx.JSONWriteData(gin.H{"total": total, "data": data}, c)
 }

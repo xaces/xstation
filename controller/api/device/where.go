@@ -48,7 +48,7 @@ func (s *Where) Alarm() *orm.DbWhere {
 	return where
 }
 
-func (s *Where) AlarmDetailsPage() *orm.DbWhere {
+func (s *Where) AlarmDetails() *orm.DbWhere {
 	where := s.DbWhere()
 	where.Equal("device_id", s.deviceID)
 	where.TimeRange("dtu", s.StartTime, s.EndTime)

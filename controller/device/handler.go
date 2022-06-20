@@ -96,11 +96,10 @@ func (o *handler) dispatchStatus() {
 func (o *handler) dispatchAlarm() {
 	var dataArr []model.DevAlarmDetails
 	ticker := time.NewTicker(time.Second * 2)
-	p, _ := ants.NewPoolWithFunc(2, func(v interface{}) {
+	p, _ := ants.NewPoolWithFunc(10, func(v interface{}) {
 		data := v.([]model.DevAlarmDetails)
+		orm.DbCreate(&data)
 		for _, alr := range data {
-			orm.DbCreate(alr.DevStatus) // 报警
-			orm.DbCreate(&alr)
 			service.DevAlarmAdd(&alr)
 		}
 	}) // 协程池
