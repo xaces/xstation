@@ -65,9 +65,9 @@ func (s *Where) Status() *orm.DbWhere {
 	return where
 }
 
-func (s *Where) checkDeviceNo() uint {
+func (s *Where) isDeviceNoInvalid() bool {
 	if dev := cache.GetDevice(s.DeviceNo); dev != nil {
-		return dev.ID
+		s.deviceID = dev.ID
 	}
-	return 0
+	return s.deviceID == 0
 }

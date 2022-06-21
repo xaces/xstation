@@ -21,19 +21,6 @@ func (t *JLocation) Scan(v interface{}) error {
 	return jsoniter.Unmarshal(v.([]byte), t)
 }
 
-// JFloats float array
-type JFloats []float32
-
-// Value insert
-func (j JFloats) Value() (driver.Value, error) {
-	return jsoniter.Marshal(&j)
-}
-
-// Scan valueof
-func (t *JFloats) Scan(v interface{}) error {
-	return jsoniter.Unmarshal(v.([]byte), t)
-}
-
 // JMileage mileage
 type JMileage xproto.Mileage
 
@@ -59,98 +46,52 @@ func (t *JOil) Scan(v interface{}) error {
 	return jsoniter.Unmarshal(v.([]byte), t)
 }
 
-type JModule xproto.Module
+type JParam1 struct {
+	Obds      []xproto.Obd  `json:"obds"`
+	Tempers   []float32     `json:"temps"`
+	Humiditys []float32     `json:"humis"`
+	Module    xproto.Module `json:"mod"`   // 模块状态 json 字符串
+	Disks     []xproto.Disk `json:"disks"` // 磁盘 json 字符串
+}
 
 // Value insert
-func (j JModule) Value() (driver.Value, error) {
+func (j JParam1) Value() (driver.Value, error) {
 	return jsoniter.Marshal(&j)
 }
 
 // Scan valueof
-func (t *JModule) Scan(v interface{}) error {
-	return jsoniter.Unmarshal(v.([]byte), t)
+func (j *JParam1) Scan(v interface{}) error {
+	return jsoniter.Unmarshal(v.([]byte), j)
 }
 
-type JGsensor xproto.Gsensor
+type JParam2 struct {
+	Gsensor xproto.Gsensor `json:"gs"`   // GSensor json 字符串
+	People  xproto.People  `json:"peop"` // 人数统计 json 字符串
+	Vols    []float32      `json:"vols"`
+}
 
 // Value insert
-func (j JGsensor) Value() (driver.Value, error) {
+func (j JParam2) Value() (driver.Value, error) {
 	return jsoniter.Marshal(&j)
 }
 
 // Scan valueof
-func (t *JGsensor) Scan(v interface{}) error {
-	return jsoniter.Unmarshal(v.([]byte), t)
-}
-
-type JMobile xproto.Mobile
-
-// Value insert
-func (j JMobile) Value() (driver.Value, error) {
-	return jsoniter.Marshal(&j)
-}
-
-// Scan valueof
-func (t *JMobile) Scan(v interface{}) error {
-	return jsoniter.Unmarshal(v.([]byte), t)
-}
-
-type JDisks []xproto.Disk
-
-// Value insert
-func (j JDisks) Value() (driver.Value, error) {
-	return jsoniter.Marshal(&j)
-}
-
-// Scan valueof
-func (t *JDisks) Scan(v interface{}) error {
-	return jsoniter.Unmarshal(v.([]byte), t)
-}
-
-type JPeople xproto.People
-
-// Value insert
-func (j JPeople) Value() (driver.Value, error) {
-	return jsoniter.Marshal(&j)
-}
-
-// Scan valueof
-func (t *JPeople) Scan(v interface{}) error {
-	return jsoniter.Unmarshal(v.([]byte), t)
-}
-
-type JObds []xproto.Obd
-
-// Value insert
-func (j JObds) Value() (driver.Value, error) {
-	return jsoniter.Marshal(&j)
-}
-
-// Scan valueof
-func (t *JObds) Scan(v interface{}) error {
-	return jsoniter.Unmarshal(v.([]byte), t)
+func (j *JParam2) Scan(v interface{}) error {
+	return jsoniter.Unmarshal(v.([]byte), j)
 }
 
 // Status 状态数据
 type DevStatus struct {
-	ID       uint   `json:"id" gorm:"primary_key"`
-	DeviceID uint   `json:"deviceId" gorm:"index:idx_status"`
-	Flag     uint8  `json:"flag"`                                                  // 0-实时 1-补传 2-报警开始 3-报警结束
-	Acc      uint8  `json:"acc"`                                                   // acc
-	DTU      string `json:"dtu" gorm:"type:datetime;primary_key;index:idx_status"` // 时间
-
-	Location  JLocation `json:"location" gorm:"type:varchar(128);"` // location json 字符串
-	Obds      JObds     `json:"obds"`                               // obd json 字符串
-	Tempers   JFloats   `json:"tempers"`                            // 温度 json 字符串
-	Humiditys JFloats   `json:"humidity"`                           // 湿度 json 字符串
-	Mileage   JMileage  `json:"mileage"`                            // 里程 json 字符串
-	Oils      JOil      `json:"oils"`                               // 油耗 json 字符串
-	Module    JModule   `json:"module"`                             // 模块状态 json 字符串
-	Gsensor   JGsensor  `json:"gsensor"`                            // GSensor json 字符串
-	Mobile    JMobile   `json:"mobile"`                             // 移动网络 json 字符串
-	Disks     JDisks    `json:"disks"`                              // 磁盘 json 字符串
-	People    JPeople   `json:"people"`                             // 人数统计 json 字符串
-	Vols      JFloats   `json:"vols"`
+	ID       uint      `json:"id" gorm:"primary_key"`
+	DeviceID uint      `json:"deviceId" gorm:"index:idx_status"`
+	Flag     uint8     `json:"flag"`                                                  // 0-实时 1-补传 2-报警开始 3-报警结束
+	Acc      uint8     `json:"acc"`                                                   // acc
+	DTU      string    `json:"dtu" gorm:"type:datetime;primary_key;index:idx_status"` // 时间
+	Location JLocation `json:"loc" gorm:"type:varchar(128);"`                         // location json 字符串
+	Mileage  JMileage  `json:"mile" gorm:"type:varchar(32)"`                          // 里程 json 字符串
+	Oils     JOil      `json:"oils"  gorm:"type:varchar(32)"`                         // 油耗 json 字符串
+	P1       JParam1   `json:"p1" gorm:"type:varchar(512)"`
+	P2       JParam2   `json:"p2" gorm:"type:varchar(512)"`
 }
 
 // Value insert
@@ -165,7 +106,7 @@ func (j *DevStatus) Scan(v interface{}) error {
 
 // 分库
 var (
-	gStatusTabCount uint = 5
+	gStatusTabCount uint = 2
 )
 
 // TableName 表名

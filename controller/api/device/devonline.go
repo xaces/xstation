@@ -17,7 +17,7 @@ func (o *Online) ListHandler(c *gin.Context) {
 		ctx.JSONWriteError(err, c)
 		return
 	}
-	if p.checkDeviceNo() == 0 {
+	if p.isDeviceNoInvalid() {
 		ctx.JSONWriteError(errors.InvalidDeviceNo, c)
 		return
 	}

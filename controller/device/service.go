@@ -54,17 +54,20 @@ func devStatusModel(s *xproto.Status) *model.DevStatus {
 	}
 	o.Acc = s.Acc
 	o.Location = model.JLocation(s.Location)
-	o.Tempers = model.JFloats(s.Tempers)
-	o.Humiditys = model.JFloats(s.Humiditys)
 	o.Mileage = model.JMileage(s.Mileage)
 	o.Oils = model.JOil(s.Oils)
-	o.Module = model.JModule(s.Module)
-	o.Gsensor = model.JGsensor(s.Gsensor)
-	o.Mobile = model.JMobile(s.Mobile)
-	o.Disks = model.JDisks(s.Disks)
-	o.People = model.JPeople(s.People)
-	o.Obds = model.JObds(s.Obds)
-	o.Vols = model.JFloats(s.Vol)
+	o.P1 = model.JParam1{
+		Obds:      s.Obds,
+		Tempers:   s.Tempers,
+		Humiditys: s.Humiditys,
+		Module:    s.Module,
+		Disks:     s.Disks,
+	}
+	o.P2 = model.JParam2{
+		Gsensor: s.Gsensor,
+		People:  s.People,
+		Vols:    s.Vol,
+	}
 	return o
 }
 

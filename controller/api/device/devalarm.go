@@ -18,7 +18,7 @@ func (o *Alarm) ListHandler(c *gin.Context) {
 		ctx.JSONWriteError(err, c)
 		return
 	}
-	if p.checkDeviceNo() == 0 {
+	if p.isDeviceNoInvalid() {
 		ctx.JSONWriteError(errors.InvalidDeviceNo, c)
 		return
 	}
@@ -33,7 +33,7 @@ func (o *Alarm) ListDetailsHandler(c *gin.Context) {
 		ctx.JSONWriteError(err, c)
 		return
 	}
-	if p.checkDeviceNo() == 0 {
+	if p.isDeviceNoInvalid() {
 		ctx.JSONWriteError(errors.InvalidDeviceNo, c)
 		return
 	}

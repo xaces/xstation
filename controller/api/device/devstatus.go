@@ -20,14 +20,12 @@ func (o *Status) ListHandler(c *gin.Context) {
 		ctx.JSONWriteError(err, c)
 		return
 	}
-	var (
-		data  []model.DevStatus
-		total int64
-	)
-	devID := p.checkDeviceNo()
-	if devID > 0 {
-		total, _ = p.Status().Model(&model.DevStatus{DeviceID: devID}).Find(&data)
+	if p.isDeviceNoInvalid() {
+		ctx.JSONWriteError(errors.InvalidDeviceNo, c)
+		return
 	}
+	var data []model.DevStatus
+	total, _ := p.Status().Model(&model.DevStatus{DeviceID: p.deviceID}).Find(&data)
 	ctx.JSONWriteData(gin.H{"total": total, "data": data}, c)
 }
 
