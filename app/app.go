@@ -45,7 +45,7 @@ func Run() error {
 	}
 	if err := ftp.Run(&conf.Ftp); err == nil {
 		configs.FtpAddr = fmt.Sprintf("ftp://%s:%s@%s:%d", conf.Ftp.User, conf.Ftp.Pswd, conf.Host, conf.Ftp.Port)
-		log.Printf("Xftp ListenAndServe at %s\n", configs.FtpAddr)
+		log.Printf("xftp server listening at: %s\n", configs.FtpAddr)
 	}
 	device.NewHooks(conf.Hooks)
 	if err := access.Run(conf.Host, conf.Port.Access); err != nil {

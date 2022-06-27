@@ -304,14 +304,14 @@ func FtpTransferHandler(c *gin.Context) {
 
 // UserDefineHandler
 func UserDefineHandler(c *gin.Context) {
-	var param xproto.UserDefine
+	var param xproto.User
 	i, err := checkParam(c, &param)
 	if err != nil {
 		ctx.JSONWriteError(err, c)
 		return
 	}
 	var resp interface{}
-	if err := xproto.SyncSend(xproto.Req_UserDefine, param, &resp, i.deviceNo); err != nil {
+	if err := xproto.SyncSend(xproto.Req_User, param, &resp, i.deviceNo); err != nil {
 		ctx.JSONWriteError(err, c)
 		return
 	}
@@ -343,7 +343,6 @@ func requestRouter(r *gin.RouterGroup) {
 	r.POST("/ftpTransfer", FtpTransferHandler)
 	r.POST("/user", UserDefineHandler)
 	r.POST("/close", CloseLinkHandler)
-
 }
 
 func controlRouter(r *gin.RouterGroup) {

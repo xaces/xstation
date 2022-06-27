@@ -45,7 +45,7 @@ func Run(port uint16) {
 	}
 	pprof.Register(r)
 	go s.ListenAndServe()
-	log.Printf("Http ListenAndServe at %s\n", address)
+	log.Printf("http server listening at: %s\n", address)
 }
 
 func Shutdown() {
