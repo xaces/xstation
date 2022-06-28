@@ -9,8 +9,8 @@ import (
 	"xstation/model"
 	"xstation/util"
 
-	"github.com/wlgd/xutils/ctx"
-	"github.com/wlgd/xutils/orm"
+	"github.com/xaces/xutils/ctx"
+	"github.com/xaces/xutils/orm"
 	"gorm.io/gorm"
 
 	"github.com/gin-gonic/gin"

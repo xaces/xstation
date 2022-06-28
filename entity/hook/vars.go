@@ -1,6 +1,6 @@
 package hook
 
-import "github.com/wlgd/xproto"
+import "github.com/xaces/xproto"
 
 type Option struct {
 	Address string

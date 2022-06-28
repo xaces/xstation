@@ -5,8 +5,8 @@ import (
 	"xstation/model"
 
 	"github.com/gin-gonic/gin"
-	"github.com/wlgd/xutils/ctx"
-	"github.com/wlgd/xutils/orm"
+	"github.com/xaces/xutils/ctx"
+	"github.com/xaces/xutils/orm"
 )
 
 type Alarm struct {

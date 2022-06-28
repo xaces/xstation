@@ -5,7 +5,7 @@ import (
 	"fmt"
 
 	jsoniter "github.com/json-iterator/go"
-	"github.com/wlgd/xproto"
+	"github.com/xaces/xproto"
 )
 
 // JLocation

@@ -1,6 +1,6 @@
 package rpc
 
-import "github.com/wlgd/xutils/mq"
+import "github.com/xaces/xutils/mq"
 
 type natsclient struct {
 	Conn *mq.NatsClient

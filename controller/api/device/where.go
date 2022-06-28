@@ -3,7 +3,7 @@ package device
 import (
 	"xstation/entity/cache"
 
-	"github.com/wlgd/xutils/orm"
+	"github.com/xaces/xutils/orm"
 )
 
 // 搜索条件

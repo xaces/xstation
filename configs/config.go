@@ -7,7 +7,7 @@ import (
 	"xstation/app/ftp"
 	"xstation/entity/hook"
 
-	"github.com/wlgd/xutils"
+	"github.com/xaces/xutils"
 )
 
 type configure struct {

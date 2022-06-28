@@ -1,8 +1,8 @@
 package hook
 
 import (
-	"github.com/wlgd/xproto"
-	"github.com/wlgd/xutils/mq"
+	"github.com/xaces/xproto"
+	"github.com/xaces/xutils/mq"
 )
 
 type Nats struct {

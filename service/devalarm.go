@@ -3,7 +3,7 @@ package service
 import (
 	"xstation/model"
 
-	"github.com/wlgd/xutils/orm"
+	"github.com/xaces/xutils/orm"
 )
 
 func DevAlarmAdd(a *model.DevAlarmDetails) error {

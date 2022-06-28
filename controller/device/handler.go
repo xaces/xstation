@@ -8,8 +8,8 @@ import (
 	"xstation/service"
 
 	"github.com/panjf2000/ants/v2"
-	"github.com/wlgd/xproto"
-	"github.com/wlgd/xutils/orm"
+	"github.com/xaces/xproto"
+	"github.com/xaces/xutils/orm"
 )
 
 type Hook interface {

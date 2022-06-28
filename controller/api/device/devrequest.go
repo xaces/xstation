@@ -3,12 +3,12 @@ package device
 import (
 	"xstation/internal/errors"
 
-	"github.com/wlgd/xutils/ctx"
+	"github.com/xaces/xutils/ctx"
 
 	"os"
 
 	"github.com/gin-gonic/gin"
-	"github.com/wlgd/xproto"
+	"github.com/xaces/xproto"
 )
 
 type devInfo struct {

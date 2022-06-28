@@ -13,8 +13,8 @@ import (
 	"xstation/entity/task"
 	"xstation/model"
 
-	"github.com/wlgd/xutils"
-	"github.com/wlgd/xutils/orm"
+	"github.com/xaces/xutils"
+	"github.com/xaces/xutils/orm"
 )
 
 func getLocalDeivce() (err error) {

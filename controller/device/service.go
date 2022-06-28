@@ -4,8 +4,8 @@ import (
 	"xstation/model"
 	"xstation/util"
 
-	"github.com/wlgd/xproto"
-	"github.com/wlgd/xutils/orm"
+	"github.com/xaces/xproto"
+	"github.com/xaces/xutils/orm"
 )
 
 // 转换

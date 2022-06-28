@@ -3,7 +3,7 @@ package cache
 import (
 	"sync"
 
-	"github.com/wlgd/xproto"
+	"github.com/xaces/xproto"
 )
 
 type DeviceInfo struct {

@@ -5,7 +5,7 @@ import (
 	"xstation/model"
 
 	"github.com/FishGoddess/cachego"
-	"github.com/wlgd/xutils/orm"
+	"github.com/xaces/xutils/orm"
 )
 
 var (

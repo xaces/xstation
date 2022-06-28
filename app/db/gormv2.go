@@ -4,7 +4,7 @@ import (
 	"xstation/entity/task"
 	"xstation/model"
 
-	"github.com/wlgd/xutils/orm"
+	"github.com/xaces/xutils/orm"
 )
 
 type Option struct {

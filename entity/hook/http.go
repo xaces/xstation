@@ -1,8 +1,8 @@
 package hook
 
 import (
-	"github.com/wlgd/xproto"
-	"github.com/wlgd/xutils"
+	"github.com/xaces/xproto"
+	"github.com/xaces/xutils"
 )
 
 type Http struct {

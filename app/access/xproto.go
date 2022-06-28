@@ -3,10 +3,10 @@ package access
 import (
 	"xstation/controller/device"
 
-	"github.com/wlgd/xproto"
-	_ "github.com/wlgd/xproto/ho"
-	_ "github.com/wlgd/xproto/jt"
-	_ "github.com/wlgd/xproto/ttx"
+	_ "github.com/xaces/ho"
+	_ "github.com/xaces/jt"
+	_ "github.com/xaces/ttx"
+	"github.com/xaces/xproto"
 )
 
 var (
