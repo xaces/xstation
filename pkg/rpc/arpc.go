@@ -19,11 +19,11 @@ func NewArpc(addr string) IRpc {
 	return c
 }
 
-func (n *arpclient) Subscribe(topicstr string, handler func([]byte)) {
+func (n *arpclient) Subscribe(topicstr string, handler func([]byte)) error {
 	if n.Conn == nil {
-		return
+		return nil
 	}
-	n.Conn.Subscribe(topicstr, func(topic *pubsub.Topic) {
+	return n.Conn.Subscribe(topicstr, func(topic *pubsub.Topic) {
 		handler(topic.Data)
 	}, time.Second)
 }
@@ -35,7 +35,7 @@ func (n *arpclient) Publish(topicstr string, v interface{}) error {
 	return n.Conn.Publish(topicstr, v, 2*time.Second)
 }
 
-func (n *arpclient) Relase() {
+func (n *arpclient) Release() {
 	if n.Conn == nil {
 		return
 	}

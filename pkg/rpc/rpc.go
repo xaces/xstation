@@ -7,9 +7,9 @@ import (
 )
 
 type IRpc interface {
-	Subscribe(string, func([]byte))
+	Subscribe(string, func([]byte)) error
 	Publish(string, interface{}) error
-	Relase()
+	Release()
 }
 
 var gRpc IRpc
@@ -19,6 +19,7 @@ func Handler(b []byte) {
 	if j.LastError() != nil {
 		return
 	}
+	// fmt.Printf("%s\n", b)
 	code := j.Get("code").ToInt()
 	switch code {
 	case 5000: // 同步服务器信息
@@ -57,5 +58,5 @@ func Shutdown() {
 	if gRpc == nil {
 		return
 	}
-	gRpc.Relase()
+	gRpc.Release()
 }

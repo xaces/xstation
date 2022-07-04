@@ -6,7 +6,7 @@ import (
 	"github.com/xaces/xutils/orm"
 )
 
-func QueryById(v interface{}, c *gin.Context) {
+func QueryByID(v interface{}, c *gin.Context) {
 	id := ctx.ParamUInt(c, "id")
 	if err := orm.DbFirstById(v, id); err != nil {
 		ctx.JSONWriteError(err, c)

@@ -14,7 +14,7 @@ type configure struct {
 	Host    string
 	License string
 	Public  string
-	Guid    string
+	GUID    string
 	Port    struct {
 		Http   uint16
 		Access uint16

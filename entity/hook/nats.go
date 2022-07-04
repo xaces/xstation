@@ -6,52 +6,49 @@ import (
 )
 
 type Nats struct {
-	Conn *mq.NatsClient
-	Opt  Option
+	Cli *mq.Client
+	Option
 }
 
 func NewNats(o Option) *Nats {
-	if o.Address == "" {
-		o.Address = mq.DefaultURL
-	}
-	c := &Nats{Opt: o}
-	if conn, err := mq.NewNatsClient(o.Address, false); err == nil {
-		c.Conn = conn
+	c := &Nats{Option: o}
+	if conn, err := mq.NewPublish(&mq.Options{Address: o.Address, Goc: 4}, mq.NewNats); err == nil {
+		c.Cli = conn
 	}
 	return c
 }
 
-func (n *Nats) Online(deviceId uint, a *xproto.Access) {
-	if n.Conn == nil {
+func (o *Nats) PublishOnline(v *xproto.Access) {
+	if o.Cli == nil {
 		return
 	}
-	n.Conn.Publish(n.Opt.Online, newOnline(deviceId, a))
+	o.Cli.Publish(o.Online, &online{Code: 50001, Access: v})
 }
 
-func (n *Nats) Status(deviceId uint, s *xproto.Status) {
-	if n.Conn == nil {
+func (o *Nats) PublishStatus(v *xproto.Status) {
+	if o.Cli == nil {
 		return
 	}
-	n.Conn.Publish(n.Opt.Status, newStatus(deviceId, s))
+	o.Cli.Publish(o.Status, &status{Code: 50002, Status: v})
 }
 
-func (n *Nats) Alarm(deviceId uint, a *xproto.Alarm) {
-	if n.Conn == nil {
+func (o *Nats) PublishAlarm(v *xproto.Alarm) {
+	if o.Cli == nil {
 		return
 	}
-	n.Conn.Publish(n.Opt.Alarm, newAlarm(deviceId, a))
+	o.Cli.Publish(o.Alarm, &alarm{Code: 50003, Alarm: v})
 }
 
-func (n *Nats) Event(deviceId uint, e *xproto.Event) {
-	if n.Conn == nil {
+func (o *Nats) PublishEvent(v *xproto.Event) {
+	if o.Cli == nil {
 		return
 	}
-	n.Conn.Publish(n.Opt.Event, newEvent(deviceId, e))
+	o.Cli.Publish(o.Event, &event{Code: 50004, Event: v})
 }
 
-func (n *Nats) Stop() {
-	if n.Conn == nil {
+func (o *Nats) Stop() {
+	if o.Cli == nil {
 		return
 	}
-	n.Conn.Release()
+	o.Cli.Shutdown()
 }

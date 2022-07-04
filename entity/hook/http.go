@@ -6,36 +6,31 @@ import (
 )
 
 type Http struct {
-	urlOnline string
-	urlStatus string
-	urlAlarm  string
-	urlEvent  string
+	Option
 }
 
 func NewHttp(o Option) *Http {
-	return &Http{
-		urlOnline: o.Address + "/" + o.Online,
-		urlStatus: o.Address + "/" + o.Status,
-		urlAlarm:  o.Address + "/" + o.Alarm,
-		urlEvent:  o.Address + "/" + o.Event,
-	}
+	c := &Http{}
+	c.Online = o.Address + "/" + o.Online
+	c.Status = o.Address + "/" + o.Status
+	c.Alarm = o.Address + "/" + o.Alarm
+	c.Event = o.Address + "/" + o.Event
+	return c
 }
 
-func (h *Http) Online(deviceId uint, a *xproto.Access) {
-	xutils.HttpPost(h.urlOnline, newOnline(deviceId, a), nil)
+func (o *Http) PublishOnline(v *xproto.Access) {
+	xutils.HttpPost(o.Address+"/"+o.Online, &online{Code: 50001, Access: v}, nil)
 }
 
-func (h *Http) Status(deviceId uint, s *xproto.Status) {
-	xutils.HttpPost(h.urlStatus, newStatus(deviceId, s), nil)
+func (o *Http) PublishStatus(v *xproto.Status) {
+	xutils.HttpPost(o.Status, &status{Code: 50002, Status: v}, nil)
+}
+func (o *Http) PublishAlarm(v *xproto.Alarm) {
+	xutils.HttpPost(o.Alarm, &alarm{Code: 50003, Alarm: v}, nil)
+}
+func (o *Http) PublishEvent(v *xproto.Event) {
+	xutils.HttpPost(o.Event, &event{Code: 50004, Event: v}, nil)
 }
 
-func (h *Http) Alarm(deviceId uint, a *xproto.Alarm) {
-	xutils.HttpPost(h.urlAlarm, newAlarm(deviceId, a), nil)
-}
-
-func (h *Http) Event(deviceId uint, e *xproto.Event) {
-	xutils.HttpPost(h.urlEvent, newEvent(deviceId, e), nil)
-}
-
-func (h *Http) Stop() {
+func (o *Http) Stop() {
 }

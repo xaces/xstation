@@ -40,6 +40,6 @@ func Run(o *Option) error {
 	task.Timer.AddDbPartFunc(func() {
 		orm.NewPartiton(model.DevAlarm{}.TableName()).AlterRange("start_time", 30)
 	})
-	orm.SetDB(db.Debug())
+	// orm.SetDB(db.Debug())
 	return nil
 }

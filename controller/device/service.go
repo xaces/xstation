@@ -9,10 +9,10 @@ import (
 )
 
 // 转换
-func devOnlineUpdate(a *xproto.Access, s *xproto.Status, deviceId uint) error {
+func devOnlineUpdate(a *xproto.Access, s *xproto.Status) error {
 	o := &model.DevOnline{
 		GUID:          a.Session,
-		DeviceID:      deviceId,
+		DeviceID:      s.DeviceID,
 		RemoteAddress: a.RemoteAddress,
 		NetType:       int(a.NetType),
 		Type:          int(a.LinkType),
@@ -31,14 +31,14 @@ func devOnlineUpdate(a *xproto.Access, s *xproto.Status, deviceId uint) error {
 	return orm.DbUpdatesBy(o, []string{"offline_time, offline_status"}, "guid = ?", o.GUID)
 }
 
-func deviceUpdate(deviceId uint, a *xproto.Access) error {
+func deviceUpdate(a *xproto.Access) error {
 	o := &model.Device{
 		Type:           a.DevType,
 		Version:        a.Version,
 		Online:         a.Online,
 		LastOnlineTime: a.DeviceTime,
 	}
-	o.ID = deviceId
+	o.ID = a.DeviceID
 	return orm.DbUpdateModel(o)
 }
 
@@ -81,6 +81,7 @@ func devAlarmDetailsModel(a *xproto.Alarm) *model.DevAlarmDetails {
 		Data:      util.JString(a.Data),
 		DevStatus: devStatusModel(a.Status),
 	}
+	o.DeviceID = a.DeviceID
 	o.Flag = a.Status.Flag
 	o.DevStatus.Flag = 2
 	o.Status = 0

@@ -8,17 +8,8 @@ import (
 	"xstation/service"
 
 	"github.com/panjf2000/ants/v2"
-	"github.com/xaces/xproto"
 	"github.com/xaces/xutils/orm"
 )
-
-type Hook interface {
-	Online(deviceId uint, a *xproto.Access)
-	Status(deviceId uint, s *xproto.Status)
-	Alarm(deviceId uint, a *xproto.Alarm)
-	Event(deviceId uint, e *xproto.Event)
-	Stop()
-}
 
 type handler struct {
 	status chan *model.DevStatus
@@ -30,7 +21,7 @@ var (
 		status: make(chan *model.DevStatus, 50),
 		alarm:  make(chan *model.DevAlarmDetails, 1),
 	}
-	hooks []Hook
+	hooks []hook.Interface
 )
 
 func (o *handler) Disptah() {

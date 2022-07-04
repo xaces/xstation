@@ -12,6 +12,7 @@ import (
 	"xstation/entity/cache"
 	"xstation/entity/task"
 	"xstation/model"
+	"xstation/pkg/rpc"
 
 	"github.com/xaces/xutils"
 	"github.com/xaces/xutils/orm"
@@ -24,7 +25,7 @@ func getLocalDeivce() (err error) {
 		err = orm.DB().Model(&model.Device{}).Scan(&data).Error
 	} else {
 		configs.MsgProc = 1
-		url := fmt.Sprintf("%s/devices/%s", configs.Default.Super.Api, configs.Default.Guid)
+		url := fmt.Sprintf("%s/devices/%s", configs.Default.Super.Api, configs.Default.GUID)
 		err = xutils.HttpGet(url, &data)
 	}
 	for _, v := range data {
@@ -51,6 +52,7 @@ func Run() error {
 	if err := access.Run(conf.Host, conf.Port.Access); err != nil {
 		return err
 	}
+	rpc.Run(rpc.NewNats(conf.Hooks[0].Address), conf.Hooks[0].Status) // 订阅测试
 	router.Run(conf.Port.Http)
 	return nil
 }

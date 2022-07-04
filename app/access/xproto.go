@@ -2,10 +2,10 @@ package access
 
 import (
 	"xstation/controller/device"
-
-	_ "github.com/xaces/ho"
-	_ "github.com/xaces/jt"
-	_ "github.com/xaces/ttx"
+	
+	_ "github.com/xaces/xproto/jt"
+	_ "github.com/xaces/xproto/ttx"
+	_ "github.com/xaces/xproto/ho"
 	"github.com/xaces/xproto"
 )
 

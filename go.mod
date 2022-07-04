@@ -18,13 +18,10 @@ require (
 	github.com/panjf2000/ants/v2 v2.4.6
 	github.com/satori/go.uuid v1.2.0
 	github.com/unrolled/secure v1.0.9
-	github.com/xaces/ho v0.0.0-00010101000000-000000000000
-	github.com/xaces/jt v0.0.0-20220628073848-58ea8ec7ada8
-	github.com/xaces/ttx v0.0.0-00010101000000-000000000000
 	github.com/xaces/xproto v0.0.0-20220628072958-df937929e81c
 	github.com/xaces/xutils v0.0.0-20220628091733-0c4a51f21780
 	gorm.io/gorm v1.23.1
 )
 
-replace github.com/xaces/ho => ../ho
-replace github.com/xaces/ttx => ../ttx
+replace	github.com/xaces/xproto => ../../xproto
+replace	github.com/xaces/xutils => ../xutils
